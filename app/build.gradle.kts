@@ -79,4 +79,11 @@ dependencies {
 
     // Coil
     implementation(libs.coil.compose)
+
+    // Tests
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.androidx.core.testing)
+    testImplementation(libs.androidx.room.testing)
+    testImplementation(libs.androidx.core)
 }
