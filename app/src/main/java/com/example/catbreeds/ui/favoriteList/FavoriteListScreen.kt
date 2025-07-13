@@ -1,2 +1,31 @@
 package com.example.catbreeds.ui.favoriteList
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FavoriteListScreen() {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Favorites") }
+            )
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            Text("Favorite Breeds here")
+        }
+    }
+}
