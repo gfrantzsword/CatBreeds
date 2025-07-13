@@ -7,4 +7,7 @@ interface BreedRepository {
     fun getBreeds(): Flow<List<Breed>>
     suspend fun getBreedById(breedId: String): Breed?
     suspend fun refreshBreeds()
+    suspend fun addBreedToFavorites(breedId : String)
+    suspend fun removeBreedFromFavorites(breedId : String)
+    fun getFavoriteBreeds(): Flow<List<Breed>>
 }

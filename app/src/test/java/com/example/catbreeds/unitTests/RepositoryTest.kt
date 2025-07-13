@@ -1,6 +1,7 @@
 package com.example.catbreeds.unitTests
 
 import com.example.catbreeds.data.local.BreedDao
+import com.example.catbreeds.data.local.FavoriteDao
 import com.example.catbreeds.data.remote.RemoteService
 import com.example.catbreeds.data.repository.BreedRepositoryImpl
 import com.example.catbreeds.domain.utils.ConnectivityChecker
@@ -21,14 +22,16 @@ class RepositoryTest {
     private lateinit var repository: BreedRepositoryImpl
     private lateinit var remoteService: RemoteService
     private lateinit var breedDao: BreedDao
+    private lateinit var favoriteDao: FavoriteDao
     private lateinit var connectivityChecker: ConnectivityChecker
 
     @Before
     fun setup() {
         remoteService = mockk()
         breedDao = mockk()
+        favoriteDao = mockk()
         connectivityChecker = mockk()
-        repository = BreedRepositoryImpl(remoteService, breedDao, connectivityChecker)
+        repository = BreedRepositoryImpl(remoteService, breedDao, favoriteDao, connectivityChecker)
     }
 
     @Test

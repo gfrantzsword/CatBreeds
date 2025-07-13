@@ -15,7 +15,7 @@ data class BreedEntity(
     @ColumnInfo(name = "life_span") val life_span: String,
     @ColumnInfo(name = "reference_image_id") val reference_image_id: String
 ) {
-    fun toBreed(): Breed {
+    fun toBreed(isFavorite: Boolean = false): Breed {
         return Breed(
             id = id,
             name = name,
@@ -23,7 +23,8 @@ data class BreedEntity(
             description = description,
             temperament = temperament,
             life_span = life_span,
-            reference_image_id = reference_image_id
+            reference_image_id = reference_image_id,
+            isFavorite = isFavorite
         )
     }
 }

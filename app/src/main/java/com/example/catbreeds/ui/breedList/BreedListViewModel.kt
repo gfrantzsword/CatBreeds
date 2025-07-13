@@ -18,8 +18,17 @@ class BreedListViewModel @Inject constructor(
     private val _breeds = mutableStateOf<List<Breed>>(emptyList())
     val breeds: State<List<Breed>> = _breeds
 
+    private val _searchQuery = mutableStateOf("")
+    val searchQuery: State<String> = _searchQuery
+
+    private val _filteredBreeds = mutableStateOf<List<Breed>>(emptyList())
+    val filteredBreeds: State<List<Breed>> = _filteredBreeds
+
+    private val _favoriteBreedIds = mutableStateOf<Set<String>>(emptySet())
+
     init {
         observeBreeds()
+        observeFavorites()
         refreshBreeds()
     }
 
@@ -27,7 +36,24 @@ class BreedListViewModel @Inject constructor(
         viewModelScope.launch {
             breedRepository.getBreeds().collectLatest { breedList ->
                 _breeds.value = breedList
+                filterBreeds()
             }
+        }
+    }
+
+    private fun observeFavorites() {
+        viewModelScope.launch {
+            breedRepository.getFavoriteBreeds().collectLatest { favoriteBreeds ->
+                _favoriteBreedIds.value = favoriteBreeds.map { it.id }.toSet()
+                updateFilteredBreedsWithFavorites()
+            }
+        }
+    }
+
+    private fun updateFilteredBreedsWithFavorites() {
+        val favoriteIds = _favoriteBreedIds.value
+        _filteredBreeds.value = _filteredBreeds.value.map { breed ->
+            breed.copy(isFavorite = favoriteIds.contains(breed.id))
         }
     }
 
@@ -36,7 +62,54 @@ class BreedListViewModel @Inject constructor(
             try {
                 breedRepository.refreshBreeds()
             } catch (e: Exception) {
-                TODO("Handle exception")
+                // TODO: Handle error
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun updateSearchQuery(query: String) {
+        _searchQuery.value = query
+        filterBreeds()
+    }
+
+    private fun filterBreeds() {
+        val query = _searchQuery.value.lowercase()
+        val favoriteIds = _favoriteBreedIds.value
+
+        _filteredBreeds.value = if (query.isEmpty()) {
+            _breeds.value.map { breed ->
+                breed.copy(isFavorite = favoriteIds.contains(breed.id))
+            }
+        } else {
+            _breeds.value.filter { breed ->
+                breed.name.lowercase().contains(query) ||
+                        breed.origin.lowercase().contains(query) ||
+                        breed.temperament.lowercase().contains(query)
+            }.map { breed ->
+                breed.copy(isFavorite = favoriteIds.contains(breed.id))
+            }
+        }
+    }
+
+    fun toggleFavorite(breedId: String) {
+        viewModelScope.launch {
+            try {
+                val currentFavorites = _favoriteBreedIds.value
+                if (currentFavorites.contains(breedId)) {
+                    breedRepository.removeBreedFromFavorites(breedId)
+                } else {
+                    breedRepository.addBreedToFavorites(breedId)
+                }
+
+                val newFavorites = if (currentFavorites.contains(breedId)) {
+                    currentFavorites - breedId
+                } else {
+                    currentFavorites + breedId
+                }
+                _favoriteBreedIds.value = newFavorites
+                updateFilteredBreedsWithFavorites()
+            } catch (e: Exception) {
                 e.printStackTrace()
             }
         }

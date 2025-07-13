@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.example.catbreeds.data.connectivity.ConnectivityCheckerImpl
 import com.example.catbreeds.data.local.AppDatabase
 import com.example.catbreeds.data.local.BreedDao
+import com.example.catbreeds.data.local.FavoriteDao
 import com.example.catbreeds.data.remote.RemoteService
 import com.example.catbreeds.data.remote.RetrofitInstance
 import com.example.catbreeds.data.repository.BreedRepositoryImpl
@@ -44,6 +45,12 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideFavoriteDao(appDatabase: AppDatabase): FavoriteDao {
+        return appDatabase.favoriteDao()
+    }
+
+    @Provides
+    @Singleton
     fun provideConnectivityChecker(
         @ApplicationContext context: Context
     ): ConnectivityChecker {
@@ -55,9 +62,10 @@ object AppModule {
     fun provideBreedRepository(
         remoteService: RemoteService,
         localSource: BreedDao,
+        favoriteDao: FavoriteDao,
         connectivityChecker: ConnectivityChecker
     ): BreedRepository {
-        return BreedRepositoryImpl(remoteService, localSource, connectivityChecker)
+        return BreedRepositoryImpl(remoteService, localSource, favoriteDao, connectivityChecker)
     }
 
 }

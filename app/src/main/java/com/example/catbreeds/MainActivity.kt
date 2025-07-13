@@ -3,7 +3,6 @@ package com.example.catbreeds
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -19,15 +18,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.catbreeds.ui.breedDetail.BreedDetailScreen
 import com.example.catbreeds.ui.breedList.BreedListScreen
 import com.example.catbreeds.ui.favoriteList.FavoriteListScreen
-import com.example.catbreeds.ui.theme.CatBreedsTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlin.collections.contains
 
@@ -60,10 +58,26 @@ fun AppContent() {
             modifier = Modifier.padding(paddingValues)
         ) {
             composable("breeds") {
-                BreedListScreen()
+                BreedListScreen(
+                    onBreedClick = { breedId ->
+                        navController.navigate("breed_detail/$breedId")
+                    }
+                )
             }
             composable("favorites") {
-                FavoriteListScreen()
+                FavoriteListScreen(
+                    onBreedClick = { breedId ->
+                        navController.navigate("breed_detail/$breedId")
+                    }
+                )
+            }
+            composable("breed_detail/{breedId}") { backStackEntry ->
+                val breedId = backStackEntry.arguments?.getString("breedId")
+                breedId?.let {
+                    BreedDetailScreen(
+                        onBackClick = { navController.popBackStack() }
+                    )
+                }
             }
         }
     }

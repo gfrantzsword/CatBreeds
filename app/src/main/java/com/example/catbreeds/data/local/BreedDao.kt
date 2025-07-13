@@ -20,5 +20,4 @@ interface BreedDao {
     @Delete
     suspend fun delete(breed: BreedEntity)
 
-
 }
