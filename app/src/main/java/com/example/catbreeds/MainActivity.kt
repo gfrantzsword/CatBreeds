@@ -18,7 +18,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -27,6 +26,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.catbreeds.ui.breedDetail.BreedDetailScreen
 import com.example.catbreeds.ui.breedList.BreedListScreen
 import com.example.catbreeds.ui.favoriteList.FavoriteListScreen
+import com.example.catbreeds.ui.navigation.Screen
 import dagger.hilt.android.AndroidEntryPoint
 import kotlin.collections.contains
 
@@ -55,24 +55,24 @@ fun AppContent() {
     ) { paddingValues ->
         NavHost(
             navController = navController,
-            startDestination = "breeds",
+            startDestination = Screen.BreedList.route,
             modifier = Modifier.padding(top = paddingValues.calculateTopPadding())
         ) {
-            composable("breeds") {
+            composable(Screen.BreedList.route) {
                 BreedListScreen(
                     onBreedClick = { breedId ->
-                        navController.navigate("breed_detail/$breedId")
+                        navController.navigate(Screen.BreedDetail.createRoute(breedId))
                     }
                 )
             }
-            composable("favorites") {
+            composable(Screen.Favorites.route) {
                 FavoriteListScreen(
                     onBreedClick = { breedId ->
-                        navController.navigate("breed_detail/$breedId")
+                        navController.navigate(Screen.BreedDetail.createRoute(breedId))
                     }
                 )
             }
-            composable("breed_detail/{breedId}") { backStackEntry ->
+            composable(Screen.BreedDetail.route) { backStackEntry ->
                 val breedId = backStackEntry.arguments?.getString("breedId")
                 breedId?.let {
                     BreedDetailScreen(
@@ -89,18 +89,18 @@ fun BottomNavigationBar(navController: NavController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    val showBottomBar = currentRoute in listOf("breeds", "favorites")
+    val showBottomBar = currentRoute in listOf(Screen.BreedList.route, Screen.Favorites.route)
 
     if (showBottomBar) {
         NavigationBar {
             NavigationBarItem(
                 icon = { Icon(Icons.Default.Home, contentDescription = "Breeds") },
                 label = { Text("Breeds") },
-                selected = currentRoute == "breeds",
+                selected = currentRoute == Screen.BreedList.route,
                 onClick = {
-                    if (currentRoute != "breeds") {
-                        navController.navigate("breeds") {
-                            popUpTo("breeds") { inclusive = true }
+                    if (currentRoute != Screen.BreedList.route) {
+                        navController.navigate(Screen.BreedList.route) {
+                            popUpTo(Screen.BreedList.route) { inclusive = true }
                         }
                     }
                 }
@@ -108,11 +108,11 @@ fun BottomNavigationBar(navController: NavController) {
             NavigationBarItem(
                 icon = { Icon(Icons.Default.Favorite, contentDescription = "Favorites") },
                 label = { Text("Favorites") },
-                selected = currentRoute == "favorites",
+                selected = currentRoute == Screen.Favorites.route,
                 onClick = {
-                    if (currentRoute != "favorites") {
-                        navController.navigate("favorites") {
-                            popUpTo("breeds")
+                    if (currentRoute != Screen.Favorites.route) {
+                        navController.navigate(Screen.Favorites.route) {
+                            popUpTo(Screen.BreedList.route)
                         }
                     }
                 }
