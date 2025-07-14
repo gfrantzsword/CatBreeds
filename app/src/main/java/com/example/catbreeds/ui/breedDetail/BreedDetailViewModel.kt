@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.catbreeds.domain.models.Breed
 import com.example.catbreeds.domain.repository.BreedRepository
+import com.example.catbreeds.domain.utils.ErrorMessages
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -22,6 +23,9 @@ class BreedDetailViewModel @Inject constructor(
     val breed: State<Breed?> = _breed
 
     private val breedId = savedStateHandle.get<String>("breedId")
+
+    private val _errorMessage = mutableStateOf<String?>(null)
+    val errorMessage: State<String?> = _errorMessage
 
     init {
         breedId?.let { id ->
@@ -67,8 +71,13 @@ class BreedDetailViewModel @Inject constructor(
                     }
                 }
             } catch (e: Exception) {
+                throw Exception(ErrorMessages.LOCAL_ERROR, e)
                 e.printStackTrace()
             }
         }
+    }
+
+    fun clearError() {
+        _errorMessage.value = null
     }
 }

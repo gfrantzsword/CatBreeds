@@ -8,6 +8,7 @@ import com.example.catbreeds.data.remote.RemoteService
 import com.example.catbreeds.domain.models.Breed
 import com.example.catbreeds.domain.repository.BreedRepository
 import com.example.catbreeds.domain.utils.ConnectivityChecker
+import com.example.catbreeds.domain.utils.ErrorMessages
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -30,7 +31,7 @@ class BreedRepositoryImpl(
 
     override suspend fun refreshBreeds() {
         if (!connectivityChecker.isConnected()) {
-            throw Exception("No internet connection")
+            throw Exception(ErrorMessages.NO_INTERNET_CONNECTION)
         }
 
         try {
@@ -47,10 +48,9 @@ class BreedRepositoryImpl(
                     reference_image_id = breed.reference_image_id.toString()
                 )
             }
-
             localSource.insertAll(breedEntities)
         } catch (e: Exception) {
-            throw Exception("Error refreshing breeds", e)
+            throw Exception(ErrorMessages.NETWORK_ERROR, e)
         }
     }
 

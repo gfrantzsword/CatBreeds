@@ -7,6 +7,7 @@ import com.example.catbreeds.domain.models.Breed
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.State
 import com.example.catbreeds.domain.repository.BreedRepository
+import com.example.catbreeds.domain.utils.ErrorMessages
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
 import javax.inject.Inject
@@ -25,6 +26,9 @@ class BreedListViewModel @Inject constructor(
     val filteredBreeds: State<List<Breed>> = _filteredBreeds
 
     private val _favoriteBreedIds = mutableStateOf<Set<String>>(emptySet())
+
+    private val _errorMessage = mutableStateOf<String?>(null)
+    val errorMessage: State<String?> = _errorMessage
 
     init {
         observeBreeds()
@@ -62,8 +66,10 @@ class BreedListViewModel @Inject constructor(
             try {
                 breedRepository.refreshBreeds()
             } catch (e: Exception) {
-                // TODO: Handle error
-                e.printStackTrace()
+                _errorMessage.value = when (e.message) {
+                    ErrorMessages.NO_INTERNET_CONNECTION -> ErrorMessages.NO_INTERNET_CONNECTION
+                    else -> ErrorMessages.NETWORK_ERROR
+                }
             }
         }
     }
@@ -113,5 +119,9 @@ class BreedListViewModel @Inject constructor(
                 e.printStackTrace()
             }
         }
+    }
+
+    fun clearError() {
+        _errorMessage.value = null
     }
 }

@@ -35,6 +35,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.catbreeds.domain.models.Breed
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.remember
+import com.example.catbreeds.ui.util.ErrorHandler
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,6 +47,15 @@ fun FavoriteListScreen(
 ) {
     val favoriteBreeds by viewModel.favoriteBreeds
     val isLoading by viewModel.isLoading
+
+    val errorMessage by viewModel.errorMessage
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    ErrorHandler(
+        errorMessage = errorMessage,
+        snackbarHostState = snackbarHostState,
+        onErrorShown = viewModel::clearError
+    )
 
     Scaffold(
         topBar = {

@@ -22,6 +22,9 @@ class FavoriteListViewModel @Inject constructor(
     private val _isLoading = mutableStateOf(false)
     val isLoading: State<Boolean> = _isLoading
 
+    private val _errorMessage = mutableStateOf<String?>(null)
+    val errorMessage: State<String?> = _errorMessage
+
     init {
         loadFavoriteBreeds()
     }
@@ -50,5 +53,9 @@ class FavoriteListViewModel @Inject constructor(
                 e.printStackTrace()
             }
         }
+    }
+
+    fun clearError() {
+        _errorMessage.value = null
     }
 }

@@ -22,10 +22,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,6 +38,7 @@ import androidx.compose.ui.unit.sp
 import com.example.catbreeds.domain.models.Breed
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.example.catbreeds.ui.util.ErrorHandler
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,6 +47,15 @@ fun BreedListScreen(
     viewModel: BreedListViewModel = hiltViewModel(),
     onBreedClick: (String) -> Unit
 ) {
+    val errorMessage by viewModel.errorMessage
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    ErrorHandler(
+        errorMessage = errorMessage,
+        snackbarHostState = snackbarHostState,
+        onErrorShown = viewModel::clearError
+    )
+
     val breeds by viewModel.breeds
     val searchQuery by viewModel.searchQuery
     val filteredBreeds by viewModel.filteredBreeds
@@ -52,7 +65,8 @@ fun BreedListScreen(
             TopAppBar(
                 title = { Text("Cat Breeds") }
             )
-        }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         Column(
             modifier = Modifier
