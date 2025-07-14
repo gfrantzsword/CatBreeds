@@ -1,4 +1,4 @@
-This project was developed as part of a coding challenge for [Sword Health](https://swordhealth.com/)
+This project was developed as part of a technical challenge to demonstrate Android development skills and modern architectural patterns.
 
 # Cat Breeds - Android App
 A modern Android application built with Kotlin that integrates with [The Cat API](https://thecatapi.com/) to showcase cat breeds. This project demonstrates a clean separation of concerns with an MVVM architecture, Jetpack Compose UI, offline functionality, unit testing, error handling, and follows Android development best practices.
