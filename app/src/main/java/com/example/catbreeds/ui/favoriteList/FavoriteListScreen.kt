@@ -1,5 +1,6 @@
 package com.example.catbreeds.ui.favoriteList
 
+import android.R
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,8 +36,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.catbreeds.domain.models.Breed
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.remember
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import com.example.catbreeds.ui.util.ErrorHandler
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -148,8 +153,14 @@ fun FavoriteBreedCard(
         ) {
             AsyncImage(
                 model = "https://cdn2.thecatapi.com/images/${breed.reference_image_id}.jpg",
-                contentDescription = null,
-                modifier = Modifier.size(80.dp)
+                contentDescription = "Image of ${breed.name}",
+                modifier = Modifier
+                    .size(height = 100.dp, width = 100.dp)
+                    .padding(end = 16.dp)
+                    .clip(RoundedCornerShape(8.dp)),
+                contentScale = ContentScale.Crop,
+                placeholder = painterResource(id = R.drawable.ic_menu_report_image),
+                error = painterResource(id = R.drawable.ic_menu_close_clear_cancel)
             )
 
             Column(modifier = Modifier.weight(1f)) {
