@@ -21,7 +21,6 @@ class BreedDetailViewModel @Inject constructor(
 
     private val _breed = mutableStateOf<Breed?>(null)
     val breed: State<Breed?> = _breed
-
     private val breedId = savedStateHandle.get<String>("breedId")
 
     private val _errorMessage = mutableStateOf<String?>(null)
@@ -34,6 +33,7 @@ class BreedDetailViewModel @Inject constructor(
         }
     }
 
+    // Fetches the data from local database
     private fun fetchBreedDetail(breedId: String) {
         viewModelScope.launch {
             try {
@@ -45,6 +45,7 @@ class BreedDetailViewModel @Inject constructor(
         }
     }
 
+    // Observes for changes on the favorites button
     private fun observeFavorites(breedId: String) {
         viewModelScope.launch {
             breedRepository.getFavoriteBreeds().collectLatest { favoriteBreeds ->

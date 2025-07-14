@@ -48,15 +48,16 @@ fun BreedDetailScreen(
 ) {
     val breed by viewModel.breed
 
+    // To handle snackbar and error messages
     val errorMessage by viewModel.errorMessage
     val snackbarHostState = remember { SnackbarHostState() }
-
     ErrorHandler(
         errorMessage = errorMessage,
         snackbarHostState = snackbarHostState,
         onErrorShown = viewModel::clearError
     )
 
+    // Content
     Scaffold(
         topBar = {
             TopAppBar(
@@ -89,6 +90,7 @@ fun BreedDetailScreen(
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+                // Cat image
                 AsyncImage(
                     model = "https://cdn2.thecatapi.com/images/${breed.reference_image_id}.jpg",
                     contentDescription = "Image of ${breed.name}",
@@ -99,6 +101,7 @@ fun BreedDetailScreen(
                     placeholder = painterResource(id = R.drawable.ic_menu_report_image),
                     error = painterResource(id = R.drawable.ic_menu_close_clear_cancel)
                 )
+                // Name and origin
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,

@@ -45,6 +45,7 @@ class BreedListViewModel @Inject constructor(
         }
     }
 
+    // Observes for changes on the favorites button
     private fun observeFavorites() {
         viewModelScope.launch {
             breedRepository.getFavoriteBreeds().collectLatest { favoriteBreeds ->
@@ -61,6 +62,7 @@ class BreedListViewModel @Inject constructor(
         }
     }
 
+    // Fetches new data from the API and loads into the local database
     private fun refreshBreeds() {
         viewModelScope.launch {
             try {

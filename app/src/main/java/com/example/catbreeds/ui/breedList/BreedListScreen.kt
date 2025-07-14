@@ -44,26 +44,26 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.catbreeds.ui.util.ErrorHandler
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BreedListScreen(
     viewModel: BreedListViewModel = hiltViewModel(),
     onBreedClick: (String) -> Unit
 ) {
+    val breeds by viewModel.breeds
+    val searchQuery by viewModel.searchQuery
+    val filteredBreeds by viewModel.filteredBreeds
+
+    // Handles snackbar and error messages
     val errorMessage by viewModel.errorMessage
     val snackbarHostState = remember { SnackbarHostState() }
-
     ErrorHandler(
         errorMessage = errorMessage,
         snackbarHostState = snackbarHostState,
         onErrorShown = viewModel::clearError
     )
 
-    val breeds by viewModel.breeds
-    val searchQuery by viewModel.searchQuery
-    val filteredBreeds by viewModel.filteredBreeds
-
+    // Content
     Scaffold(
         topBar = {
             TopAppBar(
@@ -87,7 +87,7 @@ fun BreedListScreen(
                     .padding(16.dp)
             )
 
-            // Content
+            // List
             if (breeds.isEmpty()) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -126,6 +126,7 @@ fun BreedCard(
             .clickable { onClick() }
     ) {
         Column {
+            // Cat image
             AsyncImage(
                 model = "https://cdn2.thecatapi.com/images/${breed.reference_image_id}.jpg",
                 contentDescription = "Image of ${breed.name}",
@@ -137,6 +138,7 @@ fun BreedCard(
                 error = painterResource(id = R.drawable.ic_menu_close_clear_cancel)
             )
 
+            // Name and origin
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -156,6 +158,7 @@ fun BreedCard(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
+                // Favorite button
                 IconButton(onClick = onFavoriteClick) {
                     Icon(
                         imageVector = if (breed.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,

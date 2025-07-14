@@ -53,15 +53,16 @@ fun FavoriteListScreen(
     val favoriteBreeds by viewModel.favoriteBreeds
     val isLoading by viewModel.isLoading
 
+    // Handles snackbar and error messages
     val errorMessage by viewModel.errorMessage
     val snackbarHostState = remember { SnackbarHostState() }
-
     ErrorHandler(
         errorMessage = errorMessage,
         snackbarHostState = snackbarHostState,
         onErrorShown = viewModel::clearError
     )
 
+    // Content
     Scaffold(
         topBar = {
             TopAppBar(
@@ -91,6 +92,7 @@ fun FavoriteListScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
+                        // When there are no favorite breeds
                         Icon(
                             Icons.Default.Favorite,
                             contentDescription = null,
@@ -145,6 +147,7 @@ fun FavoriteBreedCard(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // Cat image
             AsyncImage(
                 model = "https://cdn2.thecatapi.com/images/${breed.reference_image_id}.jpg",
                 contentDescription = "Image of ${breed.name}",
@@ -157,8 +160,8 @@ fun FavoriteBreedCard(
                 error = painterResource(id = R.drawable.ic_menu_close_clear_cancel)
             )
 
+            // Name, origin, and average lifespan
             Column(modifier = Modifier.weight(1f)) {
-
                 Text(
                     text = breed.name,
                     fontSize = 18.sp,
@@ -170,6 +173,7 @@ fun FavoriteBreedCard(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
+                // 'Average lifespan' actually uses the lower value of the range ('12 - 15' is 12)
                 val lowerLifeSpan = breed.life_span.split(" - ").firstOrNull()?.trim()
                 lowerLifeSpan?.let {
                     Text(
@@ -179,6 +183,7 @@ fun FavoriteBreedCard(
                     )
                 }
             }
+            // Favorite button
             IconButton(onClick = onRemoveFromFavorites) {
                 Icon(
                     Icons.Default.Favorite,

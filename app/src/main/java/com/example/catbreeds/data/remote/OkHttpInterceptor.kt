@@ -4,6 +4,7 @@ import com.example.catbreeds.BuildConfig
 import okhttp3.Interceptor
 import okhttp3.Response
 
+// Utilizes the API key from the local.properties file
 class OkHttpInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest = chain.request()

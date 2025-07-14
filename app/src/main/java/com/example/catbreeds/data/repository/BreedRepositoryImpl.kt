@@ -19,16 +19,20 @@ class BreedRepositoryImpl(
     private val favoriteLocalSource: FavoriteDao,
     private val connectivityChecker: ConnectivityChecker
 ) : BreedRepository {
+
+    // Fetches the breeds from the local database
     override fun getBreeds(): Flow<List<Breed>> {
         return localSource.getAll().map { entities ->
             entities.map { it.toBreed() }
         }
     }
 
+    // Fetches a single breed from the local database
     override suspend fun getBreedById(breedId: String): Breed? {
         return localSource.getById(breedId)?.toBreed()
     }
 
+    // Fetches the breeds from the API and updates de local database with it
     override suspend fun refreshBreeds() {
         if (!connectivityChecker.isConnected()) {
             throw Exception(ErrorMessages.NO_INTERNET_CONNECTION)
@@ -54,14 +58,17 @@ class BreedRepositoryImpl(
         }
     }
 
+    // Adds a breed's id to the 'favorites' local database
     override suspend fun addBreedToFavorites(breedId: String) {
         favoriteLocalSource.insert(FavoriteEntity(breedId))
     }
 
+    // Removes a breed's id from the 'favorites' local database
     override suspend fun removeBreedFromFavorites(breedId: String) {
         favoriteLocalSource.delete(FavoriteEntity(breedId))
     }
 
+    // Gets all the breeds from the local database that are marked as favorites
     override fun getFavoriteBreeds(): Flow<List<Breed>> {
         return flow {
             val favoriteEntities = favoriteLocalSource.getAll()
