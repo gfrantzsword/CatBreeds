@@ -101,7 +101,7 @@ class RepositoryTest {
             repository.refreshBreeds()
             fail("Expected exception to be thrown")
         } catch (e: Exception) {
-            assertEquals("Error refreshing breeds", e.message)
+            assertEquals("Something went wrong. Please try again later", e.message)
         }
     }
 }
