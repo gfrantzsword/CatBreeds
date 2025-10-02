@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "CatBreeds"
 include(":app")
- 
+include(":domain")
