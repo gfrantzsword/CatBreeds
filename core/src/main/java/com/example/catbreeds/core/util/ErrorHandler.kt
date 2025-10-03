@@ -1,4 +1,4 @@
-package com.example.catbreeds.ui.util
+package com.example.catbreeds.core.util
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect

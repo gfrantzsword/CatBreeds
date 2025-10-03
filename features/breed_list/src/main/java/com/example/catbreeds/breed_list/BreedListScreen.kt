@@ -1,4 +1,4 @@
-package com.example.catbreeds.ui.breedList
+package com.example.catbreeds.breed_list
 
 import android.R
 import androidx.compose.foundation.clickable
@@ -42,7 +42,7 @@ import androidx.compose.ui.unit.sp
 import com.example.catbreeds.domain.models.Breed
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
-import com.example.catbreeds.ui.util.ErrorHandler
+import com.example.catbreeds.core.util.ErrorHandler
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

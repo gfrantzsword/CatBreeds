@@ -42,7 +42,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import com.example.catbreeds.ui.util.ErrorHandler
+import com.example.catbreeds.core.util.ErrorHandler
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

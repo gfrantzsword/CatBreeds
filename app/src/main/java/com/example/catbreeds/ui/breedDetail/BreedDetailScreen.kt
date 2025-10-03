@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
-import com.example.catbreeds.ui.util.ErrorHandler
+import com.example.catbreeds.core.util.ErrorHandler
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

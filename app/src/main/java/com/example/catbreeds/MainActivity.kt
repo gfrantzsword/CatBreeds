@@ -24,7 +24,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.catbreeds.ui.breedDetail.BreedDetailScreen
-import com.example.catbreeds.ui.breedList.BreedListScreen
+import com.example.catbreeds.breed_list.BreedListScreen
 import com.example.catbreeds.ui.favoriteList.FavoriteListScreen
 import com.example.catbreeds.ui.navigation.Screen
 import dagger.hilt.android.AndroidEntryPoint

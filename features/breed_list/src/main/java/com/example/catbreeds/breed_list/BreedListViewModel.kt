@@ -1,4 +1,4 @@
-package com.example.catbreeds.ui.breedList
+package com.example.catbreeds.breed_list
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
