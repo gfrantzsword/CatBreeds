@@ -1,4 +1,4 @@
-package com.example.catbreeds.ui.navigation
+package com.example.catbreeds.core.ui.navigation
 
 sealed class Screen(val route: String) {
     object BreedList : Screen("breeds")

@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.catbreeds.domain.models.Breed
 import com.example.catbreeds.domain.repository.BreedRepository
-import com.example.catbreeds.domain.utils.ErrorMessages
+import com.example.catbreeds.core.util.ErrorMessages
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch

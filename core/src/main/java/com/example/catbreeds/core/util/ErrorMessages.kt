@@ -1,4 +1,4 @@
-package com.example.catbreeds.domain.utils
+package com.example.catbreeds.core.util
 
 object ErrorMessages {
     const val NO_INTERNET_CONNECTION = "No internet connection"

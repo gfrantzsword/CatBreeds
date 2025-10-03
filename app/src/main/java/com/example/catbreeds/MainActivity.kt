@@ -26,7 +26,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.catbreeds.breed_detail.BreedDetailScreen
 import com.example.catbreeds.breed_list.BreedListScreen
 import com.example.catbreeds.favorite_list.FavoriteListScreen
-import com.example.catbreeds.ui.navigation.Screen
+import com.example.catbreeds.core.ui.navigation.Screen
 import dagger.hilt.android.AndroidEntryPoint
 import kotlin.collections.contains
 
