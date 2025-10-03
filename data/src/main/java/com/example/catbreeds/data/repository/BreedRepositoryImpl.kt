@@ -7,8 +7,8 @@ import com.example.catbreeds.data.local.FavoriteEntity
 import com.example.catbreeds.data.remote.RemoteService
 import com.example.catbreeds.domain.models.Breed
 import com.example.catbreeds.domain.repository.BreedRepository
-import com.example.catbreeds.domain.utils.ConnectivityChecker
-import com.example.catbreeds.domain.utils.ErrorMessages
+import com.example.catbreeds.core.util.ConnectivityChecker
+import com.example.catbreeds.core.util.ErrorMessages
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map

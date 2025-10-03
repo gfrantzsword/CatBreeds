@@ -10,7 +10,7 @@ import com.example.catbreeds.data.remote.RemoteService
 import com.example.catbreeds.data.remote.RetrofitInstance
 import com.example.catbreeds.data.repository.BreedRepositoryImpl
 import com.example.catbreeds.domain.repository.BreedRepository
-import com.example.catbreeds.domain.utils.ConnectivityChecker
+import com.example.catbreeds.core.util.ConnectivityChecker
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

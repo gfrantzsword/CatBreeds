@@ -3,7 +3,7 @@ package com.example.catbreeds.data.connectivity
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import com.example.catbreeds.domain.utils.ConnectivityChecker
+import com.example.catbreeds.core.util.ConnectivityChecker
 
 class ConnectivityCheckerImpl(private val context: Context) : ConnectivityChecker {
     override fun isConnected(): Boolean {

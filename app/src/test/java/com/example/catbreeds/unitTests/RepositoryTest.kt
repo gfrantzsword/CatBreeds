@@ -4,7 +4,7 @@ import com.example.catbreeds.data.local.BreedDao
 import com.example.catbreeds.data.local.FavoriteDao
 import com.example.catbreeds.data.remote.RemoteService
 import com.example.catbreeds.data.repository.BreedRepositoryImpl
-import com.example.catbreeds.domain.utils.ConnectivityChecker
+import com.example.catbreeds.core.util.ConnectivityChecker
 import com.example.catbreeds.unitTests.utils.TestUtils
 import io.mockk.coEvery
 import io.mockk.coVerify

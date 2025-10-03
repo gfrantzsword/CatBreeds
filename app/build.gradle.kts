@@ -49,6 +49,10 @@ android {
 dependencies {
     implementation(project(":domain"))
     implementation(project(":data"))
+    implementation(project(":core"))
+    implementation(project(":features:breed_list"))
+    implementation(project(":features:breed_detail"))
+    implementation(project(":features:favorite_list"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
