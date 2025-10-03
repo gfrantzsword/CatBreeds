@@ -1,6 +1,6 @@
 package com.example.catbreeds.data.remote
 
-import com.example.catbreeds.BuildConfig
+import com.example.catbreeds.data.BuildConfig
 import okhttp3.Interceptor
 import okhttp3.Response
 
@@ -10,7 +10,6 @@ class OkHttpInterceptor : Interceptor {
         val originalRequest = chain.request()
         val requestBuilder = originalRequest.newBuilder()
             .header("x-api-key", BuildConfig.API_KEY)
-            .method(originalRequest.method, originalRequest.body)
         val request = requestBuilder.build()
         return chain.proceed(request)
     }

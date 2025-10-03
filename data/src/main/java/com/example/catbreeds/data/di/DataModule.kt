@@ -20,7 +20,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object AppModule {
+object DataModule {
     @Provides
     @Singleton
     fun provideRemoteService(): RemoteService {
@@ -67,5 +67,4 @@ object AppModule {
     ): BreedRepository {
         return BreedRepositoryImpl(remoteService, localSource, favoriteDao, connectivityChecker)
     }
-
 }
