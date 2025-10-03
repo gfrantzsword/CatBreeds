@@ -1,4 +1,4 @@
-package com.example.catbreeds.ui.breedDetail
+package com.example.catbreeds.breed_detail
 
 import android.R
 import androidx.compose.foundation.layout.Arrangement
