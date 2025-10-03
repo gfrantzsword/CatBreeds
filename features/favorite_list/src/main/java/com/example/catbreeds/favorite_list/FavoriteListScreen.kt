@@ -1,4 +1,4 @@
-package com.example.catbreeds.ui.favoriteList
+package com.example.catbreeds.favorite_list
 
 import android.R
 import androidx.compose.foundation.clickable
