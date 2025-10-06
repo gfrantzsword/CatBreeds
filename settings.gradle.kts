@@ -23,3 +23,7 @@ rootProject.name = "CatBreeds"
 include(":app")
 include(":domain")
 include(":data")
+include(":core")
+include(":features:breed_list")
+include(":features:breed_detail")
+include(":features:favorite_list")
