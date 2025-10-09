@@ -1,4 +1,4 @@
-package com.example.catbreeds.unitTests
+package com.example.catbreeds.data.unitTests
 
 import android.content.Context
 import android.net.ConnectivityManager

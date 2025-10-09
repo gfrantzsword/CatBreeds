@@ -1,8 +1,7 @@
-package com.example.catbreeds.unitTests
+package com.example.catbreeds.data.unitTests
 
 import com.example.catbreeds.data.local.BreedEntity
 import com.example.catbreeds.domain.models.Breed
-import com.example.catbreeds.unitTests.utils.TestUtils
 import org.junit.Test
 import org.junit.Assert.*
 
@@ -64,22 +63,5 @@ class ModelTest {
         assertEquals(entity.temperament, breed.temperament)
         assertEquals(entity.life_span, breed.life_span)
         assertEquals(entity.reference_image_id, breed.reference_image_id)
-    }
-
-    @Test
-    fun `sample breed from TestUtils has correct structure`() {
-        val sampleBreed = TestUtils.getSampleBreed()
-
-        assertNotNull(sampleBreed.id)
-        assertNotNull(sampleBreed.name)
-        assertNotNull(sampleBreed.origin)
-        assertNotNull(sampleBreed.description)
-        assertNotNull(sampleBreed.temperament)
-        assertNotNull(sampleBreed.life_span)
-        assertNotNull(sampleBreed.reference_image_id)
-
-        assertTrue(sampleBreed.id.isNotEmpty())
-        assertTrue(sampleBreed.name.isNotEmpty())
-        assertTrue(sampleBreed.description.isNotEmpty())
     }
 }
