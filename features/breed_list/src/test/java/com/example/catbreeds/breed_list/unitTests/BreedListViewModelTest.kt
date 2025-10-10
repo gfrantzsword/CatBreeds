@@ -25,10 +25,10 @@ import org.junit.Test
 // Mock data
 object TestBreedListData {
     fun getTestBreeds(): List<Breed> = listOf(
-        Breed("sibe", "Siberian", "Siberia", "Playful, Calm", "10 - 15", "desc", "sibe_ref", false),
-        Breed("pers", "Persian", "Iran", "Reserved, Quiet", "12 - 14", "desc", "pers_ref", false),
-        Breed("beng", "Bengal", "USA", "Active, Energetic", "9 - 12", "desc", "beng_ref", false),
-        Breed("mcoo", "Maine Coon", "USA", "Gentle, Playful", "12 - 15", "desc", "mcoo_ref", false)
+        Breed("sibe", "Siberian", "desc", "Playful, Calm", "Siberia", "10 - 15", "sibe_ref", false),
+        Breed("pers", "Persian", "desc", "Reserved, Quiet", "Iran", "12 - 14", "pers_ref", false),
+        Breed("beng", "Bengal", "desc", "Active, Energetic", "USA", "9 - 12", "beng_ref", false),
+        Breed("mcoo", "Maine Coon", "desc", "Gentle, Playful", "USA", "12 - 15", "mcoo_ref", false)
     )
 }
 
@@ -160,22 +160,31 @@ class BreedListViewModelTest {
         val breedId = testBreed.id
 
         val favoriteBreedsFlow = MutableStateFlow(emptyList<Breed>())
+        val favoriteBreed = testBreed.copy(isFavorite = true)
+
         every { breedRepository.getBreeds() } returns flowOf(listOf(testBreed))
         every { breedRepository.getFavoriteBreeds() } returns favoriteBreedsFlow
         coEvery { breedRepository.refreshBreeds() } returns Unit
-        coEvery { breedRepository.addBreedToFavorites(breedId) } returns Unit
-        coEvery { breedRepository.removeBreedFromFavorites(breedId) } returns Unit
+        coEvery { breedRepository.addBreedToFavorites(breedId) } answers {
+            favoriteBreedsFlow.value = listOf(favoriteBreed)
+        }
+        coEvery { breedRepository.removeBreedFromFavorites(breedId) } answers {
+            favoriteBreedsFlow.value = emptyList()
+        }
 
         viewModel = BreedListViewModel(breedRepository)
         testDispatcher.scheduler.advanceUntilIdle()
 
-        viewModel.toggleFavorite(breedId) // add
+        viewModel.toggleFavorite(breedId) //add
+        testDispatcher.scheduler.advanceUntilIdle()
         viewModel.toggleFavorite(breedId) // remove
+        testDispatcher.scheduler.advanceUntilIdle()
         viewModel.toggleFavorite(breedId) // add
         testDispatcher.scheduler.advanceUntilIdle()
 
         val finalBreed = viewModel.filteredBreeds.value.firstOrNull()
         assertTrue(finalBreed?.isFavorite ?: false)
+
         coVerify(exactly = 2) { breedRepository.addBreedToFavorites(breedId) }
         coVerify(exactly = 1) { breedRepository.removeBreedFromFavorites(breedId) }
     }
