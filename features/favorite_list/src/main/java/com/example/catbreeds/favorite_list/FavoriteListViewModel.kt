@@ -48,6 +48,7 @@ class FavoriteListViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 breedRepository.removeBreedFromFavorites(breedId)
+                _favoriteBreeds.value = _favoriteBreeds.value.filter { it.id != breedId }
             } catch (e: Exception) {
                 e.printStackTrace()
             }

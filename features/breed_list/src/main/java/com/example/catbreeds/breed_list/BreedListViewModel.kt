@@ -109,6 +109,13 @@ class BreedListViewModel @Inject constructor(
                 } else {
                     breedRepository.addBreedToFavorites(breedId)
                 }
+                val newFavorites = if (currentFavorites.contains(breedId)) {
+                    currentFavorites - breedId
+                } else {
+                    currentFavorites + breedId
+                }
+                _favoriteBreedIds.value = newFavorites
+                updateFilteredBreedsWithFavorites()
             } catch (e: Exception) {
                 e.printStackTrace()
             }
