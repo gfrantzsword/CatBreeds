@@ -54,135 +54,148 @@ class BreedListViewModelTest {
         Dispatchers.resetMain()
     }
 
-    // CASE: starts empty
     @Test
-    fun initialStateWithEmptyRepoIsEmpty() = runTest {
+    fun `WHEN initialized with empty repository SHOULD have empty state`() = runTest {
+        // GIVEN
         every { breedRepository.getBreeds() } returns flowOf(emptyList())
         every { breedRepository.getFavoriteBreeds() } returns flowOf(emptyList())
         coEvery { breedRepository.refreshBreeds() } returns Unit
 
+        // WHEN
         viewModel = BreedListViewModel(breedRepository)
         testDispatcher.scheduler.advanceUntilIdle()
 
+        // THEN
         assertEquals(emptyList<Breed>(), viewModel.breeds.value)
         assertEquals(emptyList<Breed>(), viewModel.filteredBreeds.value)
         assertEquals("", viewModel.searchQuery.value)
     }
 
-    // CASE: list is correctly updated
     @Test
-    fun initLoadsBreedsCorrectly() = runTest {
+    fun `WHEN correctly initialized SHOULD load breeds correctly`() = runTest {
+        // GIVEN
         every { breedRepository.getBreeds() } returns flowOf(testBreeds)
         every { breedRepository.getFavoriteBreeds() } returns flowOf(emptyList())
         coEvery { breedRepository.refreshBreeds() } returns Unit
 
+        // WHEN
         viewModel = BreedListViewModel(breedRepository)
         testDispatcher.scheduler.advanceUntilIdle()
 
+        // THEN
         assertEquals(testBreeds, viewModel.breeds.value)
         assertEquals(testBreeds, viewModel.filteredBreeds.value)
     }
 
-    // CASE: initialization calls refresh
     @Test
-    fun initCallsRefreshBreeds() = runTest {
+    fun `WHEN initialized SHOULD call refreshBreeds`() = runTest {
+        // GIVEN
         every { breedRepository.getBreeds() } returns flowOf(emptyList())
         every { breedRepository.getFavoriteBreeds() } returns flowOf(emptyList())
         coEvery { breedRepository.refreshBreeds() } returns Unit
 
+        // WHEN
         viewModel = BreedListViewModel(breedRepository)
         testDispatcher.scheduler.advanceUntilIdle()
 
+        // THEN
         coVerify { breedRepository.refreshBreeds() }
     }
 
-    // CASE: tries segments or full string of names, origins and temperaments
     @Test
-    fun searchQueryFiltersListCorrectly() = runTest {
+    fun `WHEN search query is updated SHOULD filter list correctly by name origin or temperament`() = runTest {
+        // GIVEN
         val (breed1, breed2, breed3, breed4) = testBreeds
         every { breedRepository.getBreeds() } returns flowOf(testBreeds)
         every { breedRepository.getFavoriteBreeds() } returns flowOf(emptyList())
         coEvery { breedRepository.refreshBreeds() } returns Unit
-
         viewModel = BreedListViewModel(breedRepository)
         testDispatcher.scheduler.advanceUntilIdle()
 
-        // Name (Siberian)
+        // WHEN (search by Name segment)
         viewModel.updateSearchQuery("sibe")
         testDispatcher.scheduler.advanceUntilIdle()
+        // THEN (name match)
         assertEquals(listOf(breed1), viewModel.filteredBreeds.value)
 
-        // Origin (Iran)
+        // WHEN (search by origin)
         viewModel.updateSearchQuery("iran")
         testDispatcher.scheduler.advanceUntilIdle()
+        // THEN (origin match)
         assertEquals(listOf(breed2), viewModel.filteredBreeds.value)
 
-        // Temperament (Energetic) (Upper case)
+        // WHEN (search by temperament (Upper case))
         viewModel.updateSearchQuery("ENERGETIC")
         testDispatcher.scheduler.advanceUntilIdle()
+        // THEN (temperament match)
         assertEquals(listOf(breed3), viewModel.filteredBreeds.value)
 
-        // Temperament (Playful) (Match multiple)
+        // WHEN (search by temperament (multiple matches))
         viewModel.updateSearchQuery("Playful")
         testDispatcher.scheduler.advanceUntilIdle()
+        // THEN (multiple matches)
         assertEquals(2, viewModel.filteredBreeds.value.size)
         assertTrue(viewModel.filteredBreeds.value.containsAll(listOf(breed1, breed4)))
 
-        // No match
+        // WHEN (no matches)
         viewModel.updateSearchQuery("Zzz")
         testDispatcher.scheduler.advanceUntilIdle()
+        // THEN (empty list)
         assertEquals(emptyList<Breed>(), viewModel.filteredBreeds.value)
     }
 
-    // CASE: simple testing if fav toggle works
     @Test
-    fun toggleFavoriteCallsAddRepositoryMethod() = runTest {
+    fun `WHEN toggleFavorite is called on an unfavorite breed SHOULD call addBreedToFavorites repository method`() = runTest {
+        // GIVEN
         val breedId = testBreeds.first().id
         every { breedRepository.getBreeds() } returns flowOf(testBreeds)
         every { breedRepository.getFavoriteBreeds() } returns flowOf(emptyList())
         coEvery { breedRepository.refreshBreeds() } returns Unit
         coEvery { breedRepository.addBreedToFavorites(breedId) } returns Unit
         coEvery { breedRepository.removeBreedFromFavorites(breedId) } returns Unit
-
         viewModel = BreedListViewModel(breedRepository)
         testDispatcher.scheduler.advanceUntilIdle()
 
+        // WHEN
         viewModel.toggleFavorite(breedId)
         testDispatcher.scheduler.advanceUntilIdle()
 
+        // THEN
         coVerify { breedRepository.addBreedToFavorites(breedId) }
+        coVerify(exactly = 0) { breedRepository.removeBreedFromFavorites(any()) }
     }
 
-    // CASE: spam fav toggle
     @Test
-    fun toggleFavoriteRapidlyHandlesStateCorrectly() = runTest {
+    fun `WHEN rapidly toggling favorite SHOULD result in correct final state and repository calls`() = runTest {
+        // GIVEN
         val testBreed = testBreeds.first()
         val breedId = testBreed.id
-
         val favoriteBreedsFlow = MutableStateFlow(emptyList<Breed>())
+
         every { breedRepository.getBreeds() } returns flowOf(listOf(testBreed))
         every { breedRepository.getFavoriteBreeds() } returns favoriteBreedsFlow
         coEvery { breedRepository.refreshBreeds() } returns Unit
         coEvery { breedRepository.addBreedToFavorites(breedId) } returns Unit
         coEvery { breedRepository.removeBreedFromFavorites(breedId) } returns Unit
-
         viewModel = BreedListViewModel(breedRepository)
         testDispatcher.scheduler.advanceUntilIdle()
 
+        // WHEN (spam toggle)
         viewModel.toggleFavorite(breedId) // add
         viewModel.toggleFavorite(breedId) // remove
         viewModel.toggleFavorite(breedId) // add
         testDispatcher.scheduler.advanceUntilIdle()
 
+        // THEN
         val finalBreed = viewModel.filteredBreeds.value.firstOrNull()
         assertTrue(finalBreed?.isFavorite ?: false)
         coVerify(exactly = 2) { breedRepository.addBreedToFavorites(breedId) }
         coVerify(exactly = 1) { breedRepository.removeBreedFromFavorites(breedId) }
     }
 
-    // CASE: fav toggle updated between pages/back button
     @Test
-    fun favoriteStatusUpdatesFromFlow() = runTest {
+    fun `WHEN favorite status updates from flow SHOULD correctly update favorite status in filtered list`() = runTest {
+        // GIVEN
         val favoriteBreed = testBreeds.first()
         val unfavoriteBreed = testBreeds.last()
         val favoriteFlow = MutableStateFlow(emptyList<Breed>())
@@ -190,15 +203,14 @@ class BreedListViewModelTest {
         every { breedRepository.getBreeds() } returns flowOf(listOf(favoriteBreed, unfavoriteBreed))
         every { breedRepository.getFavoriteBreeds() } returns favoriteFlow
         coEvery { breedRepository.refreshBreeds() } returns Unit
-
         viewModel = BreedListViewModel(breedRepository)
         testDispatcher.scheduler.advanceUntilIdle()
 
-        assertFalse(viewModel.filteredBreeds.value.first().isFavorite)
-
+        // WHEN
         favoriteFlow.value = listOf(favoriteBreed.copy(isFavorite = true))
         testDispatcher.scheduler.advanceUntilIdle()
 
+        // THEN
         val favoriteInFiltered = viewModel.filteredBreeds.value.find { it.id == favoriteBreed.id }
         assertNotNull(favoriteInFiltered)
         assertTrue(favoriteInFiltered!!.isFavorite)

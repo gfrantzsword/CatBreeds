@@ -58,107 +58,110 @@ class BreedDetailViewModelTest {
         Dispatchers.resetMain()
     }
 
-    // CASE: everything is fine and load ok
     @Test
-    fun initWithValidIdLoadsBreed() = runTest {
+    fun `WHEN initialized with valid ID SHOULD load breed`() = runTest {
+        // GIVEN
         val targetBreed = TestBreedDetailData.testBreed
         val breedId = targetBreed.id
         val savedStateHandle = SavedStateHandle(mapOf("breedId" to breedId))
-
         coEvery { breedRepository.getBreedById(breedId) } returns targetBreed
         every { breedRepository.getFavoriteBreeds() } returns flowOf(emptyList())
 
+        // WHEN
         val viewModel = BreedDetailViewModel(breedRepository, savedStateHandle)
         testDispatcher.scheduler.advanceUntilIdle()
 
+        // THEN
         assertEquals(targetBreed.copy(isFavorite = false), viewModel.breed.value)
     }
 
-    // CASE: breed not found
     @Test
-    fun initWithInvalidIdHandlesNotFound() = runTest {
+    fun `WHEN initialized with invalid ID SHOULD handle not found by setting breed to null`() = runTest {
+        // GIVEN
         val nonExistentId = "non_existent"
         val savedStateHandle = SavedStateHandle(mapOf("breedId" to nonExistentId))
-
         coEvery { breedRepository.getBreedById(nonExistentId) } returns null
         every { breedRepository.getFavoriteBreeds() } returns flowOf(emptyList())
 
+        // WHEN
         val viewModel = BreedDetailViewModel(breedRepository, savedStateHandle)
         testDispatcher.scheduler.advanceUntilIdle()
 
+        // THEN
         assertNull(viewModel.breed.value)
     }
 
-    // CASE: favorites display correctly
     @Test
-    fun favoriteStatusUpdatesFromFlow() = runTest {
+    fun `WHEN favorite status updates from flow SHOULD update the ViewModel's breed favorite status`() = runTest {
+        // GIVEN
         val targetBreed = TestBreedDetailData.testBreed
         val breedId = targetBreed.id
         val savedStateHandle = SavedStateHandle(mapOf("breedId" to breedId))
         val favoriteFlow = MutableStateFlow(emptyList<Breed>())
-
         coEvery { breedRepository.getBreedById(breedId) } returns targetBreed
         every { breedRepository.getFavoriteBreeds() } returns favoriteFlow
-
         val viewModel = BreedDetailViewModel(breedRepository, savedStateHandle)
         testDispatcher.scheduler.advanceUntilIdle()
         assertFalse(viewModel.breed.value?.isFavorite ?: true)
 
+        // WHEN
         favoriteFlow.value = listOf(targetBreed.copy(isFavorite = true))
         testDispatcher.scheduler.advanceUntilIdle()
 
+        // THEN
         assertTrue(viewModel.breed.value?.isFavorite ?: false)
     }
 
-    // CASE: favorite/unfav button on detail works
     @Test
-    fun toggleFavoriteUpdatesStateAndCallsRepository() = runTest {
+    fun `WHEN toggling favorite SHOULD update state and call repository correctly`() = runTest {
+        // GIVEN
         val targetBreed = TestBreedDetailData.testBreed
         val breedId = targetBreed.id
         val savedStateHandle = SavedStateHandle(mapOf("breedId" to breedId))
-
         coEvery { breedRepository.getBreedById(breedId) } returns targetBreed
         every { breedRepository.getFavoriteBreeds() } returns flowOf(emptyList())
         coEvery { breedRepository.addBreedToFavorites(breedId) } returns Unit
         coEvery { breedRepository.removeBreedFromFavorites(breedId) } returns Unit
-
         val viewModel = BreedDetailViewModel(breedRepository, savedStateHandle)
         testDispatcher.scheduler.advanceUntilIdle()
 
-        // Add to fav
+        // WHEN (Add to fav)
         viewModel.toggleFavorite(breedId)
         testDispatcher.scheduler.advanceUntilIdle()
+
+        // THEN (Verify)
         coVerify(exactly = 1) { breedRepository.addBreedToFavorites(breedId) }
         assertTrue(viewModel.breed.value?.isFavorite ?: false)
 
-        // Remove from fav
+        // WHEN (Remove from fav)
         viewModel.toggleFavorite(breedId)
         testDispatcher.scheduler.advanceUntilIdle()
+
+        // THEN (Verify)
         coVerify(exactly = 1) { breedRepository.removeBreedFromFavorites(breedId) }
         assertFalse(viewModel.breed.value?.isFavorite ?: true)
     }
 
-    // CASE: spam fav toggle handles fine
     @Test
-    fun toggleFavoriteRapidlyHandlesStateCorrectly() = runTest {
+    fun `WHEN rapidly toggling favorite SHOULD result in correct final state and repository calls`() = runTest {
+        // GIVEN
         val targetBreed = TestBreedDetailData.testBreed
         val breedId = targetBreed.id
         val savedStateHandle = SavedStateHandle(mapOf("breedId" to breedId))
-
         coEvery { breedRepository.getBreedById(breedId) } returns targetBreed
         every { breedRepository.getFavoriteBreeds() } returns flowOf(emptyList())
         coEvery { breedRepository.addBreedToFavorites(breedId) } returns Unit
         coEvery { breedRepository.removeBreedFromFavorites(breedId) } returns Unit
-
         val viewModel = BreedDetailViewModel(breedRepository, savedStateHandle)
         testDispatcher.scheduler.advanceUntilIdle()
 
-        // Spamming toggle
+        // WHEN (Spam toggle)
         viewModel.toggleFavorite(breedId) // add
         viewModel.toggleFavorite(breedId) // remove
         viewModel.toggleFavorite(breedId) // add
         testDispatcher.scheduler.advanceUntilIdle()
 
+        // THEN
         assertTrue(viewModel.breed.value?.isFavorite ?: false)
         coVerify(exactly = 2) { breedRepository.addBreedToFavorites(breedId) }
         coVerify(exactly = 1) { breedRepository.removeBreedFromFavorites(breedId) }

@@ -52,18 +52,20 @@ class FavoriteListViewModelTest {
         Dispatchers.resetMain()
     }
 
-    // CASE: displays correct info (ideal)
     @Test
-    fun initLoadsFavoritesCorrectly() = runTest {
+    fun `WHEN correctly initialized SHOULD load and display favorites correctly`() = runTest {
+        // GIVEN
         val initialFavorites = listOf(
             TestFavoriteListData.getFavoriteBreed("id1", "Siberian", "Russia", "10 - 15"),
             TestFavoriteListData.getFavoriteBreed("id2", "Persian", "Iran", "12 - 14")
         )
         favoriteBreedsFlow.value = initialFavorites
 
+        // WHEN
         viewModel = FavoriteListViewModel(breedRepository)
         testDispatcher.scheduler.advanceUntilIdle()
 
+        // THEN
         assertEquals(2, viewModel.favoriteBreeds.value.size)
         val firstFavorite = viewModel.favoriteBreeds.value.first()
         assertEquals("Siberian", firstFavorite.name)
@@ -71,45 +73,45 @@ class FavoriteListViewModelTest {
         assertEquals("10 - 15", firstFavorite.life_span)
     }
 
-    // CASE: fav toggle immediately eliminates from list
     @Test
-    fun removeFromFavoritesUpdatesListAndCallsRepo() = runTest {
+    fun `WHEN breed is removed from favorites SHOULD update list and call repository`() = runTest {
+        // GIVEN
         val favoriteToRemove = TestFavoriteListData.getFavoriteBreed("id_remove", "A", "O", "1-1")
         val remainingFavorite = TestFavoriteListData.getFavoriteBreed("id_keep", "B", "O", "1-1")
         val initialFavorites = listOf(favoriteToRemove, remainingFavorite)
         favoriteBreedsFlow.value = initialFavorites
-
         coEvery { breedRepository.removeBreedFromFavorites(favoriteToRemove.id) } answers {
             favoriteBreedsFlow.value = listOf(remainingFavorite)
         }
-
         viewModel = FavoriteListViewModel(breedRepository)
         testDispatcher.scheduler.advanceUntilIdle()
         assertEquals(2, viewModel.favoriteBreeds.value.size)
 
+        // WHEN
         viewModel.removeFromFavorites(favoriteToRemove.id)
         testDispatcher.scheduler.advanceUntilIdle()
 
+        // THEN
         coVerify(exactly = 1) { breedRepository.removeBreedFromFavorites(favoriteToRemove.id) }
         assertEquals(1, viewModel.favoriteBreeds.value.size)
         assertFalse(viewModel.favoriteBreeds.value.any { it.id == favoriteToRemove.id })
         assertTrue(viewModel.favoriteBreeds.value.any { it.id == remainingFavorite.id })
     }
 
-    // CASE: fav toggle updated between pages/back button
     @Test
-    fun favoritesUpdateFromExternalFlow() = runTest {
+    fun `WHEN favorites list updates externally SHOULD update the ViewModel list`() = runTest {
+        // GIVEN
         val initialFavorites = listOf(TestFavoriteListData.getFavoriteBreed("id1", "A", "O", "1-1"))
         favoriteBreedsFlow.value = initialFavorites
-
         viewModel = FavoriteListViewModel(breedRepository)
         testDispatcher.scheduler.advanceUntilIdle()
         assertEquals(1, viewModel.favoriteBreeds.value.size)
 
-        // Simulate external change
+        // WHEN (simulate external change)
         favoriteBreedsFlow.value = emptyList()
         testDispatcher.scheduler.advanceUntilIdle()
 
+        // THEN
         assertEquals(0, viewModel.favoriteBreeds.value.size)
     }
 }
