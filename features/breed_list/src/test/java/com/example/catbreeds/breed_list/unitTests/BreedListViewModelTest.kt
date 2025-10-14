@@ -22,10 +22,10 @@ import org.junit.Test
 // Mock data
 object TestBreedListData {
     fun getTestBreeds(): List<Breed> = listOf(
-        Breed("sibe", "Siberian", "Siberia", "Playful, Calm", "10 - 15", "desc", "sibe_ref", false),
-        Breed("pers", "Persian", "Iran", "Reserved, Quiet", "12 - 14", "desc", "pers_ref", false),
-        Breed("beng", "Bengal", "USA", "Active, Energetic", "9 - 12", "desc", "beng_ref", false),
-        Breed("mcoo", "Maine Coon", "USA", "Gentle, Playful", "12 - 15", "desc", "mcoo_ref", false)
+        Breed("sibe", "Siberian", "desc", "Playful, Calm", "Siberia", "10 - 15", "sibe_ref", false),
+        Breed("pers", "Persian", "desc", "Reserved, Quiet", "Iran", "12 - 14", "pers_ref", false),
+        Breed("beng", "Bengal", "desc", "Active, Energetic", "USA", "9 - 12", "beng_ref", false),
+        Breed("mcoo", "Maine Coon", "desc", "Gentle, Playful", "USA", "12 - 15", "mcoo_ref", false)
     )
 }
 
