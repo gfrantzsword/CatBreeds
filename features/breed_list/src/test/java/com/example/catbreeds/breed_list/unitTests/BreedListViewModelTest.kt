@@ -13,6 +13,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -63,7 +64,7 @@ class BreedListViewModelTest {
 
         // WHEN
         viewModel = BreedListViewModel(breedRepository)
-        testDispatcher.scheduler.advanceUntilIdle()
+        advanceUntilIdle()
 
         // THEN
         assertEquals(emptyList<Breed>(), viewModel.breeds.value)
@@ -80,7 +81,7 @@ class BreedListViewModelTest {
 
         // WHEN
         viewModel = BreedListViewModel(breedRepository)
-        testDispatcher.scheduler.advanceUntilIdle()
+        advanceUntilIdle()
 
         // THEN
         assertEquals(testBreeds, viewModel.breeds.value)
@@ -96,7 +97,7 @@ class BreedListViewModelTest {
 
         // WHEN
         viewModel = BreedListViewModel(breedRepository)
-        testDispatcher.scheduler.advanceUntilIdle()
+        advanceUntilIdle()
 
         // THEN
         coVerify { breedRepository.refreshBreeds() }
@@ -110,36 +111,36 @@ class BreedListViewModelTest {
         every { breedRepository.getFavoriteBreeds() } returns flowOf(emptyList())
         coEvery { breedRepository.refreshBreeds() } returns Unit
         viewModel = BreedListViewModel(breedRepository)
-        testDispatcher.scheduler.advanceUntilIdle()
+        advanceUntilIdle()
 
         // WHEN (search by Name segment)
         viewModel.updateSearchQuery("sibe")
-        testDispatcher.scheduler.advanceUntilIdle()
+        advanceUntilIdle()
         // THEN (name match)
         assertEquals(listOf(breed1), viewModel.filteredBreeds.value)
 
         // WHEN (search by origin)
         viewModel.updateSearchQuery("iran")
-        testDispatcher.scheduler.advanceUntilIdle()
+        advanceUntilIdle()
         // THEN (origin match)
         assertEquals(listOf(breed2), viewModel.filteredBreeds.value)
 
         // WHEN (search by temperament (Upper case))
         viewModel.updateSearchQuery("ENERGETIC")
-        testDispatcher.scheduler.advanceUntilIdle()
+        advanceUntilIdle()
         // THEN (temperament match)
         assertEquals(listOf(breed3), viewModel.filteredBreeds.value)
 
         // WHEN (search by temperament (multiple matches))
         viewModel.updateSearchQuery("Playful")
-        testDispatcher.scheduler.advanceUntilIdle()
+        advanceUntilIdle()
         // THEN (multiple matches)
         assertEquals(2, viewModel.filteredBreeds.value.size)
         assertTrue(viewModel.filteredBreeds.value.containsAll(listOf(breed1, breed4)))
 
         // WHEN (no matches)
         viewModel.updateSearchQuery("Zzz")
-        testDispatcher.scheduler.advanceUntilIdle()
+        advanceUntilIdle()
         // THEN (empty list)
         assertEquals(emptyList<Breed>(), viewModel.filteredBreeds.value)
     }
@@ -154,11 +155,11 @@ class BreedListViewModelTest {
         coEvery { breedRepository.addBreedToFavorites(breedId) } returns Unit
         coEvery { breedRepository.removeBreedFromFavorites(breedId) } returns Unit
         viewModel = BreedListViewModel(breedRepository)
-        testDispatcher.scheduler.advanceUntilIdle()
+        advanceUntilIdle()
 
         // WHEN
         viewModel.toggleFavorite(breedId)
-        testDispatcher.scheduler.advanceUntilIdle()
+        advanceUntilIdle()
 
         // THEN
         coVerify { breedRepository.addBreedToFavorites(breedId) }
@@ -178,13 +179,13 @@ class BreedListViewModelTest {
         coEvery { breedRepository.addBreedToFavorites(breedId) } returns Unit
         coEvery { breedRepository.removeBreedFromFavorites(breedId) } returns Unit
         viewModel = BreedListViewModel(breedRepository)
-        testDispatcher.scheduler.advanceUntilIdle()
+        advanceUntilIdle()
 
         // WHEN (spam toggle)
         viewModel.toggleFavorite(breedId) // add
         viewModel.toggleFavorite(breedId) // remove
         viewModel.toggleFavorite(breedId) // add
-        testDispatcher.scheduler.advanceUntilIdle()
+        advanceUntilIdle()
 
         // THEN
         val finalBreed = viewModel.filteredBreeds.value.firstOrNull()
@@ -204,7 +205,7 @@ class BreedListViewModelTest {
         every { breedRepository.getFavoriteBreeds() } returns favoriteFlow
         coEvery { breedRepository.refreshBreeds() } returns Unit
         viewModel = BreedListViewModel(breedRepository)
-        testDispatcher.scheduler.advanceUntilIdle()
+        advanceUntilIdle()
 
         // WHEN
         favoriteFlow.value = listOf(favoriteBreed.copy(isFavorite = true))

@@ -12,6 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -63,7 +64,7 @@ class FavoriteListViewModelTest {
 
         // WHEN
         viewModel = FavoriteListViewModel(breedRepository)
-        testDispatcher.scheduler.advanceUntilIdle()
+        advanceUntilIdle()
 
         // THEN
         assertEquals(2, viewModel.favoriteBreeds.value.size)
@@ -84,12 +85,12 @@ class FavoriteListViewModelTest {
             favoriteBreedsFlow.value = listOf(remainingFavorite)
         }
         viewModel = FavoriteListViewModel(breedRepository)
-        testDispatcher.scheduler.advanceUntilIdle()
+        advanceUntilIdle()
         assertEquals(2, viewModel.favoriteBreeds.value.size)
 
         // WHEN
         viewModel.removeFromFavorites(favoriteToRemove.id)
-        testDispatcher.scheduler.advanceUntilIdle()
+        advanceUntilIdle()
 
         // THEN
         coVerify(exactly = 1) { breedRepository.removeBreedFromFavorites(favoriteToRemove.id) }
@@ -104,12 +105,12 @@ class FavoriteListViewModelTest {
         val initialFavorites = listOf(TestFavoriteListData.getFavoriteBreed("id1", "A", "O", "1-1"))
         favoriteBreedsFlow.value = initialFavorites
         viewModel = FavoriteListViewModel(breedRepository)
-        testDispatcher.scheduler.advanceUntilIdle()
+        advanceUntilIdle()
         assertEquals(1, viewModel.favoriteBreeds.value.size)
 
         // WHEN (simulate external change)
         favoriteBreedsFlow.value = emptyList()
-        testDispatcher.scheduler.advanceUntilIdle()
+        advanceUntilIdle()
 
         // THEN
         assertEquals(0, viewModel.favoriteBreeds.value.size)

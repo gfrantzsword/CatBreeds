@@ -14,6 +14,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -69,7 +70,7 @@ class BreedDetailViewModelTest {
 
         // WHEN
         val viewModel = BreedDetailViewModel(breedRepository, savedStateHandle)
-        testDispatcher.scheduler.advanceUntilIdle()
+        advanceUntilIdle()
 
         // THEN
         assertEquals(targetBreed.copy(isFavorite = false), viewModel.breed.value)
@@ -85,7 +86,7 @@ class BreedDetailViewModelTest {
 
         // WHEN
         val viewModel = BreedDetailViewModel(breedRepository, savedStateHandle)
-        testDispatcher.scheduler.advanceUntilIdle()
+        advanceUntilIdle()
 
         // THEN
         assertNull(viewModel.breed.value)
@@ -101,12 +102,12 @@ class BreedDetailViewModelTest {
         coEvery { breedRepository.getBreedById(breedId) } returns targetBreed
         every { breedRepository.getFavoriteBreeds() } returns favoriteFlow
         val viewModel = BreedDetailViewModel(breedRepository, savedStateHandle)
-        testDispatcher.scheduler.advanceUntilIdle()
+        advanceUntilIdle()
         assertFalse(viewModel.breed.value?.isFavorite ?: true)
 
         // WHEN
         favoriteFlow.value = listOf(targetBreed.copy(isFavorite = true))
-        testDispatcher.scheduler.advanceUntilIdle()
+        advanceUntilIdle()
 
         // THEN
         assertTrue(viewModel.breed.value?.isFavorite ?: false)
@@ -123,11 +124,11 @@ class BreedDetailViewModelTest {
         coEvery { breedRepository.addBreedToFavorites(breedId) } returns Unit
         coEvery { breedRepository.removeBreedFromFavorites(breedId) } returns Unit
         val viewModel = BreedDetailViewModel(breedRepository, savedStateHandle)
-        testDispatcher.scheduler.advanceUntilIdle()
+        advanceUntilIdle()
 
         // WHEN (Add to fav)
         viewModel.toggleFavorite(breedId)
-        testDispatcher.scheduler.advanceUntilIdle()
+        advanceUntilIdle()
 
         // THEN (Verify)
         coVerify(exactly = 1) { breedRepository.addBreedToFavorites(breedId) }
@@ -135,7 +136,7 @@ class BreedDetailViewModelTest {
 
         // WHEN (Remove from fav)
         viewModel.toggleFavorite(breedId)
-        testDispatcher.scheduler.advanceUntilIdle()
+        advanceUntilIdle()
 
         // THEN (Verify)
         coVerify(exactly = 1) { breedRepository.removeBreedFromFavorites(breedId) }
@@ -153,13 +154,13 @@ class BreedDetailViewModelTest {
         coEvery { breedRepository.addBreedToFavorites(breedId) } returns Unit
         coEvery { breedRepository.removeBreedFromFavorites(breedId) } returns Unit
         val viewModel = BreedDetailViewModel(breedRepository, savedStateHandle)
-        testDispatcher.scheduler.advanceUntilIdle()
+        advanceUntilIdle()
 
         // WHEN (Spam toggle)
         viewModel.toggleFavorite(breedId) // add
         viewModel.toggleFavorite(breedId) // remove
         viewModel.toggleFavorite(breedId) // add
-        testDispatcher.scheduler.advanceUntilIdle()
+        advanceUntilIdle()
 
         // THEN
         assertTrue(viewModel.breed.value?.isFavorite ?: false)
