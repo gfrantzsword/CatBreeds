@@ -52,6 +52,7 @@ dependencies {
     testImplementation(libs.androidx.room.testing)
     testImplementation(libs.androidx.core)
     testImplementation(kotlin("test"))
+    testImplementation(project(":test_core"))
 
     androidTestImplementation(libs.hilt.android.testing.v2571)
 

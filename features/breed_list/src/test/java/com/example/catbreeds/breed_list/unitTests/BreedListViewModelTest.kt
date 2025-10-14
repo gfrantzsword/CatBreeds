@@ -4,20 +4,16 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.catbreeds.domain.models.Breed
 import com.example.catbreeds.domain.repository.BreedRepository
 import com.example.catbreeds.breed_list.BreedListViewModel
+import com.example.catbreeds.test_core.MainDispatcherRule
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
-import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -39,20 +35,16 @@ class BreedListViewModelTest {
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    private val testDispatcher = StandardTestDispatcher()
+    @get:Rule
+    val mainDispatcherRule = MainDispatcherRule()
+
     private lateinit var viewModel: BreedListViewModel
     private lateinit var breedRepository: BreedRepository
     private val testBreeds = TestBreedListData.getTestBreeds()
 
     @Before
     fun setup() {
-        Dispatchers.setMain(testDispatcher)
-        breedRepository = mockk()
-    }
-
-    @After
-    fun tearDown() {
-        Dispatchers.resetMain()
+        breedRepository = mockk(relaxed = true)
     }
 
     @Test
@@ -209,7 +201,7 @@ class BreedListViewModelTest {
 
         // WHEN
         favoriteFlow.value = listOf(favoriteBreed.copy(isFavorite = true))
-        testDispatcher.scheduler.advanceUntilIdle()
+        advanceUntilIdle()
 
         // THEN
         val favoriteInFiltered = viewModel.filteredBreeds.value.find { it.id == favoriteBreed.id }
