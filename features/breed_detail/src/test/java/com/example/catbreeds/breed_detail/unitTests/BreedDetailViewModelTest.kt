@@ -9,7 +9,8 @@ import com.example.catbreeds.test_core.MainDispatcherRule
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
-import io.mockk.mockk
+import io.mockk.impl.annotations.RelaxedMockK
+import io.mockk.junit4.MockKRule
 import io.mockk.spyk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,11 +42,14 @@ class BreedDetailViewModelTest {
 
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
-
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
+    @get:Rule
+    val mockkRule = MockKRule(this)
 
+    @RelaxedMockK
     private lateinit var breedRepository: BreedRepository
+
     private lateinit var savedStateHandle: SavedStateHandle
 
     private val vmUnderTest: BreedDetailViewModel by lazy {
@@ -59,7 +63,6 @@ class BreedDetailViewModelTest {
 
     @Before
     fun setup() {
-        breedRepository = mockk(relaxed = true)
         savedStateHandle = SavedStateHandle()
     }
 

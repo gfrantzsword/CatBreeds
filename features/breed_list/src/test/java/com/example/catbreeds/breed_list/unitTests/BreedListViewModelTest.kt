@@ -8,7 +8,8 @@ import com.example.catbreeds.test_core.MainDispatcherRule
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
-import io.mockk.mockk
+import io.mockk.impl.annotations.RelaxedMockK
+import io.mockk.junit4.MockKRule
 import io.mockk.spyk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +17,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
@@ -35,22 +35,20 @@ class BreedListViewModelTest {
 
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
-
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
+    @get:Rule
+    val mockkRule = MockKRule(this)
 
+    @RelaxedMockK
     private lateinit var breedRepository: BreedRepository
+
     private val testBreeds = TestBreedListData.getTestBreeds()
 
     private val vmUnderTest: BreedListViewModel by lazy {
         spyk(
             BreedListViewModel(breedRepository)
         )
-    }
-
-    @Before
-    fun setup() {
-        breedRepository = mockk(relaxed = true)
     }
 
     @Test
