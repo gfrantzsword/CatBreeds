@@ -9,6 +9,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.spyk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -35,9 +36,14 @@ class FavoriteListViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    private lateinit var viewModel: FavoriteListViewModel
     private lateinit var breedRepository: BreedRepository
     private val favoriteBreedsFlow = MutableStateFlow<List<Breed>>(emptyList())
+
+    private val vmUnderTest: FavoriteListViewModel by lazy {
+        spyk(
+            FavoriteListViewModel(breedRepository)
+        )
+    }
 
     @Before
     fun setup() {
@@ -55,12 +61,12 @@ class FavoriteListViewModelTest {
         favoriteBreedsFlow.value = initialFavorites
 
         // WHEN
-        viewModel = FavoriteListViewModel(breedRepository)
+        val vm = vmUnderTest
         advanceUntilIdle()
 
         // THEN
-        assertEquals(2, viewModel.favoriteBreeds.value.size)
-        val firstFavorite = viewModel.favoriteBreeds.value.first()
+        assertEquals(2, vm.favoriteBreeds.value.size)
+        val firstFavorite = vm.favoriteBreeds.value.first()
         assertEquals("Siberian", firstFavorite.name)
         assertEquals("Russia", firstFavorite.origin)
         assertEquals("10 - 15", firstFavorite.life_span)
@@ -76,19 +82,19 @@ class FavoriteListViewModelTest {
         coEvery { breedRepository.removeBreedFromFavorites(favoriteToRemove.id) } answers {
             favoriteBreedsFlow.value = listOf(remainingFavorite)
         }
-        viewModel = FavoriteListViewModel(breedRepository)
+        val vm = vmUnderTest
         advanceUntilIdle()
-        assertEquals(2, viewModel.favoriteBreeds.value.size)
+        assertEquals(2, vm.favoriteBreeds.value.size)
 
         // WHEN
-        viewModel.removeFromFavorites(favoriteToRemove.id)
+        vm.removeFromFavorites(favoriteToRemove.id)
         advanceUntilIdle()
 
         // THEN
         coVerify(exactly = 1) { breedRepository.removeBreedFromFavorites(favoriteToRemove.id) }
-        assertEquals(1, viewModel.favoriteBreeds.value.size)
-        assertFalse(viewModel.favoriteBreeds.value.any { it.id == favoriteToRemove.id })
-        assertTrue(viewModel.favoriteBreeds.value.any { it.id == remainingFavorite.id })
+        assertEquals(1, vm.favoriteBreeds.value.size)
+        assertFalse(vm.favoriteBreeds.value.any { it.id == favoriteToRemove.id })
+        assertTrue(vm.favoriteBreeds.value.any { it.id == remainingFavorite.id })
     }
 
     @Test
@@ -96,15 +102,15 @@ class FavoriteListViewModelTest {
         // GIVEN
         val initialFavorites = listOf(TestFavoriteListData.getFavoriteBreed("id1", "A", "O", "1-1"))
         favoriteBreedsFlow.value = initialFavorites
-        viewModel = FavoriteListViewModel(breedRepository)
+        val vm = vmUnderTest
         advanceUntilIdle()
-        assertEquals(1, viewModel.favoriteBreeds.value.size)
+        assertEquals(1, vm.favoriteBreeds.value.size)
 
         // WHEN (simulate external change)
         favoriteBreedsFlow.value = emptyList()
         advanceUntilIdle()
 
         // THEN
-        assertEquals(0, viewModel.favoriteBreeds.value.size)
+        assertEquals(0, vm.favoriteBreeds.value.size)
     }
 }

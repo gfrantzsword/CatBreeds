@@ -9,6 +9,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.spyk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
@@ -38,9 +39,14 @@ class BreedListViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    private lateinit var viewModel: BreedListViewModel
     private lateinit var breedRepository: BreedRepository
     private val testBreeds = TestBreedListData.getTestBreeds()
+
+    private val vmUnderTest: BreedListViewModel by lazy {
+        spyk(
+            BreedListViewModel(breedRepository)
+        )
+    }
 
     @Before
     fun setup() {
@@ -55,13 +61,13 @@ class BreedListViewModelTest {
         coEvery { breedRepository.refreshBreeds() } returns Unit
 
         // WHEN
-        viewModel = BreedListViewModel(breedRepository)
+        val vm = vmUnderTest
         advanceUntilIdle()
 
         // THEN
-        assertEquals(emptyList<Breed>(), viewModel.breeds.value)
-        assertEquals(emptyList<Breed>(), viewModel.filteredBreeds.value)
-        assertEquals("", viewModel.searchQuery.value)
+        assertEquals(emptyList<Breed>(), vm.breeds.value)
+        assertEquals(emptyList<Breed>(), vm.filteredBreeds.value)
+        assertEquals("", vm.searchQuery.value)
     }
 
     @Test
@@ -72,12 +78,12 @@ class BreedListViewModelTest {
         coEvery { breedRepository.refreshBreeds() } returns Unit
 
         // WHEN
-        viewModel = BreedListViewModel(breedRepository)
+        val vm = vmUnderTest
         advanceUntilIdle()
 
         // THEN
-        assertEquals(testBreeds, viewModel.breeds.value)
-        assertEquals(testBreeds, viewModel.filteredBreeds.value)
+        assertEquals(testBreeds, vm.breeds.value)
+        assertEquals(testBreeds, vm.filteredBreeds.value)
     }
 
     @Test
@@ -88,7 +94,7 @@ class BreedListViewModelTest {
         coEvery { breedRepository.refreshBreeds() } returns Unit
 
         // WHEN
-        viewModel = BreedListViewModel(breedRepository)
+        val vm = vmUnderTest // Triggers the lazy initialization of vmUnderTest
         advanceUntilIdle()
 
         // THEN
@@ -102,39 +108,39 @@ class BreedListViewModelTest {
         every { breedRepository.getBreeds() } returns flowOf(testBreeds)
         every { breedRepository.getFavoriteBreeds() } returns flowOf(emptyList())
         coEvery { breedRepository.refreshBreeds() } returns Unit
-        viewModel = BreedListViewModel(breedRepository)
+        val vm = vmUnderTest
         advanceUntilIdle()
 
         // WHEN (search by Name segment)
-        viewModel.updateSearchQuery("sibe")
+        vm.updateSearchQuery("sibe")
         advanceUntilIdle()
         // THEN (name match)
-        assertEquals(listOf(breed1), viewModel.filteredBreeds.value)
+        assertEquals(listOf(breed1), vm.filteredBreeds.value)
 
         // WHEN (search by origin)
-        viewModel.updateSearchQuery("iran")
+        vm.updateSearchQuery("iran")
         advanceUntilIdle()
         // THEN (origin match)
-        assertEquals(listOf(breed2), viewModel.filteredBreeds.value)
+        assertEquals(listOf(breed2), vm.filteredBreeds.value)
 
         // WHEN (search by temperament (Upper case))
-        viewModel.updateSearchQuery("ENERGETIC")
+        vm.updateSearchQuery("ENERGETIC")
         advanceUntilIdle()
         // THEN (temperament match)
-        assertEquals(listOf(breed3), viewModel.filteredBreeds.value)
+        assertEquals(listOf(breed3), vm.filteredBreeds.value)
 
         // WHEN (search by temperament (multiple matches))
-        viewModel.updateSearchQuery("Playful")
+        vm.updateSearchQuery("Playful")
         advanceUntilIdle()
         // THEN (multiple matches)
-        assertEquals(2, viewModel.filteredBreeds.value.size)
-        assertTrue(viewModel.filteredBreeds.value.containsAll(listOf(breed1, breed4)))
+        assertEquals(2, vm.filteredBreeds.value.size)
+        assertTrue(vm.filteredBreeds.value.containsAll(listOf(breed1, breed4)))
 
         // WHEN (no matches)
-        viewModel.updateSearchQuery("Zzz")
+        vm.updateSearchQuery("Zzz")
         advanceUntilIdle()
         // THEN (empty list)
-        assertEquals(emptyList<Breed>(), viewModel.filteredBreeds.value)
+        assertEquals(emptyList<Breed>(), vm.filteredBreeds.value)
     }
 
     @Test
@@ -146,11 +152,11 @@ class BreedListViewModelTest {
         coEvery { breedRepository.refreshBreeds() } returns Unit
         coEvery { breedRepository.addBreedToFavorites(breedId) } returns Unit
         coEvery { breedRepository.removeBreedFromFavorites(breedId) } returns Unit
-        viewModel = BreedListViewModel(breedRepository)
+        val vm = vmUnderTest
         advanceUntilIdle()
 
         // WHEN
-        viewModel.toggleFavorite(breedId)
+        vm.toggleFavorite(breedId)
         advanceUntilIdle()
 
         // THEN
@@ -170,17 +176,17 @@ class BreedListViewModelTest {
         coEvery { breedRepository.refreshBreeds() } returns Unit
         coEvery { breedRepository.addBreedToFavorites(breedId) } returns Unit
         coEvery { breedRepository.removeBreedFromFavorites(breedId) } returns Unit
-        viewModel = BreedListViewModel(breedRepository)
+        val vm = vmUnderTest
         advanceUntilIdle()
 
         // WHEN (spam toggle)
-        viewModel.toggleFavorite(breedId) // add
-        viewModel.toggleFavorite(breedId) // remove
-        viewModel.toggleFavorite(breedId) // add
+        vm.toggleFavorite(breedId) // add
+        vm.toggleFavorite(breedId) // remove
+        vm.toggleFavorite(breedId) // add
         advanceUntilIdle()
 
         // THEN
-        val finalBreed = viewModel.filteredBreeds.value.firstOrNull()
+        val finalBreed = vm.filteredBreeds.value.firstOrNull()
         assertTrue(finalBreed?.isFavorite ?: false)
         coVerify(exactly = 2) { breedRepository.addBreedToFavorites(breedId) }
         coVerify(exactly = 1) { breedRepository.removeBreedFromFavorites(breedId) }
@@ -196,7 +202,7 @@ class BreedListViewModelTest {
         every { breedRepository.getBreeds() } returns flowOf(listOf(favoriteBreed, unfavoriteBreed))
         every { breedRepository.getFavoriteBreeds() } returns favoriteFlow
         coEvery { breedRepository.refreshBreeds() } returns Unit
-        viewModel = BreedListViewModel(breedRepository)
+        val vm = vmUnderTest
         advanceUntilIdle()
 
         // WHEN
@@ -204,9 +210,9 @@ class BreedListViewModelTest {
         advanceUntilIdle()
 
         // THEN
-        val favoriteInFiltered = viewModel.filteredBreeds.value.find { it.id == favoriteBreed.id }
+        val favoriteInFiltered = vm.filteredBreeds.value.find { it.id == favoriteBreed.id }
         assertNotNull(favoriteInFiltered)
         assertTrue(favoriteInFiltered!!.isFavorite)
-        assertFalse(viewModel.filteredBreeds.value.last().isFavorite)
+        assertFalse(vm.filteredBreeds.value.last().isFavorite)
     }
 }
