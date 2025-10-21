@@ -76,7 +76,10 @@ fun AppContent() {
                 val breedId = backStackEntry.arguments?.getString("breedId")
                 breedId?.let {
                     BreedDetailScreen(
-                        onBackClick = { navController.popBackStack() }
+                        onBackClick = { navController.popBackStack() },
+                        onBreedClick = { similarBreedId ->
+                            navController.navigate(Screen.BreedDetail.createRoute(similarBreedId))
+                        }
                     )
                 }
             }
