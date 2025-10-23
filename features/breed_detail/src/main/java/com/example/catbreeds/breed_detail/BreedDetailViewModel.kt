@@ -23,6 +23,9 @@ class BreedDetailViewModel @Inject constructor(
     val breed: State<Breed?> = _breed
     private val breedId = savedStateHandle.get<String>("breedId")
 
+    private val _similarBreeds = mutableStateOf<List<Breed>>(emptyList())
+    val similarBreeds: State<List<Breed>> = _similarBreeds
+
     private val _errorMessage = mutableStateOf<String?>(null)
     val errorMessage: State<String?> = _errorMessage
 
@@ -30,6 +33,7 @@ class BreedDetailViewModel @Inject constructor(
         breedId?.let { id ->
             fetchBreedDetail(id)
             observeFavorites(id)
+            fetchSimilarBreeds(id)
         }
     }
 
@@ -54,6 +58,14 @@ class BreedDetailViewModel @Inject constructor(
                     val isFavorite = favoriteBreeds.any { it.id == breedId }
                     _breed.value = currentBreed.copy(isFavorite = isFavorite)
                 }
+            }
+        }
+    }
+
+    private fun fetchSimilarBreeds(breedId: String) {
+        viewModelScope.launch {
+            breedRepository.getSimilarBreeds(breedId).collectLatest {
+                _similarBreeds.value = it
             }
         }
     }

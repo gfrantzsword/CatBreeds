@@ -39,14 +39,25 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.catbreeds.core.util.ErrorHandler
+import com.example.catbreeds.domain.models.Breed
+import androidx.compose.material3.Card
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.clickable
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BreedDetailScreen(
     viewModel: BreedDetailViewModel = hiltViewModel(),
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onBreedClick: (String) -> Unit
 ) {
     val breed by viewModel.breed
+    val similarBreeds by viewModel.similarBreeds
 
     // To handle snackbar and error messages
     val errorMessage by viewModel.errorMessage
@@ -148,6 +159,31 @@ fun BreedDetailScreen(
                         lineHeight = 24.sp
                     )
                 }
+
+                // Similar Breeds
+                if (similarBreeds.isNotEmpty()) {
+                    Column {
+                        Text(
+                            text = "Similar Breeds",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                        LazyHorizontalGrid(
+                            rows = GridCells.Fixed(1),
+                            modifier = Modifier.height(180.dp),
+                            contentPadding = PaddingValues(end = 16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            items(similarBreeds) { similarBreed ->
+                                SimilarBreedCard(
+                                    breed = similarBreed,
+                                    onClick = { onBreedClick(similarBreed.id) }
+                                )
+                            }
+                        }
+                    }
+                }
             }
         } ?: run {
             Box(
@@ -158,6 +194,38 @@ fun BreedDetailScreen(
             ) {
                 CircularProgressIndicator()
             }
+        }
+    }
+}
+
+@Composable
+fun SimilarBreedCard(
+    breed: Breed,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .width(150.dp)
+            .clickable { onClick() }
+    ) {
+        Column {
+            AsyncImage(
+                model = "https://cdn2.thecatapi.com/images/${breed.reference_image_id}.jpg",
+                contentDescription = "Image of ${breed.name}",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(130.dp)
+                    .clip(RoundedCornerShape(8.dp, 8.dp, 0.dp, 0.dp)),
+                contentScale = ContentScale.Crop,
+                placeholder = painterResource(id = R.drawable.ic_menu_report_image),
+                error = painterResource(id = R.drawable.ic_menu_close_clear_cancel)
+            )
+            Text(
+                text = breed.name,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(8.dp)
+            )
         }
     }
 }
