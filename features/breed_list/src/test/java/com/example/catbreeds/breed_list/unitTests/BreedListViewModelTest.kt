@@ -6,7 +6,7 @@ import com.example.catbreeds.domain.repository.BreedRepository
 import com.example.catbreeds.breed_list.BreedListViewModel
 import com.example.catbreeds.test_core.MainDispatcherRule
 import com.example.catbreeds.test_core.mock.getBreeds
-import io.mockk.coEvery
+import io.mockk.coJustRun
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
@@ -47,7 +47,7 @@ class BreedListViewModelTest {
         // GIVEN
         every { breedRepository.getBreeds() } returns flowOf(emptyList())
         every { breedRepository.getFavoriteBreeds() } returns flowOf(emptyList())
-        coEvery { breedRepository.refreshBreeds() } returns Unit
+        coJustRun { breedRepository.refreshBreeds() }
 
         // WHEN
         val vm = vmUnderTest
@@ -64,7 +64,7 @@ class BreedListViewModelTest {
         // GIVEN
         every { breedRepository.getBreeds() } returns flowOf(testBreeds)
         every { breedRepository.getFavoriteBreeds() } returns flowOf(emptyList())
-        coEvery { breedRepository.refreshBreeds() } returns Unit
+        coJustRun { breedRepository.refreshBreeds() }
 
         // WHEN
         val vm = vmUnderTest
@@ -80,7 +80,7 @@ class BreedListViewModelTest {
         // GIVEN
         every { breedRepository.getBreeds() } returns flowOf(emptyList())
         every { breedRepository.getFavoriteBreeds() } returns flowOf(emptyList())
-        coEvery { breedRepository.refreshBreeds() } returns Unit
+        coJustRun { breedRepository.refreshBreeds() }
 
         // WHEN
         val vm = vmUnderTest // Triggers the lazy initialization of vmUnderTest
@@ -96,7 +96,7 @@ class BreedListViewModelTest {
         val (breed1, breed2, breed3, breed4) = testBreeds
         every { breedRepository.getBreeds() } returns flowOf(testBreeds)
         every { breedRepository.getFavoriteBreeds() } returns flowOf(emptyList())
-        coEvery { breedRepository.refreshBreeds() } returns Unit
+        coJustRun { breedRepository.refreshBreeds() }
         val vm = vmUnderTest
         advanceUntilIdle()
 
@@ -138,9 +138,9 @@ class BreedListViewModelTest {
         val breedId = testBreeds.first().id
         every { breedRepository.getBreeds() } returns flowOf(testBreeds)
         every { breedRepository.getFavoriteBreeds() } returns flowOf(emptyList())
-        coEvery { breedRepository.refreshBreeds() } returns Unit
-        coEvery { breedRepository.addBreedToFavorites(breedId) } returns Unit
-        coEvery { breedRepository.removeBreedFromFavorites(breedId) } returns Unit
+        coJustRun { breedRepository.refreshBreeds() }
+        coJustRun { breedRepository.addBreedToFavorites(breedId) }
+        coJustRun { breedRepository.removeBreedFromFavorites(breedId) }
         val vm = vmUnderTest
         advanceUntilIdle()
 
@@ -162,9 +162,9 @@ class BreedListViewModelTest {
 
         every { breedRepository.getBreeds() } returns flowOf(listOf(testBreed))
         every { breedRepository.getFavoriteBreeds() } returns favoriteBreedsFlow
-        coEvery { breedRepository.refreshBreeds() } returns Unit
-        coEvery { breedRepository.addBreedToFavorites(breedId) } returns Unit
-        coEvery { breedRepository.removeBreedFromFavorites(breedId) } returns Unit
+        coJustRun { breedRepository.refreshBreeds() }
+        coJustRun { breedRepository.addBreedToFavorites(breedId) }
+        coJustRun { breedRepository.removeBreedFromFavorites(breedId) }
         val vm = vmUnderTest
         advanceUntilIdle()
 
@@ -192,7 +192,7 @@ class BreedListViewModelTest {
 
         every { breedRepository.getBreeds() } returns flowOf(listOf(favoriteBreed, unfavoriteBreed))
         every { breedRepository.getFavoriteBreeds() } returns favoriteFlow
-        coEvery { breedRepository.refreshBreeds() } returns Unit
+        coJustRun { breedRepository.refreshBreeds() }
         val vm = vmUnderTest
         advanceUntilIdle()
 

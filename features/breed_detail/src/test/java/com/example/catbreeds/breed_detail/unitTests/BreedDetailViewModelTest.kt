@@ -8,6 +8,7 @@ import com.example.catbreeds.breed_detail.BreedDetailViewModel
 import com.example.catbreeds.test_core.MainDispatcherRule
 import com.example.catbreeds.test_core.mock.getBreed
 import io.mockk.coEvery
+import io.mockk.coJustRun
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
@@ -115,7 +116,7 @@ class BreedDetailViewModelTest {
         coEvery { breedRepository.getBreedById(breedId) } returns targetBreed
 
         every { breedRepository.getFavoriteBreeds() } returns flowOf(emptyList())
-        coEvery { breedRepository.addBreedToFavorites(breedId) } returns Unit
+        coJustRun { breedRepository.addBreedToFavorites(breedId) }
         val vm = vmUnderTest
         advanceUntilIdle()
 
@@ -138,7 +139,7 @@ class BreedDetailViewModelTest {
         coEvery { breedRepository.getBreedById(breedId) } returns targetBreed
 
         every { breedRepository.getFavoriteBreeds() } returns flowOf(listOf(targetBreed))
-        coEvery { breedRepository.removeBreedFromFavorites(breedId) } returns Unit
+        coJustRun { breedRepository.removeBreedFromFavorites(breedId) }
         val vm = vmUnderTest
         advanceUntilIdle()
 
@@ -160,8 +161,8 @@ class BreedDetailViewModelTest {
         savedStateHandle["breedId"] = breedId
         coEvery { breedRepository.getBreedById(breedId) } returns targetBreed
         every { breedRepository.getFavoriteBreeds() } returns flowOf(emptyList())
-        coEvery { breedRepository.addBreedToFavorites(breedId) } returns Unit
-        coEvery { breedRepository.removeBreedFromFavorites(breedId) } returns Unit
+        coJustRun { breedRepository.addBreedToFavorites(breedId) }
+        coJustRun { breedRepository.removeBreedFromFavorites(breedId) }
         val vm = vmUnderTest
         advanceUntilIdle()
 
