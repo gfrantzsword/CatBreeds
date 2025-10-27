@@ -14,4 +14,5 @@ kotlin {
 dependencies {
     implementation(libs.kotlinx.coroutines.test)
     implementation(libs.junit)
+    implementation(project(":domain"))
 }

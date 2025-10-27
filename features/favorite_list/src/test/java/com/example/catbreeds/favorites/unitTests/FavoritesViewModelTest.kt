@@ -5,6 +5,7 @@ import com.example.catbreeds.domain.models.Breed
 import com.example.catbreeds.domain.repository.BreedRepository
 import com.example.catbreeds.favorite_list.FavoriteListViewModel
 import com.example.catbreeds.test_core.MainDispatcherRule
+import com.example.catbreeds.test_core.mock.getBreed
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -19,14 +20,6 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-
-// Mock data
-object TestFavoriteListData {
-    fun getFavoriteBreed(id: String, name: String, origin: String, life_span: String) = Breed(
-        id = id, name = name, origin = origin, temperament = "Any", life_span = life_span,
-        description = "Test Desc", reference_image_id = "test", isFavorite = true
-    )
-}
 
 @ExperimentalCoroutinesApi
 class FavoriteListViewModelTest {
@@ -58,8 +51,8 @@ class FavoriteListViewModelTest {
     fun `WHEN correctly initialized SHOULD load and display favorites correctly`() = runTest {
         // GIVEN
         val initialFavorites = listOf(
-            TestFavoriteListData.getFavoriteBreed("id1", "Siberian", "Russia", "10 - 15"),
-            TestFavoriteListData.getFavoriteBreed("id2", "Persian", "Iran", "12 - 14")
+            getBreed(id = "id1", name = "Siberian", isFavorite = true),
+            getBreed(id = "id2", name = "Persian", isFavorite = true)
         )
         favoriteBreedsFlow.value = initialFavorites
 
@@ -69,17 +62,15 @@ class FavoriteListViewModelTest {
 
         // THEN
         assertEquals(2, vm.favoriteBreeds.value.size)
-        val firstFavorite = vm.favoriteBreeds.value.first()
-        assertEquals("Siberian", firstFavorite.name)
-        assertEquals("Russia", firstFavorite.origin)
-        assertEquals("10 - 15", firstFavorite.life_span)
+        assertEquals("Siberian", vm.favoriteBreeds.value[0].name)
+        assertEquals("Persian", vm.favoriteBreeds.value[1].name)
     }
 
     @Test
     fun `WHEN breed is removed from favorites SHOULD update list and call repository`() = runTest {
         // GIVEN
-        val favoriteToRemove = TestFavoriteListData.getFavoriteBreed("id_remove", "A", "O", "1-1")
-        val remainingFavorite = TestFavoriteListData.getFavoriteBreed("id_keep", "B", "O", "1-1")
+        val favoriteToRemove = getBreed(id = "id_remove", isFavorite = true)
+        val remainingFavorite = getBreed(id = "id_keep", isFavorite = true)
         val initialFavorites = listOf(favoriteToRemove, remainingFavorite)
         favoriteBreedsFlow.value = initialFavorites
         coEvery { breedRepository.removeBreedFromFavorites(favoriteToRemove.id) } answers {
@@ -103,7 +94,7 @@ class FavoriteListViewModelTest {
     @Test
     fun `WHEN favorites list updates externally SHOULD update the ViewModel list`() = runTest {
         // GIVEN
-        val initialFavorites = listOf(TestFavoriteListData.getFavoriteBreed("id1", "A", "O", "1-1"))
+        val initialFavorites = listOf(getBreed(id = "id1", isFavorite = true))
         favoriteBreedsFlow.value = initialFavorites
         val vm = vmUnderTest
         advanceUntilIdle()

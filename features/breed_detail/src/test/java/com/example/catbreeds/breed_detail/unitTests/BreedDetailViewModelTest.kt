@@ -6,6 +6,7 @@ import com.example.catbreeds.domain.models.Breed
 import com.example.catbreeds.domain.repository.BreedRepository
 import com.example.catbreeds.breed_detail.BreedDetailViewModel
 import com.example.catbreeds.test_core.MainDispatcherRule
+import com.example.catbreeds.test_core.mock.getBreed
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -21,21 +22,6 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-
-// Mock data
-object TestBreedDetailData {
-    fun getTestBreed(id: String, isFav: Boolean = false) = Breed(
-        id = id,
-        name = "Siberian $id",
-        origin = "Russia",
-        temperament = "Active, Playful",
-        life_span = "10 - 15",
-        description = "A strong, moderately large cat.",
-        reference_image_id = "sibe",
-        isFavorite = isFav
-    )
-    val testBreed = getTestBreed("testId", false)
-}
 
 @ExperimentalCoroutinesApi
 class BreedDetailViewModelTest {
@@ -69,7 +55,7 @@ class BreedDetailViewModelTest {
     @Test
     fun `WHEN initialized with valid ID SHOULD load breed`() = runTest {
         // GIVEN
-        val targetBreed = TestBreedDetailData.testBreed
+        val targetBreed = getBreed()
         val breedId = targetBreed.id
         savedStateHandle["breedId"] = breedId
         coEvery { breedRepository.getBreedById(breedId) } returns targetBreed
@@ -102,7 +88,7 @@ class BreedDetailViewModelTest {
     @Test
     fun `WHEN favorite status updates from flow SHOULD update the ViewModel's breed favorite status`() = runTest {
         // GIVEN
-        val targetBreed = TestBreedDetailData.testBreed
+        val targetBreed = getBreed()
         val breedId = targetBreed.id
         savedStateHandle["breedId"] = breedId
         val favoriteFlow = MutableStateFlow(emptyList<Breed>())
@@ -123,7 +109,7 @@ class BreedDetailViewModelTest {
     @Test
     fun `WHEN toggling favorite SHOULD update state and call repository correctly`() = runTest {
         // GIVEN
-        val targetBreed = TestBreedDetailData.testBreed
+        val targetBreed = getBreed()
         val breedId = targetBreed.id
         savedStateHandle["breedId"] = breedId
         coEvery { breedRepository.getBreedById(breedId) } returns targetBreed
@@ -153,7 +139,7 @@ class BreedDetailViewModelTest {
     @Test
     fun `WHEN rapidly toggling favorite SHOULD result in correct final state and repository calls`() = runTest {
         // GIVEN
-        val targetBreed = TestBreedDetailData.testBreed
+        val targetBreed = getBreed()
         val breedId = targetBreed.id
         savedStateHandle["breedId"] = breedId
         coEvery { breedRepository.getBreedById(breedId) } returns targetBreed

@@ -5,6 +5,7 @@ import com.example.catbreeds.domain.models.Breed
 import com.example.catbreeds.domain.repository.BreedRepository
 import com.example.catbreeds.breed_list.BreedListViewModel
 import com.example.catbreeds.test_core.MainDispatcherRule
+import com.example.catbreeds.test_core.mock.getBreeds
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -20,16 +21,6 @@ import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
 
-// Mock data
-object TestBreedListData {
-    fun getTestBreeds(): List<Breed> = listOf(
-        Breed("sibe", "Siberian", "desc", "Playful, Calm", "Siberia", "10 - 15", "sibe_ref", false),
-        Breed("pers", "Persian", "desc", "Reserved, Quiet", "Iran", "12 - 14", "pers_ref", false),
-        Breed("beng", "Bengal", "desc", "Active, Energetic", "USA", "9 - 12", "beng_ref", false),
-        Breed("mcoo", "Maine Coon", "desc", "Gentle, Playful", "USA", "12 - 15", "mcoo_ref", false)
-    )
-}
-
 @ExperimentalCoroutinesApi
 class BreedListViewModelTest {
 
@@ -43,7 +34,7 @@ class BreedListViewModelTest {
     @RelaxedMockK
     private lateinit var breedRepository: BreedRepository
 
-    private val testBreeds = TestBreedListData.getTestBreeds()
+    private val testBreeds = getBreeds()
 
     private val vmUnderTest: BreedListViewModel by lazy {
         spyk(
