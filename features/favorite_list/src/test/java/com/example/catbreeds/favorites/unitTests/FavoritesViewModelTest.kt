@@ -48,7 +48,7 @@ class FavoriteListViewModelTest {
     }
 
     @Test
-    fun `WHEN correctly initialized SHOULD load and display favorites correctly`() = runTest {
+    fun `WHEN correctly initialized SHOULD load AND display favorites correctly`() = runTest {
         // GIVEN
         val initialFavorites = listOf(
             getBreed(id = "id1", name = "Siberian", isFavorite = true),
@@ -67,7 +67,7 @@ class FavoriteListViewModelTest {
     }
 
     @Test
-    fun `WHEN breed is removed from favorites SHOULD update list and call repository`() = runTest {
+    fun `WHEN breed is removed from favorites SHOULD update list AND call repository`() = runTest {
         // GIVEN
         val favoriteToRemove = getBreed(id = "id_remove", isFavorite = true)
         val remainingFavorite = getBreed(id = "id_keep", isFavorite = true)

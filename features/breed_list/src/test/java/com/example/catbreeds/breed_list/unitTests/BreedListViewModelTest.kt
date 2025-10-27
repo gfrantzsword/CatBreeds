@@ -154,7 +154,7 @@ class BreedListViewModelTest {
     }
 
     @Test
-    fun `WHEN rapidly toggling favorite SHOULD result in correct final state and repository calls`() = runTest {
+    fun `WHEN rapidly toggling favorite SHOULD result in correct final state AND repository calls`() = runTest {
         // GIVEN
         val testBreed = testBreeds.first()
         val breedId = testBreed.id
@@ -168,10 +168,12 @@ class BreedListViewModelTest {
         val vm = vmUnderTest
         advanceUntilIdle()
 
-        // WHEN (spam toggle)
-        vm.toggleFavorite(breedId) // add
-        vm.toggleFavorite(breedId) // remove
-        vm.toggleFavorite(breedId) // add
+        // WHEN (Spam toggle)
+        with (vm) {
+            repeat(3) {
+                toggleFavorite(breedId)
+            }
+        }
         advanceUntilIdle()
 
         // THEN
