@@ -107,32 +107,48 @@ class BreedDetailViewModelTest {
     }
 
     @Test
-    fun `WHEN toggling favorite SHOULD update state and call repository correctly`() = runTest {
+    fun `GIVEN breed is not favorite WHEN toggleFavorite is called SHOULD add it to favorites`() = runTest {
         // GIVEN
-        val targetBreed = getBreed()
+        val targetBreed = getBreed(isFavorite = false)
         val breedId = targetBreed.id
         savedStateHandle["breedId"] = breedId
         coEvery { breedRepository.getBreedById(breedId) } returns targetBreed
+
         every { breedRepository.getFavoriteBreeds() } returns flowOf(emptyList())
         coEvery { breedRepository.addBreedToFavorites(breedId) } returns Unit
+        val vm = vmUnderTest
+        advanceUntilIdle()
+
+        // WHEN
+        vm.toggleFavorite(breedId)
+        advanceUntilIdle()
+
+        // THEN
+        coVerify(exactly = 1) { breedRepository.addBreedToFavorites(breedId) }
+        coVerify(exactly = 0) { breedRepository.removeBreedFromFavorites(any()) }
+        assertTrue(vm.breed.value?.isFavorite ?: false)
+    }
+
+    @Test
+    fun `GIVEN breed is favorite WHEN toggleFavorite is called SHOULD remove it from favorites`() = runTest {
+        // GIVEN
+        val targetBreed = getBreed(isFavorite = true)
+        val breedId = targetBreed.id
+        savedStateHandle["breedId"] = breedId
+        coEvery { breedRepository.getBreedById(breedId) } returns targetBreed
+
+        every { breedRepository.getFavoriteBreeds() } returns flowOf(listOf(targetBreed))
         coEvery { breedRepository.removeBreedFromFavorites(breedId) } returns Unit
         val vm = vmUnderTest
         advanceUntilIdle()
 
-        // WHEN (Add to fav)
+        // WHEN
         vm.toggleFavorite(breedId)
         advanceUntilIdle()
 
-        // THEN (Verify)
-        coVerify(exactly = 1) { breedRepository.addBreedToFavorites(breedId) }
-        assertTrue(vm.breed.value?.isFavorite ?: false)
-
-        // WHEN (Remove from fav)
-        vm.toggleFavorite(breedId)
-        advanceUntilIdle()
-
-        // THEN (Verify)
+        // THEN
         coVerify(exactly = 1) { breedRepository.removeBreedFromFavorites(breedId) }
+        coVerify(exactly = 0) { breedRepository.addBreedToFavorites(any()) }
         assertFalse(vm.breed.value?.isFavorite ?: true)
     }
 
