@@ -18,6 +18,7 @@
             <option value="$PROJECT_DIR$/features/breed_detail" />
             <option value="$PROJECT_DIR$/features/breed_list" />
             <option value="$PROJECT_DIR$/features/favorite_list" />
+            <option value="$PROJECT_DIR$/test_core" />
           </set>
         </option>
       </GradleProjectSettings>

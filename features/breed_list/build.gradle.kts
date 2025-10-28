@@ -44,4 +44,21 @@ dependencies {
 
     // Coil
     implementation(libs.coil.compose)
+
+    // Tests
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.androidx.core.testing)
+    testImplementation(libs.androidx.room.testing)
+    testImplementation(libs.androidx.core)
+    testImplementation(kotlin("test"))
+    testImplementation(project(":test_core"))
+
+    androidTestImplementation(libs.hilt.android.testing.v2571)
+
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.ui.test.junit4)
 }
