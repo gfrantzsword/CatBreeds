@@ -53,14 +53,33 @@ class BreedDetailViewModelTest {
         savedStateHandle = SavedStateHandle()
     }
 
+    // Helper Methods
+    private fun setupInitialState(breed: Breed, favoriteBreeds: List<Breed> = emptyList()) {
+        val breedId = breed.id
+        savedStateHandle["breedId"] = breedId
+        coEvery { breedRepository.getBreedById(breedId) } returns breed
+        every { breedRepository.getFavoriteBreeds() } returns flowOf(favoriteBreeds)
+    }
+
+    private fun setupToggleFavorites(breedId: String) {
+        coJustRun { breedRepository.addBreedToFavorites(breedId) }
+        coJustRun { breedRepository.removeBreedFromFavorites(breedId) }
+    }
+
+    private fun verifyAddBreedToFavorites(breedId: String, times: Int = 1) {
+        coVerify(exactly = times) { breedRepository.addBreedToFavorites(breedId) }
+    }
+
+    private fun verifyRemoveBreedFromFavorites(breedId: String, times: Int = 1) {
+        coVerify(exactly = times) { breedRepository.removeBreedFromFavorites(breedId) }
+    }
+
+    // Tests
     @Test
     fun `WHEN initialized with valid ID SHOULD load breed`() = runTest {
         // GIVEN
         val targetBreed = getBreed()
-        val breedId = targetBreed.id
-        savedStateHandle["breedId"] = breedId
-        coEvery { breedRepository.getBreedById(breedId) } returns targetBreed
-        every { breedRepository.getFavoriteBreeds() } returns flowOf(emptyList())
+        setupInitialState(targetBreed)
 
         // WHEN
         val vm = vmUnderTest
@@ -90,10 +109,8 @@ class BreedDetailViewModelTest {
     fun `WHEN favorite status updates from flow SHOULD update the ViewModel's breed favorite status`() = runTest {
         // GIVEN
         val targetBreed = getBreed()
-        val breedId = targetBreed.id
-        savedStateHandle["breedId"] = breedId
         val favoriteFlow = MutableStateFlow(emptyList<Breed>())
-        coEvery { breedRepository.getBreedById(breedId) } returns targetBreed
+        setupInitialState(targetBreed)
         every { breedRepository.getFavoriteBreeds() } returns favoriteFlow
         val vm = vmUnderTest
         advanceUntilIdle()
@@ -112,11 +129,8 @@ class BreedDetailViewModelTest {
         // GIVEN
         val targetBreed = getBreed(isFavorite = false)
         val breedId = targetBreed.id
-        savedStateHandle["breedId"] = breedId
-        coEvery { breedRepository.getBreedById(breedId) } returns targetBreed
-
-        every { breedRepository.getFavoriteBreeds() } returns flowOf(emptyList())
-        coJustRun { breedRepository.addBreedToFavorites(breedId) }
+        setupInitialState(targetBreed)
+        setupToggleFavorites(breedId)
         val vm = vmUnderTest
         advanceUntilIdle()
 
@@ -125,8 +139,8 @@ class BreedDetailViewModelTest {
         advanceUntilIdle()
 
         // THEN
-        coVerify(exactly = 1) { breedRepository.addBreedToFavorites(breedId) }
-        coVerify(exactly = 0) { breedRepository.removeBreedFromFavorites(any()) }
+        verifyAddBreedToFavorites(breedId, 1)
+        verifyRemoveBreedFromFavorites(breedId, 0)
         assertTrue(vm.breed.value?.isFavorite ?: false)
     }
 
@@ -135,11 +149,8 @@ class BreedDetailViewModelTest {
         // GIVEN
         val targetBreed = getBreed(isFavorite = true)
         val breedId = targetBreed.id
-        savedStateHandle["breedId"] = breedId
-        coEvery { breedRepository.getBreedById(breedId) } returns targetBreed
-
-        every { breedRepository.getFavoriteBreeds() } returns flowOf(listOf(targetBreed))
-        coJustRun { breedRepository.removeBreedFromFavorites(breedId) }
+        setupInitialState(targetBreed, listOf(targetBreed))
+        setupToggleFavorites(breedId)
         val vm = vmUnderTest
         advanceUntilIdle()
 
@@ -148,8 +159,8 @@ class BreedDetailViewModelTest {
         advanceUntilIdle()
 
         // THEN
-        coVerify(exactly = 1) { breedRepository.removeBreedFromFavorites(breedId) }
-        coVerify(exactly = 0) { breedRepository.addBreedToFavorites(any()) }
+        verifyRemoveBreedFromFavorites(breedId, 1)
+        verifyAddBreedToFavorites(breedId, 0)
         assertFalse(vm.breed.value?.isFavorite ?: true)
     }
 
@@ -158,11 +169,8 @@ class BreedDetailViewModelTest {
         // GIVEN
         val targetBreed = getBreed()
         val breedId = targetBreed.id
-        savedStateHandle["breedId"] = breedId
-        coEvery { breedRepository.getBreedById(breedId) } returns targetBreed
-        every { breedRepository.getFavoriteBreeds() } returns flowOf(emptyList())
-        coJustRun { breedRepository.addBreedToFavorites(breedId) }
-        coJustRun { breedRepository.removeBreedFromFavorites(breedId) }
+        setupInitialState(targetBreed)
+        setupToggleFavorites(breedId)
         val vm = vmUnderTest
         advanceUntilIdle()
 
@@ -176,7 +184,7 @@ class BreedDetailViewModelTest {
 
         // THEN
         assertTrue(vm.breed.value?.isFavorite ?: false)
-        coVerify(exactly = 2) { breedRepository.addBreedToFavorites(breedId) }
-        coVerify(exactly = 1) { breedRepository.removeBreedFromFavorites(breedId) }
+        verifyAddBreedToFavorites(breedId, 2)
+        verifyRemoveBreedFromFavorites(breedId, 1)
     }
 }

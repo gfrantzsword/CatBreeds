@@ -42,12 +42,35 @@ class BreedListViewModelTest {
         )
     }
 
+    // Helper Methods
+    private fun setupRepository(breeds: List<Breed>, favoriteBreeds: List<Breed> = emptyList()) {
+        every { breedRepository.getBreeds() } returns flowOf(breeds)
+        every { breedRepository.getFavoriteBreeds() } returns flowOf(favoriteBreeds)
+        coJustRun { breedRepository.refreshBreeds() }
+    }
+
+    private fun setupToggleFavorites(breedId: String) {
+        coJustRun { breedRepository.addBreedToFavorites(breedId) }
+        coJustRun { breedRepository.removeBreedFromFavorites(breedId) }
+    }
+
+    private fun verifyRefreshBreedsCalled(times: Int = 1) {
+        coVerify(exactly = times) { breedRepository.refreshBreeds() }
+    }
+
+    private fun verifyAddBreedToFavorites(breedId: String, times: Int = 1) {
+        coVerify(exactly = times) { breedRepository.addBreedToFavorites(breedId) }
+    }
+
+    private fun verifyRemoveBreedFromFavorites(breedId: String, times: Int = 1) {
+        coVerify(exactly = times) { breedRepository.removeBreedFromFavorites(breedId) }
+    }
+
+    // Tests
     @Test
     fun `WHEN initialized with empty repository SHOULD have empty state`() = runTest {
         // GIVEN
-        every { breedRepository.getBreeds() } returns flowOf(emptyList())
-        every { breedRepository.getFavoriteBreeds() } returns flowOf(emptyList())
-        coJustRun { breedRepository.refreshBreeds() }
+        setupRepository(emptyList())
 
         // WHEN
         val vm = vmUnderTest
@@ -62,9 +85,7 @@ class BreedListViewModelTest {
     @Test
     fun `WHEN correctly initialized SHOULD load breeds correctly`() = runTest {
         // GIVEN
-        every { breedRepository.getBreeds() } returns flowOf(testBreeds)
-        every { breedRepository.getFavoriteBreeds() } returns flowOf(emptyList())
-        coJustRun { breedRepository.refreshBreeds() }
+        setupRepository(testBreeds)
 
         // WHEN
         val vm = vmUnderTest
@@ -78,25 +99,21 @@ class BreedListViewModelTest {
     @Test
     fun `WHEN initialized SHOULD call refreshBreeds`() = runTest {
         // GIVEN
-        every { breedRepository.getBreeds() } returns flowOf(emptyList())
-        every { breedRepository.getFavoriteBreeds() } returns flowOf(emptyList())
-        coJustRun { breedRepository.refreshBreeds() }
+        setupRepository(emptyList())
 
         // WHEN
         val vm = vmUnderTest // Triggers the lazy initialization of vmUnderTest
         advanceUntilIdle()
 
         // THEN
-        coVerify { breedRepository.refreshBreeds() }
+        verifyRefreshBreedsCalled()
     }
 
     @Test
     fun `WHEN search query is updated SHOULD filter list correctly by name origin or temperament`() = runTest {
         // GIVEN
         val (breed1, breed2, breed3, breed4) = testBreeds
-        every { breedRepository.getBreeds() } returns flowOf(testBreeds)
-        every { breedRepository.getFavoriteBreeds() } returns flowOf(emptyList())
-        coJustRun { breedRepository.refreshBreeds() }
+        setupRepository(testBreeds)
         val vm = vmUnderTest
         advanceUntilIdle()
 
@@ -136,11 +153,8 @@ class BreedListViewModelTest {
     fun `WHEN toggleFavorite is called on an unfavorite breed SHOULD call addBreedToFavorites repository method`() = runTest {
         // GIVEN
         val breedId = testBreeds.first().id
-        every { breedRepository.getBreeds() } returns flowOf(testBreeds)
-        every { breedRepository.getFavoriteBreeds() } returns flowOf(emptyList())
-        coJustRun { breedRepository.refreshBreeds() }
-        coJustRun { breedRepository.addBreedToFavorites(breedId) }
-        coJustRun { breedRepository.removeBreedFromFavorites(breedId) }
+        setupRepository(testBreeds)
+        setupToggleFavorites(breedId)
         val vm = vmUnderTest
         advanceUntilIdle()
 
@@ -149,8 +163,8 @@ class BreedListViewModelTest {
         advanceUntilIdle()
 
         // THEN
-        coVerify { breedRepository.addBreedToFavorites(breedId) }
-        coVerify(exactly = 0) { breedRepository.removeBreedFromFavorites(any()) }
+        verifyAddBreedToFavorites(breedId)
+        verifyRemoveBreedFromFavorites(breedId, 0)
     }
 
     @Test
@@ -159,12 +173,9 @@ class BreedListViewModelTest {
         val testBreed = testBreeds.first()
         val breedId = testBreed.id
         val favoriteBreedsFlow = MutableStateFlow(emptyList<Breed>())
-
-        every { breedRepository.getBreeds() } returns flowOf(listOf(testBreed))
+        setupRepository(listOf(testBreed))
         every { breedRepository.getFavoriteBreeds() } returns favoriteBreedsFlow
-        coJustRun { breedRepository.refreshBreeds() }
-        coJustRun { breedRepository.addBreedToFavorites(breedId) }
-        coJustRun { breedRepository.removeBreedFromFavorites(breedId) }
+        setupToggleFavorites(breedId)
         val vm = vmUnderTest
         advanceUntilIdle()
 
@@ -179,8 +190,8 @@ class BreedListViewModelTest {
         // THEN
         val finalBreed = vm.filteredBreeds.value.firstOrNull()
         assertTrue(finalBreed?.isFavorite ?: false)
-        coVerify(exactly = 2) { breedRepository.addBreedToFavorites(breedId) }
-        coVerify(exactly = 1) { breedRepository.removeBreedFromFavorites(breedId) }
+        verifyAddBreedToFavorites(breedId, 2)
+        verifyRemoveBreedFromFavorites(breedId, 1)
     }
 
     @Test
@@ -189,10 +200,8 @@ class BreedListViewModelTest {
         val favoriteBreed = testBreeds.first()
         val unfavoriteBreed = testBreeds.last()
         val favoriteFlow = MutableStateFlow(emptyList<Breed>())
-
-        every { breedRepository.getBreeds() } returns flowOf(listOf(favoriteBreed, unfavoriteBreed))
+        setupRepository(listOf(favoriteBreed, unfavoriteBreed))
         every { breedRepository.getFavoriteBreeds() } returns favoriteFlow
-        coJustRun { breedRepository.refreshBreeds() }
         val vm = vmUnderTest
         advanceUntilIdle()
 

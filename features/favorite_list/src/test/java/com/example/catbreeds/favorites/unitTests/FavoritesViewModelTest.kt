@@ -47,6 +47,12 @@ class FavoriteListViewModelTest {
         every { breedRepository.getFavoriteBreeds() } returns favoriteBreedsFlow
     }
 
+    // Helper Methods
+    private fun verifyRemoveFromFavorites(breedId: String, times: Int = 1) {
+        coVerify(exactly = times) { breedRepository.removeBreedFromFavorites(breedId) }
+    }
+
+    // Tests
     @Test
     fun `WHEN correctly initialized SHOULD load AND display favorites correctly`() = runTest {
         // GIVEN
@@ -85,7 +91,7 @@ class FavoriteListViewModelTest {
         advanceUntilIdle()
 
         // THEN
-        coVerify(exactly = 1) { breedRepository.removeBreedFromFavorites(favoriteToRemove.id) }
+        verifyRemoveFromFavorites(favoriteToRemove.id)
         assertEquals(1, vm.favoriteBreeds.value.size)
         assertFalse(vm.favoriteBreeds.value.any { it.id == favoriteToRemove.id })
         assertTrue(vm.favoriteBreeds.value.any { it.id == remainingFavorite.id })
