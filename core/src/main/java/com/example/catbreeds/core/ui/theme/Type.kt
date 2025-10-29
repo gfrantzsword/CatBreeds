@@ -6,29 +6,49 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-// Set of Material typography styles to start with
-val Typography = Typography(
-    bodyLarge = TextStyle(
+private object BaseTypography {
+    val FontSizeSmall = 12.sp
+    val FontSizeMedium = 14.sp
+    val FontSizeLarge = 16.sp
+    val FontSizeTitle = 18.sp
+    val FontSizeHeadline = 24.sp
+
+    val FontWeightNormal = FontWeight.Normal
+    val FontWeightBold = FontWeight.Bold
+
+    val LineHeightDefault = 24.sp
+}
+
+val AppTypography = Typography(
+    headlineMedium = TextStyle(
         fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.5.sp
-    )
-    /* Other default text styles to override
+        fontWeight = BaseTypography.FontWeightBold,
+        fontSize = BaseTypography.FontSizeHeadline
+    ),
     titleLarge = TextStyle(
         fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 22.sp,
-        lineHeight = 28.sp,
-        letterSpacing = 0.sp
+        fontWeight = BaseTypography.FontWeightBold,
+        fontSize = BaseTypography.FontSizeTitle
     ),
-    labelSmall = TextStyle(
+    titleMedium = TextStyle(
         fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Medium,
-        fontSize = 11.sp,
-        lineHeight = 16.sp,
-        letterSpacing = 0.5.sp
+        fontWeight = BaseTypography.FontWeightBold,
+        fontSize = BaseTypography.FontSizeTitle
+    ),
+    bodyLarge = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = BaseTypography.FontWeightNormal,
+        fontSize = BaseTypography.FontSizeLarge,
+        lineHeight = BaseTypography.LineHeightDefault
+    ),
+    bodyMedium = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = BaseTypography.FontWeightNormal,
+        fontSize = BaseTypography.FontSizeMedium
+    ),
+    bodySmall = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = BaseTypography.FontWeightNormal,
+        fontSize = BaseTypography.FontSizeSmall
     )
-    */
 )

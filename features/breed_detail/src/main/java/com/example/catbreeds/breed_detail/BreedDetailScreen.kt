@@ -30,14 +30,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.example.catbreeds.core.ui.theme.AppDimensions
+import com.example.catbreeds.core.ui.theme.FavoriteIconColor
 import com.example.catbreeds.core.util.ErrorHandler
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -73,7 +71,7 @@ fun BreedDetailScreen(
                             Icon(
                                 imageVector = if (breedData.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                                 contentDescription = if (breedData.isFavorite) "Remove from favorites" else "Add to favorites",
-                                tint = if (breedData.isFavorite) Color.Red else MaterialTheme.colorScheme.onSurfaceVariant
+                                tint = if (breedData.isFavorite) FavoriteIconColor else MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
@@ -86,9 +84,9 @@ fun BreedDetailScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .padding(16.dp)
+                    .padding(AppDimensions.ScreenPadding)
                     .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(AppDimensions.DetailsVerticalSpacing)
             ) {
                 // Cat image
                 AsyncImage(
@@ -96,12 +94,12 @@ fun BreedDetailScreen(
                     contentDescription = "Image of ${breed.name}",
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(8.dp)),
+                        .clip(RoundedCornerShape(AppDimensions.CardCornerRadius)),
                     contentScale = ContentScale.Crop,
                     placeholder = painterResource(id = R.drawable.ic_menu_report_image),
                     error = painterResource(id = R.drawable.ic_menu_close_clear_cancel)
                 )
-                // Name and origin
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -110,12 +108,11 @@ fun BreedDetailScreen(
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = breed.name,
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold
+                            style = MaterialTheme.typography.headlineMedium
                         )
                         Text(
                             text = "Origin: ${breed.origin}",
-                            fontSize = 16.sp,
+                            style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -125,13 +122,11 @@ fun BreedDetailScreen(
                 Column {
                     Text(
                         text = "Temperament",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
+                        style = MaterialTheme.typography.titleLarge
                     )
                     Text(
                         text = breed.temperament,
-                        fontSize = 16.sp,
-                        lineHeight = 24.sp
+                        style = MaterialTheme.typography.bodyLarge
                     )
                 }
 
@@ -139,13 +134,11 @@ fun BreedDetailScreen(
                 Column {
                     Text(
                         text = "Description",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
+                        style = MaterialTheme.typography.titleLarge
                     )
                     Text(
                         text = breed.description,
-                        fontSize = 16.sp,
-                        lineHeight = 24.sp
+                        style = MaterialTheme.typography.bodyLarge
                     )
                 }
             }

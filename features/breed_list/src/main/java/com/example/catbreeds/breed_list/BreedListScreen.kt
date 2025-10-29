@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -48,12 +49,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.example.catbreeds.core.ui.theme.AppDimensions
+import com.example.catbreeds.core.ui.theme.FavoriteIconColor
 import com.example.catbreeds.core.util.ErrorHandler
 import com.example.catbreeds.domain.models.Breed
 
@@ -159,8 +160,12 @@ fun BreedListScreen(
             } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = androidx.compose.foundation.layout.PaddingValues(start = 16.dp, end = 16.dp, bottom = 96.dp)
+                    verticalArrangement = Arrangement.spacedBy(AppDimensions.InterItemSpacing),
+                    contentPadding = PaddingValues(
+                        start = AppDimensions.ScreenPadding,
+                        end = AppDimensions.ScreenPadding,
+                        bottom = AppDimensions.LazyColumnBottomPaddingForNav
+                    )
                 ) {
                     items(filteredBreeds) { breed ->
                         BreedCard(
@@ -193,7 +198,7 @@ fun BreedCard(
                 contentDescription = "Image of ${breed.name}",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp, 8.dp, 0.dp, 0.dp)),
+                    .clip(RoundedCornerShape(topStart = AppDimensions.CardCornerRadius, topEnd = AppDimensions.CardCornerRadius)),
                 contentScale = ContentScale.Crop,
                 placeholder = painterResource(id = R.drawable.ic_menu_report_image),
                 error = painterResource(id = R.drawable.ic_menu_close_clear_cancel)
@@ -203,19 +208,18 @@ fun BreedCard(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(AppDimensions.CardPadding),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = breed.name,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
+                        style = MaterialTheme.typography.titleMedium
                     )
                     Text(
                         text = breed.origin,
-                        fontSize = 14.sp,
+                        style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -224,7 +228,7 @@ fun BreedCard(
                     Icon(
                         imageVector = if (breed.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                         contentDescription = if (breed.isFavorite) "Remove from favorites" else "Add to favorites",
-                        tint = if (breed.isFavorite) Color.Red else MaterialTheme.colorScheme.onSurfaceVariant
+                        tint = if (breed.isFavorite) FavoriteIconColor else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }

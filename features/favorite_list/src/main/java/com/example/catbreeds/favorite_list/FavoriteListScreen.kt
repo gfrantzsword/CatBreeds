@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Card
@@ -22,27 +23,24 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.AsyncImage
-import com.example.catbreeds.domain.models.Breed
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.runtime.remember
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
+import com.example.catbreeds.core.ui.theme.AppDimensions
+import com.example.catbreeds.core.ui.theme.FavoriteIconColor
 import com.example.catbreeds.core.util.ErrorHandler
+import com.example.catbreeds.domain.models.Breed
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -90,18 +88,18 @@ fun FavoriteListScreen(
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                        verticalArrangement = Arrangement.spacedBy(AppDimensions.InterItemSpacing)
                     ) {
                         // When there are no favorite breeds
                         Icon(
                             Icons.Default.Favorite,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(16.dp)
+                            modifier = Modifier.padding(AppDimensions.NoFavoritesMessageIconPadding)
                         )
                         Text(
                             text = "No favorite breeds yet",
-                            fontSize = 18.sp,
+                            style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center
                         )
@@ -113,8 +111,13 @@ fun FavoriteListScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 96.dp)
+                    verticalArrangement = Arrangement.spacedBy(AppDimensions.InterItemSpacing),
+                    contentPadding = PaddingValues(
+                        start = AppDimensions.ScreenPadding,
+                        top = AppDimensions.ScreenPadding,
+                        end = AppDimensions.ScreenPadding,
+                        bottom = AppDimensions.LazyColumnBottomPaddingForNav
+                    )
                 ) {
                     items(favoriteBreeds) { breed ->
                         FavoriteBreedCard(
@@ -143,7 +146,7 @@ fun FavoriteBreedCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(AppDimensions.CardPadding),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -152,9 +155,9 @@ fun FavoriteBreedCard(
                 model = "https://cdn2.thecatapi.com/images/${breed.reference_image_id}.jpg",
                 contentDescription = "Image of ${breed.name}",
                 modifier = Modifier
-                    .size(height = 100.dp, width = 100.dp)
-                    .padding(end = 16.dp)
-                    .clip(RoundedCornerShape(8.dp)),
+                    .size(AppDimensions.FavoriteListItemImageSize)
+                    .padding(end = AppDimensions.CardPadding)
+                    .clip(RoundedCornerShape(AppDimensions.CardCornerRadius)),
                 contentScale = ContentScale.Crop,
                 placeholder = painterResource(id = R.drawable.ic_menu_report_image),
                 error = painterResource(id = R.drawable.ic_menu_close_clear_cancel)
@@ -164,12 +167,11 @@ fun FavoriteBreedCard(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = breed.name,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
+                    style = MaterialTheme.typography.titleMedium
                 )
                 Text(
                     text = breed.origin,
-                    fontSize = 14.sp,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
@@ -178,7 +180,7 @@ fun FavoriteBreedCard(
                 lowerLifeSpan?.let {
                     Text(
                         text = "Average lifespan: $it years",
-                        fontSize = 12.sp,
+                        style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -188,7 +190,7 @@ fun FavoriteBreedCard(
                 Icon(
                     Icons.Default.Favorite,
                     contentDescription = "Remove from favorites",
-                    tint = Color.Red
+                    tint = FavoriteIconColor
                 )
             }
         }

@@ -6,12 +6,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -27,10 +25,10 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.catbreeds.breed_detail.BreedDetailScreen
 import com.example.catbreeds.breed_list.BreedListScreen
-import com.example.catbreeds.favorite_list.FavoriteListScreen
 import com.example.catbreeds.core.ui.navigation.Screen
+import com.example.catbreeds.core.ui.theme.CatBreedsTheme
+import com.example.catbreeds.favorite_list.FavoriteListScreen
 import dagger.hilt.android.AndroidEntryPoint
-import kotlin.collections.contains
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -38,7 +36,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            MaterialTheme {
+            CatBreedsTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     AppContent()
                 }
@@ -56,7 +54,8 @@ fun AppContent() {
         bottomBar = {
             BottomNavigationBar(navController = navController)
         }
-    ) { NavHost(
+    ) {
+        NavHost(
             navController = navController,
             startDestination = Screen.BreedList.route,
         ) {
