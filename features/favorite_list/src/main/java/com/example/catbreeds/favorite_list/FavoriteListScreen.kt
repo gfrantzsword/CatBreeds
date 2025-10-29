@@ -114,7 +114,7 @@ fun FavoriteListScreen(
                         .fillMaxSize()
                         .padding(paddingValues),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(16.dp)
+                    contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 96.dp)
                 ) {
                     items(favoriteBreeds) { breed ->
                         FavoriteBreedCard(
