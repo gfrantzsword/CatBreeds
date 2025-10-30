@@ -10,9 +10,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,6 +20,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.catbreeds.core.ui.theme.AppDimensions
+import com.example.catbreeds.core.ui.theme.BrandRed
+import com.example.catbreeds.core.ui.theme.ShadowColor
 import com.example.catbreeds.core.util.ErrorHandler
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -41,11 +41,22 @@ fun BreedDetailScreen(
         onErrorShown = viewModel::clearError
     )
 
+    // Scroll state for dynamic shadow
+    val scrollState = rememberScrollState()
+    val showTopBarShadow = scrollState.value > 0
+
     // Content
     Scaffold(
         topBar = {
             TopAppBar(
-                modifier = Modifier.shadow(AppDimensions.BarShadow),
+                modifier = if (showTopBarShadow) {
+                    Modifier.shadow(
+                        elevation = AppDimensions.BarShadow,
+                        spotColor = ShadowColor
+                    )
+                } else {
+                    Modifier
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainer
                 ),
@@ -61,7 +72,7 @@ fun BreedDetailScreen(
                             Icon(
                                 imageVector = if (breedData.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                                 contentDescription = if (breedData.isFavorite) "Remove from favorites" else "Add to favorites",
-                                tint = if (breedData.isFavorite) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurfaceVariant
+                                tint = BrandRed
                             )
                         }
                     }
@@ -75,7 +86,7 @@ fun BreedDetailScreen(
                     .fillMaxSize()
                     .padding(paddingValues)
                     .padding(AppDimensions.ScreenPadding)
-                    .verticalScroll(rememberScrollState()),
+                    .verticalScroll(scrollState),
                 verticalArrangement = Arrangement.spacedBy(AppDimensions.DetailsVerticalSpacing)
             ) {
                 // Cat image

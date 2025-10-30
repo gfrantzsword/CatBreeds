@@ -7,10 +7,10 @@ private object BaseValues {
     val SpacingMedium = 16.dp
     val SpacingExtraLarge = 96.dp
 
-    val CornerRadius = 8.dp
+    val CornerRadius = 16.dp
     val ImageSizeMedium = 100.dp
 
-    val ShadowSmall = 8.dp
+    val ShadowSmall = 6.dp
 }
 
 object AppDimensions {

@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -30,6 +31,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.catbreeds.core.ui.theme.AppDimensions
+import com.example.catbreeds.core.ui.theme.BrandRed
+import com.example.catbreeds.core.ui.theme.ShadowColor
 import com.example.catbreeds.core.util.ErrorHandler
 import com.example.catbreeds.domain.models.Breed
 
@@ -57,6 +60,14 @@ fun BreedListScreen(
         onErrorShown = viewModel::clearError
     )
 
+    // Scroll state for dynamic shadow
+    val lazyListState = rememberLazyListState()
+    val showTopBarShadow by remember {
+        derivedStateOf {
+            lazyListState.firstVisibleItemIndex > 0 || lazyListState.firstVisibleItemScrollOffset > 0
+        }
+    }
+
     LaunchedEffect(isSearchActive) {
         if (isSearchActive) {
             focusRequester.requestFocus()
@@ -69,9 +80,18 @@ fun BreedListScreen(
             val topAppBarColors = TopAppBarDefaults.topAppBarColors(
                 containerColor = MaterialTheme.colorScheme.surfaceContainer
             )
+            val topBarModifier = if (showTopBarShadow) {
+                Modifier.shadow(
+                    elevation = AppDimensions.BarShadow,
+                    spotColor = ShadowColor
+                )
+            } else {
+                Modifier
+            }
+
             if (isSearchActive) {
                 TopAppBar(
-                    modifier = Modifier.shadow(AppDimensions.BarShadow),
+                    modifier = topBarModifier,
                     colors = topAppBarColors,
                     title = {
                         TextField(
@@ -112,7 +132,7 @@ fun BreedListScreen(
                 )
             } else {
                 TopAppBar(
-                    modifier = Modifier.shadow(AppDimensions.BarShadow),
+                    modifier = topBarModifier,
                     colors = topAppBarColors,
                     title = { Text("Cat Breeds") },
                     actions = {
@@ -141,6 +161,7 @@ fun BreedListScreen(
                 }
             } else {
                 LazyColumn(
+                    state = lazyListState,
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.spacedBy(AppDimensions.InterItemSpacing),
                     contentPadding = PaddingValues(
@@ -172,9 +193,14 @@ fun BreedCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() },
+            .clickable { onClick() }
+            .shadow(
+                elevation = AppDimensions.BarShadow,
+                spotColor = ShadowColor,
+                shape = RoundedCornerShape(AppDimensions.CardCornerRadius)
+            ),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer
+            containerColor = MaterialTheme.colorScheme.surface
         )
     ) {
         Column {
@@ -184,7 +210,12 @@ fun BreedCard(
                 contentDescription = "Image of ${breed.name}",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(topStart = AppDimensions.CardCornerRadius, topEnd = AppDimensions.CardCornerRadius)),
+                    .clip(
+                        RoundedCornerShape(
+                            topStart = AppDimensions.CardCornerRadius,
+                            topEnd = AppDimensions.CardCornerRadius
+                        )
+                    ),
                 contentScale = ContentScale.Crop,
                 placeholder = painterResource(id = R.drawable.ic_menu_report_image),
                 error = painterResource(id = R.drawable.ic_menu_close_clear_cancel)
@@ -214,7 +245,7 @@ fun BreedCard(
                     Icon(
                         imageVector = if (breed.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                         contentDescription = if (breed.isFavorite) "Remove from favorites" else "Add to favorites",
-                        tint = if (breed.isFavorite) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurfaceVariant
+                        tint = BrandRed
                     )
                 }
             }

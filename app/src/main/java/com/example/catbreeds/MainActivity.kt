@@ -31,6 +31,7 @@ import com.example.catbreeds.breed_list.BreedListScreen
 import com.example.catbreeds.core.ui.navigation.Screen
 import com.example.catbreeds.core.ui.theme.AppDimensions
 import com.example.catbreeds.core.ui.theme.CatBreedsTheme
+import com.example.catbreeds.core.ui.theme.ShadowColor
 import com.example.catbreeds.favorite_list.FavoriteListScreen
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -41,7 +42,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             CatBreedsTheme {
-                Surface(modifier = Modifier.fillMaxSize()) {
+                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                     AppContent()
                 }
             }
@@ -98,15 +99,18 @@ fun BottomNavigationBar(navController: NavController) {
 
     if (showBottomBar) {
         NavigationBar(
-            modifier = Modifier.shadow(AppDimensions.BarShadow),
-            containerColor = MaterialTheme.colorScheme.surfaceContainer
+            modifier = Modifier.shadow(
+                elevation = AppDimensions.BarShadow,
+                spotColor = ShadowColor
+            ),
+            containerColor = MaterialTheme.colorScheme.surface
         ) {
             val itemColors = NavigationBarItemDefaults.colors(
-                selectedIconColor = MaterialTheme.colorScheme.secondary,
-                selectedTextColor = MaterialTheme.colorScheme.secondary,
+                selectedIconColor = MaterialTheme.colorScheme.primary,
+                selectedTextColor = MaterialTheme.colorScheme.primary,
                 unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                indicatorColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f)
+                indicatorColor = MaterialTheme.colorScheme.surface
             )
 
             NavigationBarItem(

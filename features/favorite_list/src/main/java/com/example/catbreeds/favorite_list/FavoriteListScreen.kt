@@ -5,13 +5,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,6 +21,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.catbreeds.core.ui.theme.AppDimensions
+import com.example.catbreeds.core.ui.theme.BrandRed
+import com.example.catbreeds.core.ui.theme.ShadowColor
 import com.example.catbreeds.core.util.ErrorHandler
 import com.example.catbreeds.domain.models.Breed
 
@@ -43,11 +44,26 @@ fun FavoriteListScreen(
         onErrorShown = viewModel::clearError
     )
 
+    // Scroll state for dynamic shadow
+    val lazyListState = rememberLazyListState()
+    val showTopBarShadow by remember {
+        derivedStateOf {
+            lazyListState.firstVisibleItemIndex > 0 || lazyListState.firstVisibleItemScrollOffset > 0
+        }
+    }
+
     // Content
     Scaffold(
         topBar = {
             TopAppBar(
-                modifier = Modifier.shadow(AppDimensions.BarShadow),
+                modifier = if (showTopBarShadow) {
+                    Modifier.shadow(
+                        elevation = AppDimensions.BarShadow,
+                        spotColor = ShadowColor
+                    )
+                } else {
+                    Modifier
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainer
                 ),
@@ -95,6 +111,7 @@ fun FavoriteListScreen(
             }
             else -> {
                 LazyColumn(
+                    state = lazyListState,
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues),
@@ -128,9 +145,14 @@ fun FavoriteBreedCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onBreedClick() },
+            .clickable { onBreedClick() }
+            .shadow(
+                elevation = AppDimensions.BarShadow,
+                spotColor = ShadowColor,
+                shape = RoundedCornerShape(AppDimensions.CardCornerRadius)
+            ),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer
+            containerColor = MaterialTheme.colorScheme.surface
         )
     ) {
         Row(
@@ -180,7 +202,7 @@ fun FavoriteBreedCard(
                 Icon(
                     Icons.Default.Favorite,
                     contentDescription = "Remove from favorites",
-                    tint = MaterialTheme.colorScheme.secondary
+                    tint = BrandRed
                 )
             }
         }
