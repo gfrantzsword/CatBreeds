@@ -10,14 +10,17 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -26,6 +29,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.catbreeds.breed_detail.BreedDetailScreen
 import com.example.catbreeds.breed_list.BreedListScreen
 import com.example.catbreeds.core.ui.navigation.Screen
+import com.example.catbreeds.core.ui.theme.AppDimensions
 import com.example.catbreeds.core.ui.theme.CatBreedsTheme
 import com.example.catbreeds.favorite_list.FavoriteListScreen
 import dagger.hilt.android.AndroidEntryPoint
@@ -93,8 +97,20 @@ fun BottomNavigationBar(navController: NavController) {
     val showBottomBar = currentRoute in listOf(Screen.BreedList.route, Screen.Favorites.route)
 
     if (showBottomBar) {
-        NavigationBar {
+        NavigationBar(
+            modifier = Modifier.shadow(AppDimensions.BarShadow),
+            containerColor = MaterialTheme.colorScheme.surfaceContainer
+        ) {
+            val itemColors = NavigationBarItemDefaults.colors(
+                selectedIconColor = MaterialTheme.colorScheme.secondary,
+                selectedTextColor = MaterialTheme.colorScheme.secondary,
+                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                indicatorColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f)
+            )
+
             NavigationBarItem(
+                colors = itemColors,
                 icon = { Icon(Icons.Default.Home, contentDescription = "Breeds") },
                 label = { Text("Breeds") },
                 selected = currentRoute == Screen.BreedList.route,
@@ -107,6 +123,7 @@ fun BottomNavigationBar(navController: NavController) {
                 }
             )
             NavigationBarItem(
+                colors = itemColors,
                 icon = { Icon(Icons.Default.Favorite, contentDescription = "Favorites") },
                 label = { Text("Favorites") },
                 selected = currentRoute == Screen.Favorites.route,

@@ -11,21 +11,37 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = DarkPrimary,
+    onPrimary = DarkOnPrimary,
+    secondary = DarkSecondary,
+    onSecondary = DarkOnSecondary,
+    tertiary = DarkTertiary,
+    onTertiary = DarkOnTertiary,
+    background = DarkBackground,
+    onBackground = DarkOnBackground,
+    surface = DarkSurface,
+    onSurfaceVariant = DarkOnSurfaceVariant,
+    surfaceContainer = DarkSurfaceContainer
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    primary = LightPrimary,
+    onPrimary = LightOnPrimary,
+    secondary = LightSecondary,
+    onSecondary = LightOnSecondary,
+    tertiary = LightTertiary,
+    onTertiary = LightOnTertiary,
+    background = LightBackground,
+    onBackground = LightOnBackground,
+    surface = LightSurface,
+    onSurfaceVariant = LightOnSurfaceVariant,
+    surfaceContainer = LightSurfaceContainer
 )
 
 @Composable
 fun CatBreedsTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {

@@ -9,6 +9,8 @@ private object BaseValues {
 
     val CornerRadius = 8.dp
     val ImageSizeMedium = 100.dp
+
+    val ShadowSmall = 8.dp
 }
 
 object AppDimensions {
@@ -25,4 +27,6 @@ object AppDimensions {
 
     // Sizes
     val FavoriteListItemImageSize = BaseValues.ImageSizeMedium
+
+    val BarShadow = BaseValues.ShadowSmall
 }
