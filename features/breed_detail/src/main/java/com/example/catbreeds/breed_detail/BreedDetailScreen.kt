@@ -1,7 +1,10 @@
 package com.example.catbreeds.breed_detail
 
 import android.R
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -10,6 +13,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.*
+import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,17 +24,21 @@ import androidx.compose.ui.res.painterResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.catbreeds.core.ui.theme.AppDimensions
+import com.example.catbreeds.core.ui.theme.AppTypography
 import com.example.catbreeds.core.ui.theme.BrandRed
 import com.example.catbreeds.core.ui.theme.ShadowColor
 import com.example.catbreeds.core.util.ErrorHandler
+import com.example.catbreeds.domain.models.Breed
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BreedDetailScreen(
     viewModel: BreedDetailViewModel = hiltViewModel(),
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onBreedClick: (String) -> Unit
 ) {
     val breed by viewModel.breed
+    val similarBreeds by viewModel.similarBreeds
 
     // To handle snackbar and error messages
     val errorMessage by viewModel.errorMessage
@@ -142,6 +150,29 @@ fun BreedDetailScreen(
                         style = MaterialTheme.typography.bodyLarge
                     )
                 }
+
+                // Similar Breeds
+                if (similarBreeds.isNotEmpty()) {
+                    Column {
+                        Text(
+                            text = "Similar Breeds",
+                            style = MaterialTheme.typography.titleLarge,
+                            modifier = Modifier.padding(bottom = AppDimensions.InterItemSpacing)
+                        )
+                        LazyRow(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(AppDimensions.InterItemSpacing),
+                        ) {
+                            items(similarBreeds) { similarBreed ->
+                                SimilarBreedCard(
+                                    breed = similarBreed,
+                                    onClick = { onBreedClick(similarBreed.id) }
+                                )
+                            }
+                        }
+                    }
+                }
             }
         } ?: run {
             Box(
@@ -152,6 +183,50 @@ fun BreedDetailScreen(
             ) {
                 CircularProgressIndicator()
             }
+        }
+    }
+
+}
+
+@Composable
+fun SimilarBreedCard(
+    breed: Breed,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .clickable { onClick() }
+            .width(AppDimensions.SecondaryItemImageSize),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
+    ) {
+        Column {
+            AsyncImage(
+                model = "https://cdn2.thecatapi.com/images/${breed.reference_image_id}.jpg",
+                contentDescription = "Image of ${breed.name}",
+                modifier = Modifier
+                    .size(AppDimensions.SecondaryItemImageSize)
+                    .clip(RoundedCornerShape(
+                        topStart = AppDimensions.CardCornerRadius,
+                        topEnd = AppDimensions.CardCornerRadius
+                    )),
+                contentScale = ContentScale.Crop,
+                placeholder = painterResource(id = R.drawable.ic_menu_report_image),
+                error = painterResource(id = R.drawable.ic_menu_close_clear_cancel)
+            )
+            Column (modifier = Modifier.padding(AppDimensions.secondaryCardPadding)) {
+                Text(
+                    text = breed.name,
+                    style = AppTypography.titleSmall,
+                    maxLines = 2
+                )
+                Text(
+                    text = breed.origin,
+                    style = AppTypography.bodySmall,
+                )
+            }
+
         }
     }
 }

@@ -167,7 +167,7 @@ fun FavoriteBreedCard(
                 model = "https://cdn2.thecatapi.com/images/${breed.reference_image_id}.jpg",
                 contentDescription = "Image of ${breed.name}",
                 modifier = Modifier
-                    .size(AppDimensions.FavoriteListItemImageSize)
+                    .size(AppDimensions.TertiaryItemImageSize)
                     .padding(end = AppDimensions.CardPadding)
                     .clip(RoundedCornerShape(AppDimensions.CardCornerRadius)),
                 contentScale = ContentScale.Crop,

@@ -10,6 +10,7 @@ import com.example.catbreeds.domain.repository.BreedRepository
 import com.example.catbreeds.core.util.ConnectivityChecker
 import com.example.catbreeds.core.util.ErrorMessages
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 
@@ -76,6 +77,22 @@ class BreedRepositoryImpl(
                 localSource.getById(favoriteEntity.id)?.toBreed(isFavorite = true)
             }
             emit(favoriteBreeds)
+        }
+    }
+
+    override fun getSimilarBreeds(breedId: String): Flow<List<Breed>> {
+        return flow {
+            val breed = getBreedById(breedId)
+            if (breed != null) {
+                val allBreeds = getBreeds().first()
+                val temperamentList = breed.temperament.split(", ")
+                val similar = allBreeds.filter {
+                    it.id != breed.id && (it.origin == breed.origin || it.temperament.split(", ").count { temperament -> temperamentList.contains(temperament) } >= 3)
+                }.take(6)
+                emit(similar)
+            } else {
+                emit(emptyList())
+            }
         }
     }
 }

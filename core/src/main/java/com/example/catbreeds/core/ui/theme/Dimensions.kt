@@ -8,7 +8,8 @@ private object BaseValues {
     val SpacingExtraLarge = 96.dp
 
     val CornerRadius = 16.dp
-    val ImageSizeMedium = 100.dp
+    val ImageSizeSmall = 100.dp
+    val ImageSizeMedium = 200.dp
 
     val ShadowSmall = 6.dp
 }
@@ -17,6 +18,7 @@ object AppDimensions {
     // Paddings
     val ScreenPadding = BaseValues.SpacingMedium
     val CardPadding = BaseValues.SpacingMedium
+    val secondaryCardPadding = BaseValues.SpacingSmall
     val InterItemSpacing = BaseValues.SpacingSmall
     val DetailsVerticalSpacing = BaseValues.SpacingMedium
     val NoFavoritesMessageIconPadding = BaseValues.SpacingMedium
@@ -26,7 +28,8 @@ object AppDimensions {
     val CardCornerRadius = BaseValues.CornerRadius
 
     // Sizes
-    val FavoriteListItemImageSize = BaseValues.ImageSizeMedium
+    val SecondaryItemImageSize = BaseValues.ImageSizeMedium
+    val TertiaryItemImageSize = BaseValues.ImageSizeSmall
 
     val BarShadow = BaseValues.ShadowSmall
 }
