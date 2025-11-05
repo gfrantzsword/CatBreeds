@@ -215,7 +215,7 @@ fun SimilarBreedCard(
                 placeholder = painterResource(id = R.drawable.ic_menu_report_image),
                 error = painterResource(id = R.drawable.ic_menu_close_clear_cancel)
             )
-            Column (modifier = Modifier.padding(AppDimensions.secondaryCardPadding)) {
+            Column (modifier = Modifier.padding(AppDimensions.SecondaryCardPadding)) {
                 Text(
                     text = breed.name,
                     style = AppTypography.titleSmall,

@@ -3,9 +3,10 @@ package com.example.catbreeds.breed_list
 import android.R
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -23,7 +24,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -61,10 +61,10 @@ fun BreedListScreen(
     )
 
     // Scroll state for dynamic shadow
-    val lazyListState = rememberLazyListState()
+    val lazyGridState = rememberLazyStaggeredGridState()
     val showTopBarShadow by remember {
         derivedStateOf {
-            lazyListState.firstVisibleItemIndex > 0 || lazyListState.firstVisibleItemScrollOffset > 0
+            lazyGridState.firstVisibleItemIndex > 0 || lazyGridState.firstVisibleItemScrollOffset > 0
         }
     }
 
@@ -160,10 +160,12 @@ fun BreedListScreen(
                     CircularProgressIndicator()
                 }
             } else {
-                LazyColumn(
-                    state = lazyListState,
+                LazyVerticalStaggeredGrid(
+                    columns = StaggeredGridCells.Fixed(2),
+                    state = lazyGridState,
                     modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(AppDimensions.InterItemSpacing),
+                    verticalItemSpacing = AppDimensions.InterItemSpacing,
+                    horizontalArrangement = Arrangement.spacedBy(AppDimensions.InterItemSpacing),
                     contentPadding = PaddingValues(
                         start = AppDimensions.ScreenPadding,
                         top = AppDimensions.ScreenPadding,
@@ -192,7 +194,6 @@ fun BreedCard(
 ) {
     Card(
         modifier = Modifier
-            .fillMaxWidth()
             .clickable { onClick() }
             .shadow(
                 elevation = AppDimensions.BarShadow,
@@ -216,7 +217,6 @@ fun BreedCard(
                             topEnd = AppDimensions.CardCornerRadius
                         )
                     ),
-                contentScale = ContentScale.Crop,
                 placeholder = painterResource(id = R.drawable.ic_menu_report_image),
                 error = painterResource(id = R.drawable.ic_menu_close_clear_cancel)
             )
@@ -225,7 +225,7 @@ fun BreedCard(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(AppDimensions.CardPadding),
+                    .padding(AppDimensions.SecondaryCardPadding),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {

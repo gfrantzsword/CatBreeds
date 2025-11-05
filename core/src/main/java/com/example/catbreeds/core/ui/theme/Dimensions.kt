@@ -18,7 +18,7 @@ object AppDimensions {
     // Paddings
     val ScreenPadding = BaseValues.SpacingMedium
     val CardPadding = BaseValues.SpacingMedium
-    val secondaryCardPadding = BaseValues.SpacingSmall
+    val SecondaryCardPadding = BaseValues.SpacingSmall
     val InterItemSpacing = BaseValues.SpacingSmall
     val DetailsVerticalSpacing = BaseValues.SpacingMedium
     val NoFavoritesMessageIconPadding = BaseValues.SpacingMedium
