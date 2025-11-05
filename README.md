@@ -1,3 +1,6 @@
+> [!IMPORTANT]
+> This project is currently undergoing major changes, and the current README is vastly outdated. We will update the documentation as soon as the project reaches a stable new point
+
 This project was developed as part of a technical challenge to demonstrate Android development skills and modern architectural patterns.
 
 # Cat Breeds - Android App
