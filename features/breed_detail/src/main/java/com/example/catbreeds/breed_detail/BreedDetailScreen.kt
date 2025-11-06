@@ -212,9 +212,14 @@ fun SimilarBreedCard(
                 contentDescription = "Image of ${breed.name}",
                 modifier = Modifier
                     .size(AppDimensions.SecondaryItemImageSize)
+                    .padding(
+                        start = AppDimensions.ThinBorderEffect,
+                        top = AppDimensions.ThinBorderEffect,
+                        end = AppDimensions.ThinBorderEffect,
+                    )
                     .clip(RoundedCornerShape(
-                        topStart = AppDimensions.CardCornerRadius,
-                        topEnd = AppDimensions.CardCornerRadius
+                        topStart = AppDimensions.InnerCornerRadius,
+                        topEnd = AppDimensions.InnerCornerRadius
                     )),
                 contentScale = ContentScale.Crop,
                 placeholder = painterResource(id = R.drawable.ic_menu_report_image),

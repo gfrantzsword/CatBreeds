@@ -21,6 +21,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.catbreeds.core.ui.theme.AppDimensions
+import com.example.catbreeds.core.ui.theme.AppTypography
 import com.example.catbreeds.core.ui.theme.BrandRed
 import com.example.catbreeds.core.ui.theme.ShadowColor
 import com.example.catbreeds.core.util.ErrorHandler
@@ -161,9 +162,7 @@ fun FavoriteBreedCard(
         )
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(AppDimensions.CardPadding),
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -173,22 +172,34 @@ fun FavoriteBreedCard(
                 contentDescription = "Image of ${breed.name}",
                 modifier = Modifier
                     .size(AppDimensions.TertiaryItemImageSize)
-                    .padding(end = AppDimensions.CardPadding)
-                    .clip(RoundedCornerShape(AppDimensions.CardCornerRadius)),
+                    .padding(
+                        start = AppDimensions.ThinBorderEffect,
+                        top = AppDimensions.ThinBorderEffect,
+                        bottom = AppDimensions.ThinBorderEffect,
+                        end = AppDimensions.CardPadding
+                    )
+                    .clip(RoundedCornerShape(
+                        topStart = AppDimensions.InnerCornerRadius,
+                        bottomStart = AppDimensions.InnerCornerRadius,
+                    )),
                 contentScale = ContentScale.Crop,
                 placeholder = painterResource(id = R.drawable.ic_menu_report_image),
                 error = painterResource(id = R.drawable.ic_menu_close_clear_cancel)
             )
 
             // Name, origin, and average lifespan
-            Column(modifier = Modifier.weight(1f)) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(AppDimensions.SecondaryCardPadding)
+            ) {
                 Text(
                     text = breed.name,
-                    style = MaterialTheme.typography.titleMedium
+                    style = AppTypography.titleMedium
                 )
                 Text(
                     text = breed.origin,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = AppTypography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
@@ -197,7 +208,7 @@ fun FavoriteBreedCard(
                 lowerLifeSpan?.let {
                     Text(
                         text = "Average lifespan: $it years",
-                        style = MaterialTheme.typography.bodySmall,
+                        style = AppTypography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
