@@ -134,7 +134,12 @@ fun BreedListScreen(
                 TopAppBar(
                     modifier = topBarModifier,
                     colors = topAppBarColors,
-                    title = { Text("Cat Breeds") },
+                    title = {
+                        Text(
+                            text = "Cat Breeds",
+                            style = MaterialTheme.typography.headlineMedium
+                        )
+                    },
                     actions = {
                         IconButton(onClick = { isSearchActive = true }) {
                             Icon(Icons.Default.Search, contentDescription = "Search breeds")

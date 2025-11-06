@@ -67,7 +67,12 @@ fun FavoriteListScreen(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainer
                 ),
-                title = { Text("Favorites") }
+                title = {
+                    Text(
+                        text = "Favorites",
+                        style = MaterialTheme.typography.headlineMedium
+                    )
+                }
             )
         }
     ) { paddingValues ->

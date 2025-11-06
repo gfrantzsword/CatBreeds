@@ -68,7 +68,12 @@ fun BreedDetailScreen(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainer
                 ),
-                title = { Text(breed?.name ?: "Breed Details") },
+                title = {
+                    Text(
+                        text = breed?.name ?: "Breed Details",
+                        style = MaterialTheme.typography.headlineMedium
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -156,7 +161,7 @@ fun BreedDetailScreen(
                     Column {
                         Text(
                             text = "Similar Breeds",
-                            style = MaterialTheme.typography.titleLarge,
+                            style = AppTypography.titleLarge,
                             modifier = Modifier.padding(bottom = AppDimensions.InterItemSpacing)
                         )
                         LazyRow(
