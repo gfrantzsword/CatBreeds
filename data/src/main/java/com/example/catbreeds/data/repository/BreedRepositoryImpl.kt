@@ -71,12 +71,10 @@ class BreedRepositoryImpl(
 
     // Gets all the breeds from the local database that are marked as favorites
     override fun getFavoriteBreeds(): Flow<List<Breed>> {
-        return flow {
-            val favoriteEntities = favoriteLocalSource.getAll()
-            val favoriteBreeds = favoriteEntities.mapNotNull { favoriteEntity ->
+        return favoriteLocalSource.getAll().map { favoriteEntities ->
+            favoriteEntities.mapNotNull { favoriteEntity ->
                 localSource.getById(favoriteEntity.id)?.toBreed(isFavorite = true)
             }
-            emit(favoriteBreeds)
         }
     }
 
