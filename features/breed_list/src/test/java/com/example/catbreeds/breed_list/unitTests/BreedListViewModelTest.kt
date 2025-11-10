@@ -77,13 +77,13 @@ class BreedListViewModelTest {
         setupRepository(emptyList())
 
         // WHEN
-        val vm = vmUnderTest
+        vmUnderTest
         advanceUntilIdle()
 
         // THEN
-        assertEquals(emptyList<Breed>(), vm.breeds.value)
-        assertEquals(emptyList<Breed>(), vm.filteredBreeds.value)
-        assertEquals("", vm.searchQuery.value)
+        assertEquals(emptyList<Breed>(), vmUnderTest.breeds.value)
+        assertEquals(emptyList<Breed>(), vmUnderTest.filteredBreeds.value)
+        assertEquals("", vmUnderTest.searchQuery.value)
     }
 
     @Test
@@ -92,12 +92,12 @@ class BreedListViewModelTest {
         setupRepository(testBreeds)
 
         // WHEN
-        val vm = vmUnderTest
+        vmUnderTest
         advanceUntilIdle()
 
         // THEN
-        assertEquals(testBreeds, vm.breeds.value)
-        assertEquals(testBreeds, vm.filteredBreeds.value)
+        assertEquals(testBreeds, vmUnderTest.breeds.value)
+        assertEquals(testBreeds, vmUnderTest.filteredBreeds.value)
     }
 
     @Test
@@ -106,7 +106,7 @@ class BreedListViewModelTest {
         setupRepository(emptyList())
 
         // WHEN
-        val vm = vmUnderTest // Triggers the lazy initialization of vmUnderTest
+        vmUnderTest
         advanceUntilIdle()
 
         // THEN
@@ -117,61 +117,61 @@ class BreedListViewModelTest {
     fun `WHEN search query is updated with name segment SHOULD filter by name`() = runTest {
         // GIVEN
         setupRepository(testBreeds)
-        val vm = vmUnderTest
+        vmUnderTest
         advanceUntilIdle()
 
         // WHEN (search by Name segment)
-        vm.updateSearchQuery("sibe")
+        vmUnderTest.updateSearchQuery("sibe")
         advanceUntilIdle()
 
         // THEN (name match)
-        assertEquals(listOf(breed1), vm.filteredBreeds.value)
+        assertEquals(listOf(breed1), vmUnderTest.filteredBreeds.value)
     }
 
     @Test
     fun `WHEN search query is updated with origin SHOULD filter by origin`() = runTest {
         // GIVEN
         setupRepository(testBreeds)
-        val vm = vmUnderTest
+        vmUnderTest
         advanceUntilIdle()
 
         // WHEN (search by origin)
-        vm.updateSearchQuery("iran")
+        vmUnderTest.updateSearchQuery("iran")
         advanceUntilIdle()
 
         // THEN (origin match)
-        assertEquals(listOf(breed2), vm.filteredBreeds.value)
+        assertEquals(listOf(breed2), vmUnderTest.filteredBreeds.value)
     }
 
     @Test
     fun `WHEN search query is updated with uppercase temperament SHOULD filter by temperament`() = runTest {
         // GIVEN
         setupRepository(testBreeds)
-        val vm = vmUnderTest
+        vmUnderTest
         advanceUntilIdle()
 
         // WHEN (search by temperament (Upper case))
-        vm.updateSearchQuery("ENERGETIC")
+        vmUnderTest.updateSearchQuery("ENERGETIC")
         advanceUntilIdle()
 
         // THEN (temperament match)
-        assertEquals(listOf(breed3), vm.filteredBreeds.value)
+        assertEquals(listOf(breed3), vmUnderTest.filteredBreeds.value)
     }
 
     @Test
     fun `WHEN search query is updated with common term SHOULD return multiple matches`() = runTest {
         // GIVEN
         setupRepository(testBreeds)
-        val vm = vmUnderTest
+        vmUnderTest
         advanceUntilIdle()
 
         // WHEN (search by temperament (multiple matches))
-        vm.updateSearchQuery("Playful")
+        vmUnderTest.updateSearchQuery("Playful")
         advanceUntilIdle()
 
         // THEN (multiple matches)
         val expected = listOf(breed1, breed4)
-        val actual = vm.filteredBreeds.value
+        val actual = vmUnderTest.filteredBreeds.value
         assertEquals(expected.size, actual.size)
         assertTrue(actual.containsAll(expected))
     }
@@ -180,15 +180,15 @@ class BreedListViewModelTest {
     fun `WHEN search query has no matches SHOULD return empty list`() = runTest {
         // GIVEN
         setupRepository(testBreeds)
-        val vm = vmUnderTest
+        vmUnderTest
         advanceUntilIdle()
 
         // WHEN (no matches)
-        vm.updateSearchQuery("Zzzzz")
+        vmUnderTest.updateSearchQuery("Zzzzz")
         advanceUntilIdle()
 
         // THEN (empty list)
-        assertEquals(emptyList<Breed>(), vm.filteredBreeds.value)
+        assertEquals(emptyList<Breed>(), vmUnderTest.filteredBreeds.value)
     }
 
     @Test
@@ -197,11 +197,11 @@ class BreedListViewModelTest {
         val breedId = testBreeds.first().id
         setupRepository(testBreeds)
         setupToggleFavorites(breedId)
-        val vm = vmUnderTest
+        vmUnderTest
         advanceUntilIdle()
 
         // WHEN
-        vm.toggleFavorite(breedId)
+        vmUnderTest.toggleFavorite(breedId)
         advanceUntilIdle()
 
         // THEN
@@ -217,11 +217,11 @@ class BreedListViewModelTest {
         setupRepository(listOf(testBreed))
         every { breedRepository.getFavoriteBreeds() } returns favoriteBreedsFlow
         setupToggleFavorites(breedId)
-        val vm = vmUnderTest
+        vmUnderTest
         advanceUntilIdle()
 
         // WHEN (Spam toggle)
-        with (vm) {
+        with (vmUnderTest) {
             repeat(3) {
                 toggleFavorite(breedId)
             }
@@ -229,7 +229,7 @@ class BreedListViewModelTest {
         advanceUntilIdle()
 
         // THEN
-        val finalBreed = vm.filteredBreeds.value.firstOrNull()
+        val finalBreed = vmUnderTest.filteredBreeds.value.firstOrNull()
         assertTrue(finalBreed?.isFavorite ?: false)
         verifyAddBreedToFavorites(breedId, 2)
         verifyRemoveBreedFromFavorites(breedId)
@@ -243,7 +243,7 @@ class BreedListViewModelTest {
         val favoriteFlow = MutableStateFlow(emptyList<Breed>())
         setupRepository(listOf(favoriteBreed, unfavoriteBreed))
         every { breedRepository.getFavoriteBreeds() } returns favoriteFlow
-        val vm = vmUnderTest
+        vmUnderTest
         advanceUntilIdle()
 
         // WHEN
@@ -251,9 +251,9 @@ class BreedListViewModelTest {
         advanceUntilIdle()
 
         // THEN
-        val favoriteInFiltered = vm.filteredBreeds.value.find { it.id == favoriteBreed.id }
+        val favoriteInFiltered = vmUnderTest.filteredBreeds.value.find { it.id == favoriteBreed.id }
         assertNotNull(favoriteInFiltered)
         assertTrue(favoriteInFiltered!!.isFavorite)
-        assertFalse(vm.filteredBreeds.value.last().isFavorite)
+        assertFalse(vmUnderTest.filteredBreeds.value.last().isFavorite)
     }
 }
