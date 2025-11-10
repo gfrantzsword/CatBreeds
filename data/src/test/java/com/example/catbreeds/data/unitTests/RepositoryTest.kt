@@ -89,8 +89,8 @@ class RepositoryTest {
         }
     }
 
-    private fun setupRemoteService(networkBreeds: List<Breed>) {
-        coEvery { remoteService.getBreeds() } returns networkBreeds
+    private fun setupRemoteService(setupBreeds: List<Breed> = networkBreeds) {
+        coEvery { remoteService.getBreeds() } returns setupBreeds
         coJustRun { breedDao.insertAll(any()) }
     }
 
@@ -158,7 +158,7 @@ class RepositoryTest {
     fun `WHEN refreshBreeds is called with internet SHOULD fetch AND save breeds`() = runTest {
         // GIVEN
         setupConnectivity(isConnected = true)
-        setupRemoteService(networkBreeds)
+        setupRemoteService()
 
         // WHEN
         repository.refreshBreeds()

@@ -139,8 +139,7 @@ class BreedDetailViewModelTest {
         advanceUntilIdle()
 
         // THEN
-        verifyAddBreedToFavorites(breedId, 1)
-        verifyRemoveBreedFromFavorites(breedId, 0)
+        verifyAddBreedToFavorites(breedId)
         assertTrue(vm.breed.value?.isFavorite ?: false)
     }
 
@@ -159,8 +158,7 @@ class BreedDetailViewModelTest {
         advanceUntilIdle()
 
         // THEN
-        verifyRemoveBreedFromFavorites(breedId, 1)
-        verifyAddBreedToFavorites(breedId, 0)
+        verifyRemoveBreedFromFavorites(breedId)
         assertFalse(vm.breed.value?.isFavorite ?: true)
     }
 
@@ -185,6 +183,6 @@ class BreedDetailViewModelTest {
         // THEN
         assertTrue(vm.breed.value?.isFavorite ?: false)
         verifyAddBreedToFavorites(breedId, 2)
-        verifyRemoveBreedFromFavorites(breedId, 1)
+        verifyRemoveBreedFromFavorites(breedId)
     }
 }

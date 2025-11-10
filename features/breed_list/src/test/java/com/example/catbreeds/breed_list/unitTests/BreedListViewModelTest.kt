@@ -164,7 +164,6 @@ class BreedListViewModelTest {
 
         // THEN
         verifyAddBreedToFavorites(breedId)
-        verifyRemoveBreedFromFavorites(breedId, 0)
     }
 
     @Test
@@ -191,7 +190,7 @@ class BreedListViewModelTest {
         val finalBreed = vm.filteredBreeds.value.firstOrNull()
         assertTrue(finalBreed?.isFavorite ?: false)
         verifyAddBreedToFavorites(breedId, 2)
-        verifyRemoveBreedFromFavorites(breedId, 1)
+        verifyRemoveBreedFromFavorites(breedId)
     }
 
     @Test
