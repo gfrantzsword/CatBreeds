@@ -35,6 +35,10 @@ class BreedListViewModelTest {
     private lateinit var breedRepository: BreedRepository
 
     private val testBreeds = getBreeds()
+    private val breed1 = testBreeds[0] // Siberian
+    private val breed2 = testBreeds[1] // Persian
+    private val breed3 = testBreeds[2] // Bengal
+    private val breed4 = testBreeds[3] // MaineCoon
 
     private val vmUnderTest: BreedListViewModel by lazy {
         spyk(
@@ -110,9 +114,8 @@ class BreedListViewModelTest {
     }
 
     @Test
-    fun `WHEN search query is updated SHOULD filter list correctly by name origin or temperament`() = runTest {
+    fun `WHEN search query is updated with name segment SHOULD filter by name`() = runTest {
         // GIVEN
-        val (breed1, breed2, breed3, breed4) = testBreeds
         setupRepository(testBreeds)
         val vm = vmUnderTest
         advanceUntilIdle()
@@ -120,31 +123,70 @@ class BreedListViewModelTest {
         // WHEN (search by Name segment)
         vm.updateSearchQuery("sibe")
         advanceUntilIdle()
+
         // THEN (name match)
         assertEquals(listOf(breed1), vm.filteredBreeds.value)
+    }
+
+    @Test
+    fun `WHEN search query is updated with origin SHOULD filter by origin`() = runTest {
+        // GIVEN
+        setupRepository(testBreeds)
+        val vm = vmUnderTest
+        advanceUntilIdle()
 
         // WHEN (search by origin)
         vm.updateSearchQuery("iran")
         advanceUntilIdle()
+
         // THEN (origin match)
         assertEquals(listOf(breed2), vm.filteredBreeds.value)
+    }
+
+    @Test
+    fun `WHEN search query is updated with uppercase temperament SHOULD filter by temperament`() = runTest {
+        // GIVEN
+        setupRepository(testBreeds)
+        val vm = vmUnderTest
+        advanceUntilIdle()
 
         // WHEN (search by temperament (Upper case))
         vm.updateSearchQuery("ENERGETIC")
         advanceUntilIdle()
+
         // THEN (temperament match)
         assertEquals(listOf(breed3), vm.filteredBreeds.value)
+    }
+
+    @Test
+    fun `WHEN search query is updated with common term SHOULD return multiple matches`() = runTest {
+        // GIVEN
+        setupRepository(testBreeds)
+        val vm = vmUnderTest
+        advanceUntilIdle()
 
         // WHEN (search by temperament (multiple matches))
         vm.updateSearchQuery("Playful")
         advanceUntilIdle()
+
         // THEN (multiple matches)
-        assertEquals(2, vm.filteredBreeds.value.size)
-        assertTrue(vm.filteredBreeds.value.containsAll(listOf(breed1, breed4)))
+        val expected = listOf(breed1, breed4)
+        val actual = vm.filteredBreeds.value
+        assertEquals(expected.size, actual.size)
+        assertTrue(actual.containsAll(expected))
+    }
+
+    @Test
+    fun `WHEN search query has no matches SHOULD return empty list`() = runTest {
+        // GIVEN
+        setupRepository(testBreeds)
+        val vm = vmUnderTest
+        advanceUntilIdle()
 
         // WHEN (no matches)
-        vm.updateSearchQuery("Zzz")
+        vm.updateSearchQuery("Zzzzz")
         advanceUntilIdle()
+
         // THEN (empty list)
         assertEquals(emptyList<Breed>(), vm.filteredBreeds.value)
     }
