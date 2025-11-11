@@ -1,6 +1,6 @@
 package com.example.catbreeds.favorite_list
 
-import android.R
+import com.example.catbreeds.core.R
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -183,8 +183,8 @@ fun FavoriteBreedCard(
                         bottomStart = AppDimensions.InnerCornerRadius,
                     )),
                 contentScale = ContentScale.Crop,
-                placeholder = painterResource(id = R.drawable.ic_menu_report_image),
-                error = painterResource(id = R.drawable.ic_menu_close_clear_cancel)
+                placeholder = painterResource(id = R.drawable.ic_cat_placeholder),
+                error = painterResource(id = R.drawable.ic_cat_error)
             )
 
             // Name, origin, and average lifespan
