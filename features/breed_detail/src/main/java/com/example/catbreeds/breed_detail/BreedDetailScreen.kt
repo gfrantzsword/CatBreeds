@@ -98,7 +98,6 @@ fun BreedDetailScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .padding(AppDimensions.ScreenPadding)
                     .verticalScroll(scrollState),
                 verticalArrangement = Arrangement.spacedBy(AppDimensions.DetailsVerticalSpacing)
             ) {
@@ -108,6 +107,7 @@ fun BreedDetailScreen(
                     contentDescription = "Image of ${breed.name}",
                     modifier = Modifier
                         .fillMaxWidth()
+                        .padding(horizontal = AppDimensions.ScreenPadding)
                         .clip(RoundedCornerShape(AppDimensions.CardCornerRadius)),
                     contentScale = ContentScale.Crop,
                     placeholder = painterResource(id = R.drawable.ic_cat_placeholder),
@@ -115,7 +115,9 @@ fun BreedDetailScreen(
                 )
 
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = AppDimensions.ScreenPadding),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -133,7 +135,9 @@ fun BreedDetailScreen(
                 }
 
                 // Temperament
-                Column {
+                Column(
+                    modifier = Modifier.padding(horizontal = AppDimensions.ScreenPadding)
+                ) {
                     Text(
                         text = "Temperament",
                         style = MaterialTheme.typography.titleLarge
@@ -145,7 +149,9 @@ fun BreedDetailScreen(
                 }
 
                 // Description
-                Column {
+                Column(
+                    modifier = Modifier.padding(horizontal = AppDimensions.ScreenPadding)
+                ) {
                     Text(
                         text = "Description",
                         style = MaterialTheme.typography.titleLarge
@@ -162,11 +168,12 @@ fun BreedDetailScreen(
                         Text(
                             text = "Similar Breeds",
                             style = AppTypography.titleLarge,
-                            modifier = Modifier.padding(bottom = AppDimensions.InterItemSpacing)
+                            modifier = Modifier
+                                .padding(bottom = AppDimensions.InterItemSpacing)
+                                .padding(horizontal = AppDimensions.ScreenPadding)
                         )
                         LazyRow(
-                            modifier = Modifier
-                                .fillMaxWidth(),
+                            contentPadding = PaddingValues(horizontal = AppDimensions.ScreenPadding),
                             horizontalArrangement = Arrangement.spacedBy(AppDimensions.InterItemSpacing),
                         ) {
                             items(similarBreeds) { similarBreed ->
