@@ -1,13 +1,10 @@
 package com.example.catbreeds.breed_detail
 
-import android.R
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import com.example.catbreeds.core.R
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -15,38 +12,34 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.material3.*
+import androidx.compose.material3.CardDefaults
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.example.catbreeds.core.ui.theme.AppDimensions
+import com.example.catbreeds.core.ui.theme.AppTypography
+import com.example.catbreeds.core.ui.theme.BrandRed
+import com.example.catbreeds.core.ui.theme.BrandBlue
+import com.example.catbreeds.core.ui.theme.ShadowColor
 import com.example.catbreeds.core.util.ErrorHandler
+import com.example.catbreeds.domain.models.Breed
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun BreedDetailScreen(
     viewModel: BreedDetailViewModel = hiltViewModel(),
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onBreedClick: (String) -> Unit
 ) {
     val breed by viewModel.breed
+    val similarBreeds by viewModel.similarBreeds
 
     // To handle snackbar and error messages
     val errorMessage by viewModel.errorMessage
@@ -57,11 +50,31 @@ fun BreedDetailScreen(
         onErrorShown = viewModel::clearError
     )
 
+    // Scroll state for dynamic shadow
+    val scrollState = rememberScrollState()
+    val showTopBarShadow = scrollState.value > 0
+
     // Content
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(breed?.name ?: "Breed Details") },
+                modifier = if (showTopBarShadow) {
+                    Modifier.shadow(
+                        elevation = AppDimensions.BarShadow,
+                        spotColor = ShadowColor
+                    )
+                } else {
+                    Modifier
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer
+                ),
+                title = {
+                    Text(
+                        text = breed?.name ?: "Breed Details",
+                        style = MaterialTheme.typography.headlineMedium
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -73,7 +86,7 @@ fun BreedDetailScreen(
                             Icon(
                                 imageVector = if (breedData.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                                 contentDescription = if (breedData.isFavorite) "Remove from favorites" else "Add to favorites",
-                                tint = if (breedData.isFavorite) Color.Red else MaterialTheme.colorScheme.onSurfaceVariant
+                                tint = BrandRed
                             )
                         }
                     }
@@ -86,9 +99,8 @@ fun BreedDetailScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .padding(16.dp)
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                    .verticalScroll(scrollState),
+                verticalArrangement = Arrangement.spacedBy(AppDimensions.DetailsVerticalSpacing)
             ) {
                 // Cat image
                 AsyncImage(
@@ -96,57 +108,79 @@ fun BreedDetailScreen(
                     contentDescription = "Image of ${breed.name}",
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(8.dp)),
+                        .padding(horizontal = AppDimensions.ScreenPadding)
+                        .clip(RoundedCornerShape(AppDimensions.CardCornerRadius)),
                     contentScale = ContentScale.Crop,
-                    placeholder = painterResource(id = R.drawable.ic_menu_report_image),
-                    error = painterResource(id = R.drawable.ic_menu_close_clear_cancel)
+                    placeholder = painterResource(id = R.drawable.ic_cat_placeholder),
+                    error = painterResource(id = R.drawable.ic_cat_error)
                 )
-                // Name and origin
+
+                // Origin / Life Expectancy
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = AppDimensions.ScreenPadding),
+                    horizontalArrangement = Arrangement.spacedBy(AppDimensions.InterItemSpacing),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = breed.name,
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = "Origin: ${breed.origin}",
-                            fontSize = 16.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
+                    StatCard(
+                        "Origin",
+                        breed.origin,
+                        Modifier.weight(1f)
+                    )
+                    StatCard(
+                        "Life Expectancy",
+                        breed.life_span,
+                        Modifier.weight(1f)
+                    )
                 }
 
                 // Temperament
-                Column {
-                    Text(
-                        text = "Temperament",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = breed.temperament,
-                        fontSize = 16.sp,
-                        lineHeight = 24.sp
-                    )
+                FlowRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = AppDimensions.ScreenPadding),
+                    horizontalArrangement = Arrangement.spacedBy(
+                        AppDimensions.InterItemSpacing,
+                        Alignment.CenterHorizontally
+                    ),
+                    verticalArrangement = Arrangement.spacedBy(AppDimensions.InterItemSpacing)
+                ) {
+                    val temperaments = breed.temperament.split(", ")
+                    temperaments.forEach { temperament ->
+                        TemperamentChip(text = temperament)
+                    }
                 }
 
                 // Description
-                Column {
-                    Text(
-                        text = "Description",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = breed.description,
-                        fontSize = 16.sp,
-                        lineHeight = 24.sp
-                    )
+                StatCard(
+                    "About the ${breed.name}",
+                    breed.description,
+                    Modifier.padding(horizontal = AppDimensions.ScreenPadding)
+                )
+
+                // Similar Breeds
+                if (similarBreeds.isNotEmpty()) {
+                    Column {
+                        Text(
+                            text = "Similar Breeds",
+                            style = AppTypography.titleMedium,
+                            modifier = Modifier
+                                .padding(bottom = AppDimensions.InterItemSpacing)
+                                .padding(horizontal = AppDimensions.ScreenPadding)
+                        )
+                        LazyRow(
+                            contentPadding = PaddingValues(horizontal = AppDimensions.ScreenPadding),
+                            horizontalArrangement = Arrangement.spacedBy(AppDimensions.InterItemSpacing),
+                        ) {
+                            items(similarBreeds) { similarBreed ->
+                                SimilarBreedCard(
+                                    breed = similarBreed,
+                                    onClick = { onBreedClick(similarBreed.id) }
+                                )
+                            }
+                        }
+                    }
                 }
             }
         } ?: run {
@@ -158,6 +192,108 @@ fun BreedDetailScreen(
             ) {
                 CircularProgressIndicator()
             }
+        }
+    }
+
+}
+
+@Composable
+fun StatCard(label: String, value: String, modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier
+            .shadow(
+                elevation = AppDimensions.BarShadow,
+                spotColor = ShadowColor,
+                shape = RoundedCornerShape(AppDimensions.CardCornerRadius)
+            ),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        shape = RoundedCornerShape(AppDimensions.CardCornerRadius)
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(AppDimensions.CardPadding)
+                .fillMaxHeight(),
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = label,
+                style = AppTypography.bodyMedium
+            )
+            Spacer(modifier = Modifier.height(AppDimensions.SecondaryCardPadding))
+            Text(
+                text = value,
+                style = AppTypography.titleMedium
+            )
+        }
+    }
+}
+
+@Composable
+fun TemperamentChip(text: String) {
+    Surface(
+        shape = RoundedCornerShape(AppDimensions.InnerCornerRadius),
+        color = MaterialTheme.colorScheme.tertiary,
+    ) {
+        Text(
+            text = text,
+            style = AppTypography.titleSmall,
+            color = BrandBlue,
+            modifier = Modifier.padding(AppDimensions.SecondaryCardPadding)
+        )
+    }
+}
+
+@Composable
+fun SimilarBreedCard(
+    breed: Breed,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .clickable { onClick() }
+            .shadow(
+                elevation = AppDimensions.BarShadow,
+                spotColor = ShadowColor,
+                shape = RoundedCornerShape(AppDimensions.CardCornerRadius)
+            )
+            .width(AppDimensions.SecondaryItemImageSize),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
+    ) {
+        Column {
+            AsyncImage(
+                model = "https://cdn2.thecatapi.com/images/${breed.reference_image_id}.jpg",
+                contentDescription = "Image of ${breed.name}",
+                modifier = Modifier
+                    .size(AppDimensions.SecondaryItemImageSize)
+                    .padding(
+                        start = AppDimensions.ThinBorderEffect,
+                        top = AppDimensions.ThinBorderEffect,
+                        end = AppDimensions.ThinBorderEffect,
+                    )
+                    .clip(RoundedCornerShape(
+                        topStart = AppDimensions.InnerCornerRadius,
+                        topEnd = AppDimensions.InnerCornerRadius
+                    )),
+                contentScale = ContentScale.Crop,
+                placeholder = painterResource(id = R.drawable.ic_cat_placeholder),
+                error = painterResource(id = R.drawable.ic_cat_error)
+            )
+            Column (modifier = Modifier.padding(AppDimensions.CardPadding)) {
+                Text(
+                    text = breed.name,
+                    style = AppTypography.titleMedium,
+                    maxLines = 2
+                )
+                Text(
+                    text = breed.origin,
+                    style = AppTypography.bodyMedium,
+                )
+            }
+
         }
     }
 }
