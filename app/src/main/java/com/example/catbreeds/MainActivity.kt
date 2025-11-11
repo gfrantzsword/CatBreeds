@@ -8,7 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -16,7 +16,6 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -30,6 +29,7 @@ import com.example.catbreeds.breed_detail.BreedDetailScreen
 import com.example.catbreeds.breed_list.BreedListScreen
 import com.example.catbreeds.core.ui.navigation.Screen
 import com.example.catbreeds.core.ui.theme.AppDimensions
+import com.example.catbreeds.core.ui.theme.BrandBlue
 import com.example.catbreeds.core.ui.theme.CatBreedsTheme
 import com.example.catbreeds.core.ui.theme.ShadowColor
 import com.example.catbreeds.favorite_list.FavoriteListScreen
@@ -107,17 +107,14 @@ fun BottomNavigationBar(navController: NavController) {
             containerColor = MaterialTheme.colorScheme.surface
         ) {
             val itemColors = NavigationBarItemDefaults.colors(
-                selectedIconColor = MaterialTheme.colorScheme.primary,
-                selectedTextColor = MaterialTheme.colorScheme.primary,
+                selectedIconColor = BrandBlue,
                 unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 indicatorColor = MaterialTheme.colorScheme.surface
             )
 
             NavigationBarItem(
                 colors = itemColors,
-                icon = { Icon(Icons.Default.Home, contentDescription = "Breeds") },
-                label = { Text("Breeds") },
+                icon = { Icon(Icons.Filled.Pets, contentDescription = "Breeds") },
                 selected = currentRoute == Screen.BreedList.route,
                 onClick = {
                     if (currentRoute != Screen.BreedList.route) {
@@ -130,7 +127,6 @@ fun BottomNavigationBar(navController: NavController) {
             NavigationBarItem(
                 colors = itemColors,
                 icon = { Icon(Icons.Default.Favorite, contentDescription = "Favorites") },
-                label = { Text("Favorites") },
                 selected = currentRoute == Screen.Favorites.route,
                 onClick = {
                     if (currentRoute != Screen.Favorites.route) {

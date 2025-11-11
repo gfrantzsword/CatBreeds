@@ -19,6 +19,7 @@ mockk = "1.13.8"
 retrofit = "2.12.0"
 roomCompiler = "2.7.2"
 jetbrainsKotlinJvm = "2.0.21"
+materialIconsExtended = "1.6.8"
 
 [libraries]
 androidx-core = { module = "androidx.test:core", version.ref = "core" }
@@ -49,6 +50,7 @@ kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-t
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesTest" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+androidx-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "materialIconsExtended" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
