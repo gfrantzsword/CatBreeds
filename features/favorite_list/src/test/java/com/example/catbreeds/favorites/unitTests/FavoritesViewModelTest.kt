@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
@@ -34,20 +33,19 @@ class FavoriteListViewModelTest {
     @RelaxedMockK
     private lateinit var breedRepository: BreedRepository
 
-    private val favoriteBreedsFlow = MutableStateFlow<List<Breed>>(emptyList())
-
     private val vmUnderTest: FavoriteListViewModel by lazy {
         spyk(
             FavoriteListViewModel(breedRepository)
         )
     }
 
-    @Before
-    fun setup() {
-        every { breedRepository.getFavoriteBreeds() } returns favoriteBreedsFlow
+    // Helper Methods
+    private fun whenGetFavoriteBreedsReturns(breedList: List<Breed>): MutableStateFlow<List<Breed>> {
+        val flow = MutableStateFlow(breedList)
+        every { breedRepository.getFavoriteBreeds() } returns flow
+        return flow
     }
 
-    // Helper Methods
     private fun verifyRemoveFromFavorites(breedId: String, times: Int = 1) {
         coVerify(exactly = times) { breedRepository.removeBreedFromFavorites(breedId) }
     }
@@ -60,16 +58,16 @@ class FavoriteListViewModelTest {
             getBreed(id = "id1", name = "Siberian", isFavorite = true),
             getBreed(id = "id2", name = "Persian", isFavorite = true)
         )
-        favoriteBreedsFlow.value = initialFavorites
+        whenGetFavoriteBreedsReturns(initialFavorites)
 
         // WHEN
-        val vm = vmUnderTest
+        vmUnderTest
         advanceUntilIdle()
 
         // THEN
-        assertEquals(2, vm.favoriteBreeds.value.size)
-        assertEquals("Siberian", vm.favoriteBreeds.value[0].name)
-        assertEquals("Persian", vm.favoriteBreeds.value[1].name)
+        assertEquals(2, vmUnderTest.favoriteBreeds.value.size)
+        assertEquals("Siberian", vmUnderTest.favoriteBreeds.value[0].name)
+        assertEquals("Persian", vmUnderTest.favoriteBreeds.value[1].name)
     }
 
     @Test
@@ -78,39 +76,41 @@ class FavoriteListViewModelTest {
         val favoriteToRemove = getBreed(id = "id_remove", isFavorite = true)
         val remainingFavorite = getBreed(id = "id_keep", isFavorite = true)
         val initialFavorites = listOf(favoriteToRemove, remainingFavorite)
-        favoriteBreedsFlow.value = initialFavorites
+        val favoriteFlow = whenGetFavoriteBreedsReturns(initialFavorites)
+
         coEvery { breedRepository.removeBreedFromFavorites(favoriteToRemove.id) } answers {
-            favoriteBreedsFlow.value = listOf(remainingFavorite)
+            favoriteFlow.value = listOf(remainingFavorite)
         }
-        val vm = vmUnderTest
+        vmUnderTest
         advanceUntilIdle()
-        assertEquals(2, vm.favoriteBreeds.value.size)
+        assertEquals(2, vmUnderTest.favoriteBreeds.value.size)
 
         // WHEN
-        vm.removeFromFavorites(favoriteToRemove.id)
+        vmUnderTest.removeFromFavorites(favoriteToRemove.id)
         advanceUntilIdle()
 
         // THEN
         verifyRemoveFromFavorites(favoriteToRemove.id)
-        assertEquals(1, vm.favoriteBreeds.value.size)
-        assertFalse(vm.favoriteBreeds.value.any { it.id == favoriteToRemove.id })
-        assertTrue(vm.favoriteBreeds.value.any { it.id == remainingFavorite.id })
+        assertEquals(1, vmUnderTest.favoriteBreeds.value.size)
+        assertFalse(vmUnderTest.favoriteBreeds.value.any { it.id == favoriteToRemove.id })
+        assertTrue(vmUnderTest.favoriteBreeds.value.any { it.id == remainingFavorite.id })
     }
 
     @Test
     fun `WHEN favorites list updates externally SHOULD update the ViewModel list`() = runTest {
         // GIVEN
         val initialFavorites = listOf(getBreed(id = "id1", isFavorite = true))
-        favoriteBreedsFlow.value = initialFavorites
-        val vm = vmUnderTest
+        val favoriteFlow = whenGetFavoriteBreedsReturns(initialFavorites)
+
+        vmUnderTest
         advanceUntilIdle()
-        assertEquals(1, vm.favoriteBreeds.value.size)
+        assertEquals(1, vmUnderTest.favoriteBreeds.value.size)
 
         // WHEN (simulate external change)
-        favoriteBreedsFlow.value = emptyList()
+        favoriteFlow.value = emptyList()
         advanceUntilIdle()
 
         // THEN
-        assertEquals(0, vm.favoriteBreeds.value.size)
+        assertEquals(0, vmUnderTest.favoriteBreeds.value.size)
     }
 }
