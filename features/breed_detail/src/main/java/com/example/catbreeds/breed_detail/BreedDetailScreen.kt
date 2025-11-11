@@ -26,11 +26,12 @@ import coil.compose.AsyncImage
 import com.example.catbreeds.core.ui.theme.AppDimensions
 import com.example.catbreeds.core.ui.theme.AppTypography
 import com.example.catbreeds.core.ui.theme.BrandRed
+import com.example.catbreeds.core.ui.theme.BrandBlue
 import com.example.catbreeds.core.ui.theme.ShadowColor
 import com.example.catbreeds.core.util.ErrorHandler
 import com.example.catbreeds.domain.models.Breed
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun BreedDetailScreen(
     viewModel: BreedDetailViewModel = hiltViewModel(),
@@ -114,60 +115,56 @@ fun BreedDetailScreen(
                     error = painterResource(id = R.drawable.ic_cat_error)
                 )
 
+                // Origin / Life Expectancy
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = AppDimensions.ScreenPadding),
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    horizontalArrangement = Arrangement.spacedBy(AppDimensions.InterItemSpacing),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = breed.name,
-                            style = MaterialTheme.typography.headlineMedium
-                        )
-                        Text(
-                            text = "Origin: ${breed.origin}",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
+                    StatCard(
+                        "Origin",
+                        breed.origin,
+                        Modifier.weight(1f)
+                    )
+                    StatCard(
+                        "Life Expectancy",
+                        breed.life_span,
+                        Modifier.weight(1f)
+                    )
                 }
 
                 // Temperament
-                Column(
-                    modifier = Modifier.padding(horizontal = AppDimensions.ScreenPadding)
+                FlowRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = AppDimensions.ScreenPadding),
+                    horizontalArrangement = Arrangement.spacedBy(
+                        AppDimensions.InterItemSpacing,
+                        Alignment.CenterHorizontally
+                    ),
+                    verticalArrangement = Arrangement.spacedBy(AppDimensions.InterItemSpacing)
                 ) {
-                    Text(
-                        text = "Temperament",
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                    Text(
-                        text = breed.temperament,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
+                    val temperaments = breed.temperament.split(", ")
+                    temperaments.forEach { temperament ->
+                        TemperamentChip(text = temperament)
+                    }
                 }
 
                 // Description
-                Column(
-                    modifier = Modifier.padding(horizontal = AppDimensions.ScreenPadding)
-                ) {
-                    Text(
-                        text = "Description",
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                    Text(
-                        text = breed.description,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                }
+                StatCard(
+                    "About the ${breed.name}",
+                    breed.description,
+                    Modifier.padding(horizontal = AppDimensions.ScreenPadding)
+                )
 
                 // Similar Breeds
                 if (similarBreeds.isNotEmpty()) {
                     Column {
                         Text(
                             text = "Similar Breeds",
-                            style = AppTypography.titleLarge,
+                            style = AppTypography.titleMedium,
                             modifier = Modifier
                                 .padding(bottom = AppDimensions.InterItemSpacing)
                                 .padding(horizontal = AppDimensions.ScreenPadding)
@@ -201,6 +198,54 @@ fun BreedDetailScreen(
 }
 
 @Composable
+fun StatCard(label: String, value: String, modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier
+            .shadow(
+                elevation = AppDimensions.BarShadow,
+                spotColor = ShadowColor,
+                shape = RoundedCornerShape(AppDimensions.CardCornerRadius)
+            ),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        shape = RoundedCornerShape(AppDimensions.CardCornerRadius)
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(AppDimensions.CardPadding)
+                .fillMaxHeight(),
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = label,
+                style = AppTypography.bodyMedium
+            )
+            Spacer(modifier = Modifier.height(AppDimensions.SecondaryCardPadding))
+            Text(
+                text = value,
+                style = AppTypography.titleMedium
+            )
+        }
+    }
+}
+
+@Composable
+fun TemperamentChip(text: String) {
+    Surface(
+        shape = RoundedCornerShape(AppDimensions.InnerCornerRadius),
+        color = MaterialTheme.colorScheme.tertiary,
+    ) {
+        Text(
+            text = text,
+            style = AppTypography.titleSmall,
+            color = BrandBlue,
+            modifier = Modifier.padding(AppDimensions.SecondaryCardPadding)
+        )
+    }
+}
+
+@Composable
 fun SimilarBreedCard(
     breed: Breed,
     onClick: () -> Unit
@@ -208,6 +253,11 @@ fun SimilarBreedCard(
     Card(
         modifier = Modifier
             .clickable { onClick() }
+            .shadow(
+                elevation = AppDimensions.BarShadow,
+                spotColor = ShadowColor,
+                shape = RoundedCornerShape(AppDimensions.CardCornerRadius)
+            )
             .width(AppDimensions.SecondaryItemImageSize),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
@@ -232,15 +282,15 @@ fun SimilarBreedCard(
                 placeholder = painterResource(id = R.drawable.ic_cat_placeholder),
                 error = painterResource(id = R.drawable.ic_cat_error)
             )
-            Column (modifier = Modifier.padding(AppDimensions.SecondaryCardPadding)) {
+            Column (modifier = Modifier.padding(AppDimensions.CardPadding)) {
                 Text(
                     text = breed.name,
-                    style = AppTypography.titleSmall,
+                    style = AppTypography.titleMedium,
                     maxLines = 2
                 )
                 Text(
                     text = breed.origin,
-                    style = AppTypography.bodySmall,
+                    style = AppTypography.bodyMedium,
                 )
             }
 

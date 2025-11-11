@@ -8,7 +8,7 @@ private object BaseValues {
     val SpacingMedium = 16.dp
     val SpacingExtraLarge = 96.dp
 
-    val InnerCornerRadius = 12.dp
+    val InnerCornerRadius = 8.dp
     val CornerRadius = 16.dp
     val ImageSizeSmall = 120.dp
     val ImageSizeMedium = 160.dp
