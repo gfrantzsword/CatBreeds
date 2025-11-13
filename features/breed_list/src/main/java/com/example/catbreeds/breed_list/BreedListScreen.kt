@@ -11,7 +11,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Search
@@ -28,6 +30,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.catbreeds.core.ui.theme.AppDimensions
@@ -46,6 +49,11 @@ fun BreedListScreen(
     val searchQuery by viewModel.searchQuery
     val filteredBreeds by viewModel.filteredBreeds
     var isSearchActive by remember { mutableStateOf(false) }
+
+    var isNewBreedActive by remember { mutableStateOf(false) }
+    val newBreedSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
 
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -71,6 +79,18 @@ fun BreedListScreen(
     LaunchedEffect(isSearchActive) {
         if (isSearchActive) {
             focusRequester.requestFocus()
+        }
+    }
+
+    if (isNewBreedActive) {
+        ModalBottomSheet(
+            onDismissRequest = { isNewBreedActive = false },
+            sheetState = newBreedSheetState,
+            modifier = Modifier.padding(top = AppDimensions.SheetTopPadding)
+        ) {
+            NewBreedSheetContent(
+                onDismiss = { isNewBreedActive = false }
+            )
         }
     }
 
@@ -144,6 +164,9 @@ fun BreedListScreen(
                         IconButton(onClick = { isSearchActive = true }) {
                             Icon(Icons.Default.Search, contentDescription = "Search breeds")
                         }
+                        IconButton(onClick = { isNewBreedActive = true }) {
+                            Icon(Icons.Default.Add, contentDescription = "New breed")
+                        }
                     }
                 )
             }
@@ -189,6 +212,135 @@ fun BreedListScreen(
             }
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun NewBreedSheetContent(
+    onDismiss: () -> Unit
+) {
+    var name by remember { mutableStateOf("") }
+    var origin by remember { mutableStateOf("") }
+    var minLife by remember { mutableStateOf("") }
+    var maxLife by remember { mutableStateOf("") }
+
+    Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
+        topBar = {
+            TopAppBar(
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer
+                ),
+                title = {
+                    Text(
+                        text = "New Breed",
+                        style = MaterialTheme.typography.headlineMedium
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = onDismiss) {
+                        Icon(Icons.Default.Close, contentDescription = "Cancel")
+                    }
+                }
+            )
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(AppDimensions.ScreenPadding),
+            verticalArrangement = Arrangement.spacedBy(AppDimensions.InterItemSpacing)
+        ) {
+            // Name
+            NewBreedTextField(
+                value = name,
+                onValueChange = { name = it },
+                label = "Name",
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            // Origin
+            // TODO: Make it a dropdown + input field
+            NewBreedTextField(
+                value = origin,
+                onValueChange = { origin = it },
+                label = "Origin",
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            // Life expectancy
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(AppDimensions.InterItemSpacing),
+            ) {
+                // Min
+                NewBreedTextField(
+                    value = minLife,
+                    onValueChange = { newValue ->
+                        minLife = newValue.filter { it.isDigit() }
+                    },
+                    label = "Min",
+                    modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
+                // Max
+                NewBreedTextField(
+                    value = maxLife,
+                    onValueChange = { newValue ->
+                        maxLife = newValue.filter { it.isDigit() }
+                    },
+                    label = "Max",
+                    modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
+            }
+
+
+            Button(
+                onClick = {
+                    // TODO: Add new breed logic
+                    onDismiss()
+                },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = BrandRed
+                )
+            ) {
+                Text("Add new breed")
+            }
+            Spacer(modifier = Modifier.height(AppDimensions.ScreenPadding))
+        }
+    }
+}
+
+@Composable
+fun NewBreedTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String = "",
+    modifier: Modifier = Modifier,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    singleLine: Boolean = true,
+    trailingIcon: @Composable (() -> Unit)? = null
+) {
+    TextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(label) },
+        modifier = modifier,
+        shape = RoundedCornerShape(AppDimensions.CardCornerRadius),
+        keyboardOptions = keyboardOptions,
+        singleLine = singleLine,
+        trailingIcon = trailingIcon,
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedContainerColor = MaterialTheme.colorScheme.surface,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+            focusedBorderColor = Color.Transparent,
+            unfocusedBorderColor = Color.Transparent
+        )
+    )
 }
 
 @Composable

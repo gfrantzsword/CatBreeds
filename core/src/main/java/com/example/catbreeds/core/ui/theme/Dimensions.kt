@@ -6,6 +6,7 @@ private object BaseValues {
     val SpacingXSmall = 4.dp
     val SpacingSmall = 8.dp
     val SpacingMedium = 16.dp
+    val SpacingLarge = 32.dp
     val SpacingExtraLarge = 96.dp
 
     val InnerCornerRadius = 8.dp
@@ -26,6 +27,7 @@ object AppDimensions {
     val NoFavoritesMessageIconPadding = BaseValues.SpacingMedium
     val LazyColumnBottomPaddingForNav = BaseValues.SpacingExtraLarge
     val ThinBorderEffect = BaseValues.SpacingXSmall
+    val SheetTopPadding = BaseValues.SpacingLarge
 
     // Corners
     val CardCornerRadius = BaseValues.CornerRadius
