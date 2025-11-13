@@ -1,5 +1,6 @@
 package com.example.catbreeds.breed_list
 
+import androidx.compose.animation.animateContentSize
 import com.example.catbreeds.core.R
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -34,12 +35,16 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.catbreeds.core.ui.theme.AppDimensions
+import com.example.catbreeds.core.ui.theme.AppTypography
+import com.example.catbreeds.core.ui.theme.BrandBlue
 import com.example.catbreeds.core.ui.theme.BrandRed
 import com.example.catbreeds.core.ui.theme.ShadowColor
 import com.example.catbreeds.core.util.ErrorHandler
 import com.example.catbreeds.domain.models.Breed
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun BreedListScreen(
     viewModel: BreedListViewModel = hiltViewModel(),
@@ -54,6 +59,8 @@ fun BreedListScreen(
     val newBreedSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
+
+    val allTemperaments by viewModel.allTemperaments
 
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -90,6 +97,7 @@ fun BreedListScreen(
             containerColor = MaterialTheme.colorScheme.background
         ) {
             NewBreedSheetContent(
+                allTemperaments = allTemperaments,
                 onDismiss = { isNewBreedActive = false }
             )
         }
@@ -215,15 +223,26 @@ fun BreedListScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun NewBreedSheetContent(
+    allTemperaments: List<String>,
     onDismiss: () -> Unit
 ) {
     var name by remember { mutableStateOf("") }
     var origin by remember { mutableStateOf("") }
     var minLife by remember { mutableStateOf("") }
     var maxLife by remember { mutableStateOf("") }
+
+    var selectedTemperaments by remember { mutableStateOf(setOf<String>()) }
+    var isTemperamentsExpanded by remember { mutableStateOf(false) }
+    val maxCollapsedTemperaments = AppDimensions.MaxChipsToShow
+
+    val temperamentsToShow = if (!isTemperamentsExpanded) {
+        allTemperaments.take(maxCollapsedTemperaments)
+    } else {
+        allTemperaments
+    }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -269,6 +288,47 @@ fun NewBreedSheetContent(
                 label = "Origin",
                 modifier = Modifier.fillMaxWidth()
             )
+
+            // Temperaments
+            FlowRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .animateContentSize(),
+                horizontalArrangement = Arrangement.spacedBy(
+                    AppDimensions.InterItemSpacing,
+                    Alignment.CenterHorizontally
+                ),
+                verticalArrangement = Arrangement.spacedBy(AppDimensions.InterItemSpacing)
+            ) {
+                temperamentsToShow.forEach { temperament ->
+                    SelectTemperamentChip(
+                        text = temperament,
+                        isSelected = selectedTemperaments.contains(temperament),
+                        onClick = {
+                            if (selectedTemperaments.contains(temperament)) {
+                                selectedTemperaments = selectedTemperaments - temperament
+                            } else if (selectedTemperaments.size < AppDimensions.MaxChipsToSelect) {
+                                selectedTemperaments = selectedTemperaments + temperament
+                            }
+                        }
+                    )
+                }
+            }
+
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                TextButton(
+                    onClick = { isTemperamentsExpanded = !isTemperamentsExpanded },
+                ) {
+                    Text(
+                        text = if (isTemperamentsExpanded) "Show less" else "Show more",
+                        style = AppTypography.titleSmall,
+                        color = BrandBlue
+                    )
+                }
+            }
 
             // Life expectancy
             Row(
@@ -342,6 +402,29 @@ fun NewBreedTextField(
             unfocusedBorderColor = Color.Transparent
         )
     )
+}
+
+@Composable
+fun SelectTemperamentChip(
+    text: String,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    val backgroundColor = if (isSelected) BrandBlue else MaterialTheme.colorScheme.tertiary
+    val textColor = if (isSelected) Color.White else BrandBlue
+
+    Surface(
+        modifier = Modifier.clickable { onClick() },
+        shape = RoundedCornerShape(AppDimensions.InnerCornerRadius),
+        color = backgroundColor,
+    ) {
+        Text(
+            text = text,
+            style = AppTypography.titleSmall,
+            color = textColor,
+            modifier = Modifier.padding(AppDimensions.SecondaryCardPadding)
+        )
+    }
 }
 
 @Composable

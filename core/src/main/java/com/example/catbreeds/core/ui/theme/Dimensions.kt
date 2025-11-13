@@ -15,6 +15,9 @@ private object BaseValues {
     val ImageSizeMedium = 160.dp
 
     val ShadowSmall = 6.dp
+
+    val ConstNumberSmall = 6
+    val ConstNumberMedium = 10
 }
 
 object AppDimensions {
@@ -38,4 +41,8 @@ object AppDimensions {
     val TertiaryItemImageSize = BaseValues.ImageSizeSmall
 
     val BarShadow = BaseValues.ShadowSmall
+
+    // Constants
+    val MaxChipsToSelect = BaseValues.ConstNumberSmall
+    val MaxChipsToShow = BaseValues.ConstNumberMedium
 }
