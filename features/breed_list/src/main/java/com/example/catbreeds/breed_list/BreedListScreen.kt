@@ -86,7 +86,8 @@ fun BreedListScreen(
         ModalBottomSheet(
             onDismissRequest = { isNewBreedActive = false },
             sheetState = newBreedSheetState,
-            modifier = Modifier.padding(top = AppDimensions.SheetTopPadding)
+            modifier = Modifier.padding(top = AppDimensions.SheetTopPadding),
+            containerColor = MaterialTheme.colorScheme.background
         ) {
             NewBreedSheetContent(
                 onDismiss = { isNewBreedActive = false }
