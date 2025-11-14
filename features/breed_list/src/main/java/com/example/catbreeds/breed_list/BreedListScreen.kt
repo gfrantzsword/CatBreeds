@@ -43,6 +43,8 @@ import com.example.catbreeds.core.util.ErrorHandler
 import com.example.catbreeds.domain.models.Breed
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -253,11 +255,11 @@ fun NewBreedSheetContent(
                 ),
                 title = {
                     Text(
-                        text = "New Breed",
+                        text = "Add a new breed",
                         style = MaterialTheme.typography.headlineMedium
                     )
                 },
-                navigationIcon = {
+                actions = {
                     IconButton(onClick = onDismiss) {
                         Icon(Icons.Default.Close, contentDescription = "Cancel")
                     }
@@ -269,7 +271,8 @@ fun NewBreedSheetContent(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(AppDimensions.ScreenPadding),
+                .padding(AppDimensions.ScreenPadding)
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(AppDimensions.InterItemSpacing)
         ) {
             // Name
@@ -323,9 +326,9 @@ fun NewBreedSheetContent(
                     onClick = { isTemperamentsExpanded = !isTemperamentsExpanded },
                 ) {
                     Text(
-                        text = if (isTemperamentsExpanded) "Show less" else "Show more",
+                        text = if (isTemperamentsExpanded) "Show less -" else "Show more +",
                         style = AppTypography.titleSmall,
-                        color = BrandBlue
+                        color = MaterialTheme.colorScheme.secondary
                     )
                 }
             }
@@ -358,6 +361,7 @@ fun NewBreedSheetContent(
                 )
             }
 
+            Spacer(Modifier.weight(1f))
 
             Button(
                 onClick = {
