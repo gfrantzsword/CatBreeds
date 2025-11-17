@@ -63,6 +63,7 @@ fun BreedListScreen(
     )
 
     val allTemperaments by viewModel.allTemperaments
+    val allOrigins by viewModel.allOrigins
 
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -100,7 +101,8 @@ fun BreedListScreen(
         ) {
             NewBreedSheetContent(
                 allTemperaments = allTemperaments,
-                onDismiss = { isNewBreedActive = false }
+                allOrigins = allOrigins,
+                onDismiss = { isNewBreedActive = false}
             )
         }
     }
@@ -229,6 +231,7 @@ fun BreedListScreen(
 @Composable
 fun NewBreedSheetContent(
     allTemperaments: List<String>,
+    allOrigins: List<String>,
     onDismiss: () -> Unit
 ) {
     var name by remember { mutableStateOf("") }
@@ -239,6 +242,7 @@ fun NewBreedSheetContent(
     var selectedTemperaments by remember { mutableStateOf(setOf<String>()) }
     var isTemperamentsExpanded by remember { mutableStateOf(false) }
     val maxCollapsedTemperaments = AppDimensions.MaxChipsToShow
+    var isOriginDropdownActive by remember { mutableStateOf(false) }
 
     val temperamentsToShow = if (!isTemperamentsExpanded) {
         allTemperaments.take(maxCollapsedTemperaments)
@@ -284,11 +288,13 @@ fun NewBreedSheetContent(
             )
 
             // Origin
-            // TODO: Make it a dropdown + input field
-            NewBreedTextField(
+            NewBreedDropdownTextField(
                 value = origin,
                 onValueChange = { origin = it },
+                expanded = isOriginDropdownActive,
+                onExpandedChange = { isOriginDropdownActive = it },
                 label = "Origin",
+                options = allOrigins,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -376,6 +382,61 @@ fun NewBreedSheetContent(
                 Text("Add new breed")
             }
             Spacer(modifier = Modifier.height(AppDimensions.ScreenPadding))
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun NewBreedDropdownTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    expanded: Boolean,
+    onExpandedChange: (Boolean) -> Unit,
+    label: String,
+    options: List<String>,
+    modifier: Modifier = Modifier
+) {
+    val filteredOptions = remember(value, options) {
+        if (value.isEmpty()) {
+            options
+        } else {
+            options.filter { it.contains(value, ignoreCase = true) }
+        }
+    }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = onExpandedChange,
+        modifier = modifier
+    ) {
+        NewBreedTextField(
+            value = value,
+            onValueChange = {
+                onValueChange(it)
+                onExpandedChange(true)
+            },
+            label = label,
+            modifier = Modifier
+                .fillMaxWidth()
+                .menuAnchor(MenuAnchorType.PrimaryEditable, true)
+        )
+
+        if (filteredOptions.isNotEmpty()) {
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { onExpandedChange(false) }
+            ) {
+                filteredOptions.forEach { option ->
+                    DropdownMenuItem(
+                        text = { Text(option) },
+                        onClick = {
+                            onValueChange(option)
+                            onExpandedChange(false)
+                        }
+                    )
+                }
+            }
         }
     }
 }

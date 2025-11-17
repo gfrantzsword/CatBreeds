@@ -27,6 +27,9 @@ class BreedListViewModel @Inject constructor(
 
     private val _favoriteBreedIds = mutableStateOf<Set<String>>(emptySet())
 
+    private val _allOrigins = mutableStateOf<List<String>>(emptyList())
+    val allOrigins: State<List<String>> = _allOrigins
+
     private val _allTemperaments = mutableStateOf<List<String>>(emptyList())
     val allTemperaments: State<List<String>> = _allTemperaments
 
@@ -43,6 +46,12 @@ class BreedListViewModel @Inject constructor(
         viewModelScope.launch {
             breedRepository.getBreeds().collectLatest { breedList ->
                 _breeds.value = breedList
+
+                _allOrigins.value = breedList
+                    .map { it.origin.trim() }
+                    .filter { it.isNotEmpty() }
+                    .distinct()
+                    .sorted()
 
                 _allTemperaments.value = breedList
                     .flatMap { it.temperament.split(", ") }
