@@ -447,6 +447,9 @@ fun NewBreedTextField(
     onValueChange: (String) -> Unit,
     label: String = "",
     modifier: Modifier = Modifier,
+    isError: Boolean = false,
+    errorMessage: String = "",
+    supportingText: String = "",
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     singleLine: Boolean = true,
     trailingIcon: @Composable (() -> Unit)? = null
@@ -458,6 +461,15 @@ fun NewBreedTextField(
         modifier = modifier,
         shape = RoundedCornerShape(AppDimensions.CardCornerRadius),
         keyboardOptions = keyboardOptions,
+        isError = isError,
+        supportingText = { if (isError) {
+            Text(
+                text = errorMessage,
+                color = BrandRed
+            )
+        } else {
+            Text(supportingText)
+        }},
         singleLine = singleLine,
         trailingIcon = trailingIcon,
         colors = OutlinedTextFieldDefaults.colors(
