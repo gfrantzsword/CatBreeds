@@ -58,7 +58,7 @@ fun getBreed(
     name: String = MOCK_YORK_NAME,
     origin: String = MOCK_YORK_ORIGIN,
     description: String = MOCK_YORK_DESCRIPTION,
-    temperament: String = MOCK_YORK_TEMPERAMENT,
+    temperament: List<String> = MOCK_YORK_TEMPERAMENT,
     life_span: String = MOCK_YORK_LIFESPAN,
     isFavorite: Boolean = false,
     reference_image_id: String? = MOCK_YORK_REF_ID

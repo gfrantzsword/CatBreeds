@@ -21,7 +21,7 @@ data class BreedEntity(
             name = name,
             origin = origin,
             description = description,
-            temperament = temperament,
+            temperament = temperament.split(",").map { it.trim() },
             life_span = life_span,
             reference_image_id = reference_image_id,
             isFavorite = isFavorite

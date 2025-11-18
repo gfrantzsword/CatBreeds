@@ -161,8 +161,7 @@ fun BreedDetailScreen(
                     ),
                     verticalArrangement = Arrangement.spacedBy(InterItemSpacing)
                 ) {
-                    val temperaments = breed.temperament.split(", ")
-                    temperaments.forEach { temperament ->
+                    breed.temperament.forEach { temperament ->
                         TemperamentChip(text = temperament)
                     }
                 }

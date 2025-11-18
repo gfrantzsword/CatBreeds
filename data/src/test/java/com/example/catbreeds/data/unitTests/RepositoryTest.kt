@@ -4,6 +4,7 @@ import com.example.catbreeds.core.util.ConnectivityChecker
 import com.example.catbreeds.data.local.BreedDao
 import com.example.catbreeds.data.local.BreedEntity
 import com.example.catbreeds.data.local.FavoriteDao
+import com.example.catbreeds.data.remote.BreedDto
 import com.example.catbreeds.data.remote.RemoteService
 import com.example.catbreeds.data.repository.BreedRepositoryImpl
 import com.example.catbreeds.domain.models.Breed
@@ -89,8 +90,22 @@ class RepositoryTest {
         }
     }
 
+    private fun getMockBreedDto(setupBreeds: List<Breed>): List<BreedDto> {
+        return setupBreeds.map { breed ->
+            BreedDto(
+                id = breed.id,
+                name = breed.name,
+                description = breed.description,
+                temperament = breed.temperament.joinToString(", "),
+                origin = breed.origin,
+                life_span = breed.life_span,
+                reference_image_id = breed.reference_image_id
+            )
+        }
+    }
+
     private fun setupRemoteService(setupBreeds: List<Breed> = networkBreeds) {
-        coEvery { remoteService.getBreeds() } returns setupBreeds
+        coEvery { remoteService.getBreeds() } returns getMockBreedDto(setupBreeds)
         coJustRun { breedDao.insertAll(any()) }
     }
 
