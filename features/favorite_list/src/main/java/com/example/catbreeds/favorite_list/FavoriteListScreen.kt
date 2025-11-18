@@ -32,7 +32,10 @@ import com.example.catbreeds.core.ui.theme.AppDimensions.ScreenPadding
 import com.example.catbreeds.core.ui.theme.AppDimensions.SecondaryCardPadding
 import com.example.catbreeds.core.ui.theme.AppDimensions.TertiaryItemImageSize
 import com.example.catbreeds.core.ui.theme.AppDimensions.ThinBorderEffect
-import com.example.catbreeds.core.ui.theme.AppTypography
+import com.example.catbreeds.core.ui.theme.AppTypography.bodyMedium
+import com.example.catbreeds.core.ui.theme.AppTypography.bodySmall
+import com.example.catbreeds.core.ui.theme.AppTypography.headlineMedium
+import com.example.catbreeds.core.ui.theme.AppTypography.titleMedium
 import com.example.catbreeds.core.ui.theme.BrandRed
 import com.example.catbreeds.core.ui.theme.ShadowColor
 import com.example.catbreeds.core.util.ErrorHandler
@@ -82,7 +85,7 @@ fun FavoriteListScreen(
                 title = {
                     Text(
                         text = "Favorites",
-                        style = MaterialTheme.typography.headlineMedium
+                        style = headlineMedium
                     )
                 }
             )
@@ -119,7 +122,7 @@ fun FavoriteListScreen(
                         )
                         Text(
                             text = "No favorite breeds yet",
-                            style = MaterialTheme.typography.titleMedium,
+                            style = titleMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center
                         )
@@ -206,11 +209,11 @@ private fun FavoriteBreedCard(
             ) {
                 Text(
                     text = breed.name,
-                    style = AppTypography.titleMedium
+                    style = titleMedium
                 )
                 Text(
                     text = breed.origin,
-                    style = AppTypography.bodyMedium,
+                    style = bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
@@ -219,7 +222,7 @@ private fun FavoriteBreedCard(
                 lowerLifeSpan?.let {
                     Text(
                         text = "Average lifespan: $it years",
-                        style = AppTypography.bodySmall,
+                        style = bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }

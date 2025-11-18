@@ -34,7 +34,10 @@ import com.example.catbreeds.core.ui.theme.AppDimensions.ScreenPadding
 import com.example.catbreeds.core.ui.theme.AppDimensions.SecondaryCardPadding
 import com.example.catbreeds.core.ui.theme.AppDimensions.SecondaryItemImageSize
 import com.example.catbreeds.core.ui.theme.AppDimensions.ThinBorderEffect
-import com.example.catbreeds.core.ui.theme.AppTypography
+import com.example.catbreeds.core.ui.theme.AppTypography.bodyMedium
+import com.example.catbreeds.core.ui.theme.AppTypography.headlineMedium
+import com.example.catbreeds.core.ui.theme.AppTypography.titleMedium
+import com.example.catbreeds.core.ui.theme.AppTypography.titleSmall
 import com.example.catbreeds.core.ui.theme.BrandRed
 import com.example.catbreeds.core.ui.theme.BrandBlue
 import com.example.catbreeds.core.ui.theme.ShadowColor
@@ -84,7 +87,7 @@ fun BreedDetailScreen(
                 title = {
                     Text(
                         text = breed?.name ?: "Breed Details",
-                        style = MaterialTheme.typography.headlineMedium
+                        style = headlineMedium
                     )
                 },
                 navigationIcon = {
@@ -176,7 +179,7 @@ fun BreedDetailScreen(
                     Column {
                         Text(
                             text = "Similar Breeds",
-                            style = AppTypography.titleMedium,
+                            style = titleMedium,
                             modifier = Modifier
                                 .padding(bottom = InterItemSpacing)
                                 .padding(horizontal = ScreenPadding)
@@ -231,12 +234,12 @@ private fun StatCard(modifier: Modifier = Modifier, label: String, value: String
         ) {
             Text(
                 text = label,
-                style = AppTypography.bodyMedium
+                style = bodyMedium
             )
             Spacer(modifier = Modifier.height(SecondaryCardPadding))
             Text(
                 text = value,
-                style = AppTypography.titleMedium
+                style = titleMedium
             )
         }
     }
@@ -250,7 +253,7 @@ private fun TemperamentChip(text: String) {
     ) {
         Text(
             text = text,
-            style = AppTypography.titleSmall,
+            style = titleSmall,
             color = BrandBlue,
             modifier = Modifier.padding(SecondaryCardPadding)
         )
@@ -297,12 +300,12 @@ private fun SimilarBreedCard(
             Column (modifier = Modifier.padding(CardPadding)) {
                 Text(
                     text = breed.name,
-                    style = AppTypography.titleMedium,
+                    style = titleMedium,
                     maxLines = 2
                 )
                 Text(
                     text = breed.origin,
-                    style = AppTypography.bodyMedium,
+                    style = bodyMedium,
                 )
             }
 

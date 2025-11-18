@@ -37,6 +37,9 @@ import com.example.catbreeds.core.ui.theme.AppDimensions.InterItemSpacing
 import com.example.catbreeds.core.ui.theme.AppDimensions.LazyColumnBottomPaddingForNav
 import com.example.catbreeds.core.ui.theme.AppDimensions.ScreenPadding
 import com.example.catbreeds.core.ui.theme.AppDimensions.SecondaryCardPadding
+import com.example.catbreeds.core.ui.theme.AppTypography.bodyMedium
+import com.example.catbreeds.core.ui.theme.AppTypography.headlineMedium
+import com.example.catbreeds.core.ui.theme.AppTypography.titleMedium
 import com.example.catbreeds.core.ui.theme.BrandRed
 import com.example.catbreeds.core.ui.theme.ShadowColor
 import com.example.catbreeds.core.util.ErrorHandler
@@ -143,7 +146,7 @@ fun BreedListScreen(
                     title = {
                         Text(
                             text = "Cat Breeds",
-                            style = MaterialTheme.typography.headlineMedium
+                            style = headlineMedium
                         )
                     },
                     actions = {
@@ -243,11 +246,11 @@ private fun BreedCard(
                 Column(modifier = Modifier.weight(DefaultWeight)) {
                     Text(
                         text = breed.name,
-                        style = MaterialTheme.typography.titleMedium
+                        style = titleMedium
                     )
                     Text(
                         text = breed.origin,
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
