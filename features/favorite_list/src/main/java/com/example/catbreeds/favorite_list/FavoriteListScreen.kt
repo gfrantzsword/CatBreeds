@@ -58,7 +58,7 @@ fun FavoriteListScreen(
 
     // Scroll state for dynamic shadow
     val lazyListState = rememberLazyListState()
-    val showTopBarShadow by remember {
+    val showTopBarShadow = remember {
         derivedStateOf {
             lazyListState.firstVisibleItemIndex > 0 || lazyListState.firstVisibleItemScrollOffset > 0
         }
@@ -68,7 +68,7 @@ fun FavoriteListScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                modifier = if (showTopBarShadow) {
+                modifier = if (showTopBarShadow.value) {
                     Modifier.shadow(
                         elevation = BarShadow,
                         spotColor = ShadowColor

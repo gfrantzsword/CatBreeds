@@ -51,7 +51,7 @@ fun BreedListScreen(
     val breeds by viewModel.breeds
     val searchQuery by viewModel.searchQuery
     val filteredBreeds by viewModel.filteredBreeds
-    var isSearchActive by remember { mutableStateOf(false) }
+    val isSearchActive = remember { mutableStateOf(false) }
 
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -68,14 +68,14 @@ fun BreedListScreen(
 
     // Scroll state for dynamic shadow
     val lazyGridState = rememberLazyStaggeredGridState()
-    val showTopBarShadow by remember {
+    val showTopBarShadow = remember {
         derivedStateOf {
             lazyGridState.firstVisibleItemIndex > 0 || lazyGridState.firstVisibleItemScrollOffset > 0
         }
     }
 
     LaunchedEffect(isSearchActive) {
-        if (isSearchActive) {
+        if (isSearchActive.value) {
             focusRequester.requestFocus()
         }
     }
@@ -86,7 +86,7 @@ fun BreedListScreen(
             val topAppBarColors = TopAppBarDefaults.topAppBarColors(
                 containerColor = MaterialTheme.colorScheme.surfaceContainer
             )
-            val topBarModifier = if (showTopBarShadow) {
+            val topBarModifier = if (showTopBarShadow.value) {
                 Modifier.shadow(
                     elevation = BarShadow,
                     spotColor = ShadowColor
@@ -95,7 +95,7 @@ fun BreedListScreen(
                 Modifier
             }
 
-            if (isSearchActive) {
+            if (isSearchActive.value) {
                 TopAppBar(
                     modifier = topBarModifier,
                     colors = topAppBarColors,
@@ -128,7 +128,7 @@ fun BreedListScreen(
                     },
                     navigationIcon = {
                         IconButton(onClick = {
-                            isSearchActive = false
+                            isSearchActive.value = false
                             viewModel.updateSearchQuery("")
                             keyboardController?.hide()
                         }) {
@@ -147,7 +147,7 @@ fun BreedListScreen(
                         )
                     },
                     actions = {
-                        IconButton(onClick = { isSearchActive = true }) {
+                        IconButton(onClick = { isSearchActive.value = true }) {
                             Icon(Icons.Default.Search, contentDescription = "Search breeds")
                         }
                     }

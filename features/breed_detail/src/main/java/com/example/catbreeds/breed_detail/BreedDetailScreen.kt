@@ -62,13 +62,15 @@ fun BreedDetailScreen(
 
     // Scroll state for dynamic shadow
     val scrollState = rememberScrollState()
-    val showTopBarShadow = scrollState.value > 0
+    val showTopBarShadow = remember {
+        derivedStateOf { scrollState.value > 0 }
+    }
 
     // Content
     Scaffold(
         topBar = {
             TopAppBar(
-                modifier = if (showTopBarShadow) {
+                modifier = if (showTopBarShadow.value) {
                     Modifier.shadow(
                         elevation = BarShadow,
                         spotColor = ShadowColor
