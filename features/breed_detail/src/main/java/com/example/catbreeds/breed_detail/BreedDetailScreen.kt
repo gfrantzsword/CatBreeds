@@ -134,14 +134,14 @@ fun BreedDetailScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     StatCard(
-                        "Origin",
-                        breed.origin,
-                        Modifier.weight(DefaultWeight)
+                        modifier = Modifier.weight(DefaultWeight),
+                        label = "Origin",
+                        value = breed.origin
                     )
                     StatCard(
-                        "Life Expectancy",
-                        breed.life_span,
-                        Modifier.weight(DefaultWeight)
+                        modifier = Modifier.weight(DefaultWeight),
+                        label = "Life Expectancy",
+                        value = breed.life_span
                     )
                 }
 
@@ -164,9 +164,9 @@ fun BreedDetailScreen(
 
                 // Description
                 StatCard(
-                    "About the ${breed.name}",
-                    breed.description,
-                    Modifier.padding(horizontal = ScreenPadding)
+                    modifier = Modifier.padding(horizontal = ScreenPadding),
+                    label = "About the ${breed.name}",
+                    value = breed.description
                 )
 
                 // Similar Breeds
@@ -208,7 +208,7 @@ fun BreedDetailScreen(
 }
 
 @Composable
-fun StatCard(label: String, value: String, modifier: Modifier = Modifier) {
+private fun StatCard(modifier: Modifier = Modifier, label: String, value: String) {
     Card(
         modifier = modifier
             .shadow(
@@ -241,7 +241,7 @@ fun StatCard(label: String, value: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun TemperamentChip(text: String) {
+private fun TemperamentChip(text: String) {
     Surface(
         shape = RoundedCornerShape(InnerCornerRadius),
         color = MaterialTheme.colorScheme.tertiary,
@@ -256,7 +256,7 @@ fun TemperamentChip(text: String) {
 }
 
 @Composable
-fun SimilarBreedCard(
+private fun SimilarBreedCard(
     breed: Breed,
     onClick: () -> Unit
 ) {

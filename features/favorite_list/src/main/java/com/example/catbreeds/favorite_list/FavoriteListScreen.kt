@@ -154,7 +154,7 @@ fun FavoriteListScreen(
 }
 
 @Composable
-fun FavoriteBreedCard(
+private fun FavoriteBreedCard(
     breed: Breed,
     onBreedClick: () -> Unit,
     onRemoveFromFavorites: () -> Unit

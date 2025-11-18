@@ -198,7 +198,7 @@ fun BreedListScreen(
 }
 
 @Composable
-fun BreedCard(
+private fun BreedCard(
     breed: Breed,
     onClick: () -> Unit,
     onFavoriteClick: () -> Unit
