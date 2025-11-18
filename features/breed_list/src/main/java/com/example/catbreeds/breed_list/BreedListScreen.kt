@@ -30,7 +30,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
-import com.example.catbreeds.core.ui.theme.AppDimensions
+import com.example.catbreeds.core.ui.theme.AppDimensions.BarShadow
+import com.example.catbreeds.core.ui.theme.AppDimensions.CardCornerRadius
+import com.example.catbreeds.core.ui.theme.AppDimensions.InterItemSpacing
+import com.example.catbreeds.core.ui.theme.AppDimensions.LazyColumnBottomPaddingForNav
+import com.example.catbreeds.core.ui.theme.AppDimensions.ScreenPadding
+import com.example.catbreeds.core.ui.theme.AppDimensions.SecondaryCardPadding
 import com.example.catbreeds.core.ui.theme.BrandRed
 import com.example.catbreeds.core.ui.theme.ShadowColor
 import com.example.catbreeds.core.util.ErrorHandler
@@ -82,7 +87,7 @@ fun BreedListScreen(
             )
             val topBarModifier = if (showTopBarShadow) {
                 Modifier.shadow(
-                    elevation = AppDimensions.BarShadow,
+                    elevation = BarShadow,
                     spotColor = ShadowColor
                 )
             } else {
@@ -169,13 +174,13 @@ fun BreedListScreen(
                     columns = StaggeredGridCells.Fixed(2),
                     state = lazyGridState,
                     modifier = Modifier.fillMaxSize(),
-                    verticalItemSpacing = AppDimensions.InterItemSpacing,
-                    horizontalArrangement = Arrangement.spacedBy(AppDimensions.InterItemSpacing),
+                    verticalItemSpacing = InterItemSpacing,
+                    horizontalArrangement = Arrangement.spacedBy(InterItemSpacing),
                     contentPadding = PaddingValues(
-                        start = AppDimensions.ScreenPadding,
-                        top = AppDimensions.ScreenPadding,
-                        end = AppDimensions.ScreenPadding,
-                        bottom = AppDimensions.LazyColumnBottomPaddingForNav
+                        start = ScreenPadding,
+                        top = ScreenPadding,
+                        end = ScreenPadding,
+                        bottom = LazyColumnBottomPaddingForNav
                     )
                 ) {
                     items(filteredBreeds) { breed ->
@@ -201,9 +206,9 @@ fun BreedCard(
         modifier = Modifier
             .clickable { onClick() }
             .shadow(
-                elevation = AppDimensions.BarShadow,
+                elevation = BarShadow,
                 spotColor = ShadowColor,
-                shape = RoundedCornerShape(AppDimensions.CardCornerRadius)
+                shape = RoundedCornerShape(CardCornerRadius)
             ),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
@@ -218,8 +223,8 @@ fun BreedCard(
                     .fillMaxWidth()
                     .clip(
                         RoundedCornerShape(
-                            topStart = AppDimensions.CardCornerRadius,
-                            topEnd = AppDimensions.CardCornerRadius
+                            topStart = CardCornerRadius,
+                            topEnd = CardCornerRadius
                         )
                     ),
                 placeholder = painterResource(id = R.drawable.ic_cat_placeholder),
@@ -230,7 +235,7 @@ fun BreedCard(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(AppDimensions.SecondaryCardPadding),
+                    .padding(SecondaryCardPadding),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {

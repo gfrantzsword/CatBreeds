@@ -23,7 +23,16 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
-import com.example.catbreeds.core.ui.theme.AppDimensions
+import com.example.catbreeds.core.ui.theme.AppDimensions.BarShadow
+import com.example.catbreeds.core.ui.theme.AppDimensions.CardCornerRadius
+import com.example.catbreeds.core.ui.theme.AppDimensions.CardPadding
+import com.example.catbreeds.core.ui.theme.AppDimensions.DetailsVerticalSpacing
+import com.example.catbreeds.core.ui.theme.AppDimensions.InnerCornerRadius
+import com.example.catbreeds.core.ui.theme.AppDimensions.InterItemSpacing
+import com.example.catbreeds.core.ui.theme.AppDimensions.ScreenPadding
+import com.example.catbreeds.core.ui.theme.AppDimensions.SecondaryCardPadding
+import com.example.catbreeds.core.ui.theme.AppDimensions.SecondaryItemImageSize
+import com.example.catbreeds.core.ui.theme.AppDimensions.ThinBorderEffect
 import com.example.catbreeds.core.ui.theme.AppTypography
 import com.example.catbreeds.core.ui.theme.BrandRed
 import com.example.catbreeds.core.ui.theme.BrandBlue
@@ -60,7 +69,7 @@ fun BreedDetailScreen(
             TopAppBar(
                 modifier = if (showTopBarShadow) {
                     Modifier.shadow(
-                        elevation = AppDimensions.BarShadow,
+                        elevation = BarShadow,
                         spotColor = ShadowColor
                     )
                 } else {
@@ -100,7 +109,7 @@ fun BreedDetailScreen(
                     .fillMaxSize()
                     .padding(paddingValues)
                     .verticalScroll(scrollState),
-                verticalArrangement = Arrangement.spacedBy(AppDimensions.DetailsVerticalSpacing)
+                verticalArrangement = Arrangement.spacedBy(DetailsVerticalSpacing)
             ) {
                 // Cat image
                 AsyncImage(
@@ -108,8 +117,8 @@ fun BreedDetailScreen(
                     contentDescription = "Image of ${breed.name}",
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = AppDimensions.ScreenPadding)
-                        .clip(RoundedCornerShape(AppDimensions.CardCornerRadius)),
+                        .padding(horizontal = ScreenPadding)
+                        .clip(RoundedCornerShape(CardCornerRadius)),
                     contentScale = ContentScale.Crop,
                     placeholder = painterResource(id = R.drawable.ic_cat_placeholder),
                     error = painterResource(id = R.drawable.ic_cat_error)
@@ -119,8 +128,8 @@ fun BreedDetailScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = AppDimensions.ScreenPadding),
-                    horizontalArrangement = Arrangement.spacedBy(AppDimensions.InterItemSpacing),
+                        .padding(horizontal = ScreenPadding),
+                    horizontalArrangement = Arrangement.spacedBy(InterItemSpacing),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     StatCard(
@@ -139,12 +148,12 @@ fun BreedDetailScreen(
                 FlowRow(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = AppDimensions.ScreenPadding),
+                        .padding(horizontal = ScreenPadding),
                     horizontalArrangement = Arrangement.spacedBy(
-                        AppDimensions.InterItemSpacing,
+                        InterItemSpacing,
                         Alignment.CenterHorizontally
                     ),
-                    verticalArrangement = Arrangement.spacedBy(AppDimensions.InterItemSpacing)
+                    verticalArrangement = Arrangement.spacedBy(InterItemSpacing)
                 ) {
                     val temperaments = breed.temperament.split(", ")
                     temperaments.forEach { temperament ->
@@ -156,7 +165,7 @@ fun BreedDetailScreen(
                 StatCard(
                     "About the ${breed.name}",
                     breed.description,
-                    Modifier.padding(horizontal = AppDimensions.ScreenPadding)
+                    Modifier.padding(horizontal = ScreenPadding)
                 )
 
                 // Similar Breeds
@@ -166,12 +175,12 @@ fun BreedDetailScreen(
                             text = "Similar Breeds",
                             style = AppTypography.titleMedium,
                             modifier = Modifier
-                                .padding(bottom = AppDimensions.InterItemSpacing)
-                                .padding(horizontal = AppDimensions.ScreenPadding)
+                                .padding(bottom = InterItemSpacing)
+                                .padding(horizontal = ScreenPadding)
                         )
                         LazyRow(
-                            contentPadding = PaddingValues(horizontal = AppDimensions.ScreenPadding),
-                            horizontalArrangement = Arrangement.spacedBy(AppDimensions.InterItemSpacing),
+                            contentPadding = PaddingValues(horizontal = ScreenPadding),
+                            horizontalArrangement = Arrangement.spacedBy(InterItemSpacing),
                         ) {
                             items(similarBreeds) { similarBreed ->
                                 SimilarBreedCard(
@@ -202,18 +211,18 @@ fun StatCard(label: String, value: String, modifier: Modifier = Modifier) {
     Card(
         modifier = modifier
             .shadow(
-                elevation = AppDimensions.BarShadow,
+                elevation = BarShadow,
                 spotColor = ShadowColor,
-                shape = RoundedCornerShape(AppDimensions.CardCornerRadius)
+                shape = RoundedCornerShape(CardCornerRadius)
             ),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        shape = RoundedCornerShape(AppDimensions.CardCornerRadius)
+        shape = RoundedCornerShape(CardCornerRadius)
     ) {
         Column(
             modifier = Modifier
-                .padding(AppDimensions.CardPadding)
+                .padding(CardPadding)
                 .fillMaxHeight(),
             verticalArrangement = Arrangement.Center
         ) {
@@ -221,7 +230,7 @@ fun StatCard(label: String, value: String, modifier: Modifier = Modifier) {
                 text = label,
                 style = AppTypography.bodyMedium
             )
-            Spacer(modifier = Modifier.height(AppDimensions.SecondaryCardPadding))
+            Spacer(modifier = Modifier.height(SecondaryCardPadding))
             Text(
                 text = value,
                 style = AppTypography.titleMedium
@@ -233,14 +242,14 @@ fun StatCard(label: String, value: String, modifier: Modifier = Modifier) {
 @Composable
 fun TemperamentChip(text: String) {
     Surface(
-        shape = RoundedCornerShape(AppDimensions.InnerCornerRadius),
+        shape = RoundedCornerShape(InnerCornerRadius),
         color = MaterialTheme.colorScheme.tertiary,
     ) {
         Text(
             text = text,
             style = AppTypography.titleSmall,
             color = BrandBlue,
-            modifier = Modifier.padding(AppDimensions.SecondaryCardPadding)
+            modifier = Modifier.padding(SecondaryCardPadding)
         )
     }
 }
@@ -254,11 +263,11 @@ fun SimilarBreedCard(
         modifier = Modifier
             .clickable { onClick() }
             .shadow(
-                elevation = AppDimensions.BarShadow,
+                elevation = BarShadow,
                 spotColor = ShadowColor,
-                shape = RoundedCornerShape(AppDimensions.CardCornerRadius)
+                shape = RoundedCornerShape(CardCornerRadius)
             )
-            .width(AppDimensions.SecondaryItemImageSize),
+            .width(SecondaryItemImageSize),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         )
@@ -268,21 +277,21 @@ fun SimilarBreedCard(
                 model = "https://cdn2.thecatapi.com/images/${breed.reference_image_id}.jpg",
                 contentDescription = "Image of ${breed.name}",
                 modifier = Modifier
-                    .size(AppDimensions.SecondaryItemImageSize)
+                    .size(SecondaryItemImageSize)
                     .padding(
-                        start = AppDimensions.ThinBorderEffect,
-                        top = AppDimensions.ThinBorderEffect,
-                        end = AppDimensions.ThinBorderEffect,
+                        start = ThinBorderEffect,
+                        top = ThinBorderEffect,
+                        end = ThinBorderEffect,
                     )
                     .clip(RoundedCornerShape(
-                        topStart = AppDimensions.InnerCornerRadius,
-                        topEnd = AppDimensions.InnerCornerRadius
+                        topStart = InnerCornerRadius,
+                        topEnd = InnerCornerRadius
                     )),
                 contentScale = ContentScale.Crop,
                 placeholder = painterResource(id = R.drawable.ic_cat_placeholder),
                 error = painterResource(id = R.drawable.ic_cat_error)
             )
-            Column (modifier = Modifier.padding(AppDimensions.CardPadding)) {
+            Column (modifier = Modifier.padding(CardPadding)) {
                 Text(
                     text = breed.name,
                     style = AppTypography.titleMedium,
