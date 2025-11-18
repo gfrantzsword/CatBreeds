@@ -26,6 +26,7 @@ import coil.compose.AsyncImage
 import com.example.catbreeds.core.ui.theme.AppDimensions.BarShadow
 import com.example.catbreeds.core.ui.theme.AppDimensions.CardCornerRadius
 import com.example.catbreeds.core.ui.theme.AppDimensions.CardPadding
+import com.example.catbreeds.core.ui.theme.AppDimensions.DefaultWeight
 import com.example.catbreeds.core.ui.theme.AppDimensions.DetailsVerticalSpacing
 import com.example.catbreeds.core.ui.theme.AppDimensions.InnerCornerRadius
 import com.example.catbreeds.core.ui.theme.AppDimensions.InterItemSpacing
@@ -135,12 +136,12 @@ fun BreedDetailScreen(
                     StatCard(
                         "Origin",
                         breed.origin,
-                        Modifier.weight(1f)
+                        Modifier.weight(DefaultWeight)
                     )
                     StatCard(
                         "Life Expectancy",
                         breed.life_span,
-                        Modifier.weight(1f)
+                        Modifier.weight(DefaultWeight)
                     )
                 }
 

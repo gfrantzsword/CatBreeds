@@ -32,6 +32,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.catbreeds.core.ui.theme.AppDimensions.BarShadow
 import com.example.catbreeds.core.ui.theme.AppDimensions.CardCornerRadius
+import com.example.catbreeds.core.ui.theme.AppDimensions.DefaultWeight
 import com.example.catbreeds.core.ui.theme.AppDimensions.InterItemSpacing
 import com.example.catbreeds.core.ui.theme.AppDimensions.LazyColumnBottomPaddingForNav
 import com.example.catbreeds.core.ui.theme.AppDimensions.ScreenPadding
@@ -239,7 +240,7 @@ fun BreedCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(modifier = Modifier.weight(1f)) {
+                Column(modifier = Modifier.weight(DefaultWeight)) {
                     Text(
                         text = breed.name,
                         style = MaterialTheme.typography.titleMedium

@@ -14,6 +14,8 @@ private object BaseValues {
     val ImageSizeMedium = 160.dp
 
     val ShadowSmall = 6.dp
+
+    val DefaultWeight = 1f
 }
 
 object AppDimensions {
@@ -36,4 +38,6 @@ object AppDimensions {
     val TertiaryItemImageSize = BaseValues.ImageSizeSmall
 
     val BarShadow = BaseValues.ShadowSmall
+
+    val DefaultWeight = BaseValues.DefaultWeight
 }

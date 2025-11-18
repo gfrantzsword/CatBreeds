@@ -23,6 +23,7 @@ import coil.compose.AsyncImage
 import com.example.catbreeds.core.ui.theme.AppDimensions.BarShadow
 import com.example.catbreeds.core.ui.theme.AppDimensions.CardCornerRadius
 import com.example.catbreeds.core.ui.theme.AppDimensions.CardPadding
+import com.example.catbreeds.core.ui.theme.AppDimensions.DefaultWeight
 import com.example.catbreeds.core.ui.theme.AppDimensions.InnerCornerRadius
 import com.example.catbreeds.core.ui.theme.AppDimensions.InterItemSpacing
 import com.example.catbreeds.core.ui.theme.AppDimensions.LazyColumnBottomPaddingForNav
@@ -200,7 +201,7 @@ fun FavoriteBreedCard(
             // Name, origin, and average lifespan
             Column(
                 modifier = Modifier
-                    .weight(1f)
+                    .weight(DefaultWeight)
                     .padding(SecondaryCardPadding)
             ) {
                 Text(
