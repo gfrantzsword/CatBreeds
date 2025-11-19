@@ -34,6 +34,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.catbreeds.core.ui.theme.AppDimensions.BarShadow
@@ -42,12 +43,15 @@ import com.example.catbreeds.core.ui.theme.AppDimensions.DefaultWeight
 import com.example.catbreeds.core.ui.theme.AppDimensions.InnerCornerRadius
 import com.example.catbreeds.core.ui.theme.AppDimensions.InterItemSpacing
 import com.example.catbreeds.core.ui.theme.AppDimensions.LazyColumnBottomPaddingForNav
+import com.example.catbreeds.core.ui.theme.AppDimensions.MaxCharCountLarge
+import com.example.catbreeds.core.ui.theme.AppDimensions.MaxCharCountSmall
 import com.example.catbreeds.core.ui.theme.AppDimensions.MaxChipsToSelect
 import com.example.catbreeds.core.ui.theme.AppDimensions.MaxChipsToShow
 import com.example.catbreeds.core.ui.theme.AppDimensions.ScreenPadding
 import com.example.catbreeds.core.ui.theme.AppDimensions.SecondaryCardPadding
 import com.example.catbreeds.core.ui.theme.AppDimensions.SheetTopPadding
 import com.example.catbreeds.core.ui.theme.AppTypography.bodyMedium
+import com.example.catbreeds.core.ui.theme.AppTypography.bodySmall
 import com.example.catbreeds.core.ui.theme.AppTypography.headlineMedium
 import com.example.catbreeds.core.ui.theme.AppTypography.titleMedium
 import com.example.catbreeds.core.ui.theme.AppTypography.titleSmall
@@ -296,7 +300,8 @@ private fun NewBreedSheetContent(
                 value = name.value,
                 onValueChange = { name.value = it },
                 label = "Name",
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                maxCharCount = MaxCharCountSmall
             )
 
             // Origin
@@ -307,7 +312,8 @@ private fun NewBreedSheetContent(
                 onExpandedChange = { isOriginDropdownActive.value = it },
                 label = "Origin",
                 options = allOrigins,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                maxCharCount = MaxCharCountSmall
             )
 
             // Temperaments
@@ -385,6 +391,7 @@ private fun NewBreedSheetContent(
                 onValueChange = { description.value = it },
                 label = "Description",
                 modifier = Modifier.fillMaxWidth(),
+                maxCharCount = MaxCharCountLarge,
                 singleLine = false,
                 minLines = 3
             )
@@ -417,7 +424,8 @@ private fun NewBreedDropdownTextField(
     onExpandedChange: (Boolean) -> Unit,
     label: String,
     options: List<String>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    maxCharCount: Int? = null
 ) {
     val filteredOptions = remember(value, options) {
         if (value.isEmpty()) {
@@ -441,7 +449,8 @@ private fun NewBreedDropdownTextField(
             label = label,
             modifier = Modifier
                 .fillMaxWidth()
-                .menuAnchor(MenuAnchorType.PrimaryEditable, true)
+                .menuAnchor(MenuAnchorType.PrimaryEditable, true),
+            maxCharCount = maxCharCount
         )
 
         if (filteredOptions.isNotEmpty()) {
@@ -472,6 +481,7 @@ private fun NewBreedTextField(
     isError: Boolean = false,
     errorMessage: String = "",
     supportingText: String = "",
+    maxCharCount: Int? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     singleLine: Boolean = true,
     minLines: Int = 1,
@@ -479,20 +489,41 @@ private fun NewBreedTextField(
 ) {
     TextField(
         value = value,
-        onValueChange = onValueChange,
+        onValueChange = { newValue ->
+            if (maxCharCount == null || newValue.length <= maxCharCount) {
+                onValueChange(newValue)
+            }
+        },
         label = { Text(label) },
         modifier = modifier,
         shape = RoundedCornerShape(CardCornerRadius),
         keyboardOptions = keyboardOptions,
         isError = isError,
-        supportingText = { if (isError) {
-            Text(
-                text = errorMessage,
-                color = BrandRed
-            )
-        } else {
-            Text(supportingText)
-        }},
+        supportingText = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Box(modifier = Modifier.weight(1f)) {
+                    if (isError) {
+                        Text(
+                            text = errorMessage,
+                            color = BrandRed
+                        )
+                    } else if (supportingText.isNotEmpty()) {
+                        Text(text = supportingText)
+                    }
+                }
+                if (maxCharCount != null) {
+                    Text(
+                        text = "${value.length} / $maxCharCount",
+                        style = bodySmall,
+                        textAlign = TextAlign.End,
+                        modifier = Modifier.padding(start = SecondaryCardPadding)
+                    )
+                }
+            }
+        },
         singleLine = singleLine,
         minLines = minLines,
         trailingIcon = trailingIcon,

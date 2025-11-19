@@ -19,6 +19,9 @@ private object BaseValues {
     val ConstNumberSmall = 6
     val ConstNumberMedium = 10
 
+    val MaxCharCountSmall = 30
+    val MaxCharCountLarge = 300
+
     val DefaultWeight = 1f
 }
 
@@ -47,6 +50,8 @@ object AppDimensions {
     // Constants
     val MaxChipsToSelect = BaseValues.ConstNumberSmall
     val MaxChipsToShow = BaseValues.ConstNumberMedium
+    val MaxCharCountSmall = BaseValues.MaxCharCountSmall
+    val MaxCharCountLarge = BaseValues.MaxCharCountLarge
 
     val DefaultWeight = BaseValues.DefaultWeight
 }
