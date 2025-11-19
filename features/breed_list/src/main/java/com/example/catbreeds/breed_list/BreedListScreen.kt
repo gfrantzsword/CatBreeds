@@ -249,6 +249,7 @@ private fun NewBreedSheetContent(
     val origin = remember { mutableStateOf("") }
     val minLife = remember { mutableStateOf("") }
     val maxLife = remember { mutableStateOf("") }
+    val description = remember { mutableStateOf("") }
 
     val selectedTemperaments = remember { mutableStateOf(setOf<String>()) }
     val isTemperamentsExpanded = remember { mutableStateOf(false) }
@@ -363,7 +364,7 @@ private fun NewBreedSheetContent(
                         minLife.value = newValue.filter { it.isDigit() }
                     },
                     label = "Min",
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(DefaultWeight),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
                 // Max
@@ -373,12 +374,22 @@ private fun NewBreedSheetContent(
                         maxLife.value = newValue.filter { it.isDigit() }
                     },
                     label = "Max",
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(DefaultWeight),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
             }
 
-            Spacer(Modifier.weight(1f))
+            // Description
+            NewBreedTextField(
+                value = description.value,
+                onValueChange = { description.value = it },
+                label = "Description",
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = false,
+                minLines = 3
+            )
+
+            Spacer(Modifier.weight(DefaultWeight))
 
             Button(
                 onClick = {
@@ -463,6 +474,7 @@ private fun NewBreedTextField(
     supportingText: String = "",
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     singleLine: Boolean = true,
+    minLines: Int = 1,
     trailingIcon: @Composable (() -> Unit)? = null
 ) {
     TextField(
@@ -482,6 +494,7 @@ private fun NewBreedTextField(
             Text(supportingText)
         }},
         singleLine = singleLine,
+        minLines = minLines,
         trailingIcon = trailingIcon,
         colors = OutlinedTextFieldDefaults.colors(
             focusedContainerColor = MaterialTheme.colorScheme.surface,
