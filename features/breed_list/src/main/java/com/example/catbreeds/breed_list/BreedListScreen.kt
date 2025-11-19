@@ -358,13 +358,17 @@ private fun NewBreedSheetContent(
             )
 
             // Temperaments
+            Text(
+                text = "Temperaments",
+                style = titleSmall
+            )
             FlowRow(
                 modifier = Modifier
                     .fillMaxWidth()
                     .animateContentSize(),
                 horizontalArrangement = Arrangement.spacedBy(
                     InterItemSpacing,
-                    Alignment.CenterHorizontally
+                    Alignment.Start
                 ),
                 verticalArrangement = Arrangement.spacedBy(InterItemSpacing)
             ) {
@@ -399,6 +403,10 @@ private fun NewBreedSheetContent(
             }
 
             // Life expectancy
+            Text(
+                text = "Life Expectancy",
+                style = titleSmall
+            )
             Row(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -485,7 +493,7 @@ private fun NewBreedDropdownTextField(
     onValueChange: (String) -> Unit,
     expanded: Boolean,
     onExpandedChange: (Boolean) -> Unit,
-    label: String,
+    label: String = "",
     options: List<String>,
     modifier: Modifier = Modifier,
     maxCharCount: Int? = null,
