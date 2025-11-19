@@ -51,7 +51,6 @@ import com.example.catbreeds.core.ui.theme.AppDimensions.ScreenPadding
 import com.example.catbreeds.core.ui.theme.AppDimensions.SecondaryCardPadding
 import com.example.catbreeds.core.ui.theme.AppDimensions.SheetTopPadding
 import com.example.catbreeds.core.ui.theme.AppTypography.bodyMedium
-import com.example.catbreeds.core.ui.theme.AppTypography.bodySmall
 import com.example.catbreeds.core.ui.theme.AppTypography.headlineMedium
 import com.example.catbreeds.core.ui.theme.AppTypography.titleMedium
 import com.example.catbreeds.core.ui.theme.AppTypography.titleSmall
@@ -77,6 +76,7 @@ fun BreedListScreen(
         skipPartiallyExpanded = true
     )
 
+    val allNames by viewModel.allNames
     val allTemperaments by viewModel.allTemperaments
     val allOrigins by viewModel.allOrigins
 
@@ -115,9 +115,10 @@ fun BreedListScreen(
             containerColor = MaterialTheme.colorScheme.background
         ) {
             NewBreedSheetContent(
-                allTemperaments = allTemperaments,
+                allNames = allNames,
                 allOrigins = allOrigins,
-                onDismiss = { isNewBreedActive.value = false}
+                allTemperaments = allTemperaments,
+                onDismiss = { isNewBreedActive.value = false }
             )
         }
     }
@@ -245,8 +246,9 @@ fun BreedListScreen(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 private fun NewBreedSheetContent(
-    allTemperaments: List<String>,
+    allNames: List<String>,
     allOrigins: List<String>,
+    allTemperaments: List<String>,
     onDismiss: () -> Unit
 ) {
     val name = remember { mutableStateOf("") }
@@ -259,6 +261,41 @@ private fun NewBreedSheetContent(
     val isTemperamentsExpanded = remember { mutableStateOf(false) }
     val maxCollapsedTemperaments = MaxChipsToShow
     val isOriginDropdownActive = remember { mutableStateOf(false) }
+
+    val hasSubmitted = remember { mutableStateOf(false) }
+
+    // Validation
+    val isNameDuplicate by remember {
+        derivedStateOf {
+            name.value.trim().isNotEmpty() &&
+                    allNames.any { it.equals(name.value.trim(), ignoreCase = true) }
+        }
+    }
+    val minLifeInt = minLife.value.toIntOrNull()
+    val maxLifeInt = maxLife.value.toIntOrNull()
+    val isMaxLessThanMin = if (minLifeInt != null && maxLifeInt != null) {
+        maxLifeInt < minLifeInt
+    } else false
+
+    fun validate(value: String, customError: String? = null): String {
+        if (customError != null) return customError
+        return if (hasSubmitted.value && value.isBlank()) "Required" else ""
+    }
+
+    // Errors
+    val nameError by remember {
+        derivedStateOf {
+            validate(name.value, if (isNameDuplicate) "Name already exists" else null)
+        }
+    }
+    val originError by remember { derivedStateOf { validate(origin.value) } }
+    val minLifeError by remember { derivedStateOf { validate(minLife.value) } }
+    val maxLifeError by remember {
+        derivedStateOf {
+            validate(maxLife.value, if (isMaxLessThanMin) "Must be >= Min" else null)
+        }
+    }
+    val descriptionError by remember { derivedStateOf { validate(description.value) } }
 
     val temperamentsToShow = if (!isTemperamentsExpanded.value) {
         allTemperaments.take(maxCollapsedTemperaments)
@@ -301,7 +338,9 @@ private fun NewBreedSheetContent(
                 onValueChange = { name.value = it },
                 label = "Name",
                 modifier = Modifier.fillMaxWidth(),
-                maxCharCount = MaxCharCountSmall
+                maxCharCount = MaxCharCountSmall,
+                isError = nameError.isNotEmpty(),
+                errorMessage = nameError
             )
 
             // Origin
@@ -313,7 +352,9 @@ private fun NewBreedSheetContent(
                 label = "Origin",
                 options = allOrigins,
                 modifier = Modifier.fillMaxWidth(),
-                maxCharCount = MaxCharCountSmall
+                maxCharCount = MaxCharCountSmall,
+                isError = originError.isNotEmpty(),
+                errorMessage = originError
             )
 
             // Temperaments
@@ -350,7 +391,7 @@ private fun NewBreedSheetContent(
                     onClick = { isTemperamentsExpanded.value = !isTemperamentsExpanded.value },
                 ) {
                     Text(
-                        text = if (isTemperamentsExpanded.value) "Show less -" else "Show more +",
+                        text = if (isTemperamentsExpanded.value) "Show less" else "Show more",
                         style = titleSmall,
                         color = MaterialTheme.colorScheme.secondary
                     )
@@ -367,21 +408,29 @@ private fun NewBreedSheetContent(
                 NewBreedTextField(
                     value = minLife.value,
                     onValueChange = { newValue ->
-                        minLife.value = newValue.filter { it.isDigit() }
+                        if (newValue.length <= 2) {
+                            minLife.value = newValue.filter { it.isDigit() }
+                        }
                     },
                     label = "Min",
                     modifier = Modifier.weight(DefaultWeight),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    isError = minLifeError.isNotEmpty(),
+                    errorMessage = minLifeError
                 )
                 // Max
                 NewBreedTextField(
                     value = maxLife.value,
                     onValueChange = { newValue ->
-                        maxLife.value = newValue.filter { it.isDigit() }
+                        if (newValue.length <= 2) {
+                            maxLife.value = newValue.filter { it.isDigit() }
+                        }
                     },
                     label = "Max",
                     modifier = Modifier.weight(DefaultWeight),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    isError = maxLifeError.isNotEmpty(),
+                    errorMessage = maxLifeError
                 )
             }
 
@@ -393,15 +442,29 @@ private fun NewBreedSheetContent(
                 modifier = Modifier.fillMaxWidth(),
                 maxCharCount = MaxCharCountLarge,
                 singleLine = false,
-                minLines = 3
+                minLines = 3,
+                isError = descriptionError.isNotEmpty(),
+                errorMessage = descriptionError
             )
 
             Spacer(Modifier.weight(DefaultWeight))
 
             Button(
                 onClick = {
-                    // TODO: Add new breed logic
-                    onDismiss()
+                    hasSubmitted.value = true
+
+                    val hasLogicErrors = isNameDuplicate || isMaxLessThanMin
+
+                    val hasEmptyFields = name.value.isBlank() ||
+                            origin.value.isBlank() ||
+                            minLife.value.isBlank() ||
+                            maxLife.value.isBlank() ||
+                            description.value.isBlank()
+
+                    if (!hasLogicErrors && !hasEmptyFields) {
+                        // TODO: Add new breed logic here
+                        onDismiss()
+                    }
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
@@ -425,7 +488,9 @@ private fun NewBreedDropdownTextField(
     label: String,
     options: List<String>,
     modifier: Modifier = Modifier,
-    maxCharCount: Int? = null
+    maxCharCount: Int? = null,
+    isError: Boolean = false,
+    errorMessage: String = ""
 ) {
     val filteredOptions = remember(value, options) {
         if (value.isEmpty()) {
@@ -450,7 +515,9 @@ private fun NewBreedDropdownTextField(
             modifier = Modifier
                 .fillMaxWidth()
                 .menuAnchor(MenuAnchorType.PrimaryEditable, true),
-            maxCharCount = maxCharCount
+            maxCharCount = maxCharCount,
+            isError = isError,
+            errorMessage = errorMessage
         )
 
         if (filteredOptions.isNotEmpty()) {
@@ -517,7 +584,6 @@ private fun NewBreedTextField(
                 if (maxCharCount != null) {
                     Text(
                         text = "${value.length} / $maxCharCount",
-                        style = bodySmall,
                         textAlign = TextAlign.End,
                         modifier = Modifier.padding(start = SecondaryCardPadding)
                     )
@@ -527,11 +593,16 @@ private fun NewBreedTextField(
         singleLine = singleLine,
         minLines = minLines,
         trailingIcon = trailingIcon,
-        colors = OutlinedTextFieldDefaults.colors(
+        colors = TextFieldDefaults.colors(
             focusedContainerColor = MaterialTheme.colorScheme.surface,
             unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-            focusedBorderColor = Color.Transparent,
-            unfocusedBorderColor = Color.Transparent
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+
+            errorIndicatorColor = Color.Transparent,
+            errorContainerColor = MaterialTheme.colorScheme.surface,
+            errorCursorColor = BrandRed,
+            errorLabelColor = BrandRed
         )
     )
 }
