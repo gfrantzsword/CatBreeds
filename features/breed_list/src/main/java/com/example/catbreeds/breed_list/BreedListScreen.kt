@@ -1,6 +1,5 @@
 package com.example.catbreeds.breed_list
 
-import androidx.compose.animation.animateContentSize
 import com.example.catbreeds.core.R
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,9 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Search
@@ -31,20 +28,13 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.catbreeds.core.ui.theme.AppDimensions
-import com.example.catbreeds.core.ui.theme.AppTypography
-import com.example.catbreeds.core.ui.theme.BrandBlue
 import com.example.catbreeds.core.ui.theme.BrandRed
 import com.example.catbreeds.core.ui.theme.ShadowColor
 import com.example.catbreeds.core.util.ErrorHandler
 import com.example.catbreeds.domain.models.Breed
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -55,7 +45,7 @@ fun BreedListScreen(
     val breeds by viewModel.breeds
     val searchQuery by viewModel.searchQuery
     val filteredBreeds by viewModel.filteredBreeds
-    var isSearchActive by remember { mutableStateOf(false) }
+    val isSearchActive = remember { mutableStateOf(false) }
 
     var isNewBreedActive by remember { mutableStateOf(false) }
     val newBreedSheetState = rememberModalBottomSheetState(
@@ -80,14 +70,14 @@ fun BreedListScreen(
 
     // Scroll state for dynamic shadow
     val lazyGridState = rememberLazyStaggeredGridState()
-    val showTopBarShadow by remember {
+    val showTopBarShadow = remember {
         derivedStateOf {
             lazyGridState.firstVisibleItemIndex > 0 || lazyGridState.firstVisibleItemScrollOffset > 0
         }
     }
 
     LaunchedEffect(isSearchActive) {
-        if (isSearchActive) {
+        if (isSearchActive.value) {
             focusRequester.requestFocus()
         }
     }
@@ -113,16 +103,16 @@ fun BreedListScreen(
             val topAppBarColors = TopAppBarDefaults.topAppBarColors(
                 containerColor = MaterialTheme.colorScheme.surfaceContainer
             )
-            val topBarModifier = if (showTopBarShadow) {
+            val topBarModifier = if (showTopBarShadow.value) {
                 Modifier.shadow(
-                    elevation = AppDimensions.BarShadow,
+                    elevation = BarShadow,
                     spotColor = ShadowColor
                 )
             } else {
                 Modifier
             }
 
-            if (isSearchActive) {
+            if (isSearchActive.value) {
                 TopAppBar(
                     modifier = topBarModifier,
                     colors = topAppBarColors,
@@ -155,7 +145,7 @@ fun BreedListScreen(
                     },
                     navigationIcon = {
                         IconButton(onClick = {
-                            isSearchActive = false
+                            isSearchActive.value = false
                             viewModel.updateSearchQuery("")
                             keyboardController?.hide()
                         }) {
@@ -170,11 +160,11 @@ fun BreedListScreen(
                     title = {
                         Text(
                             text = "Cat Breeds",
-                            style = MaterialTheme.typography.headlineMedium
+                            style = headlineMedium
                         )
                     },
                     actions = {
-                        IconButton(onClick = { isSearchActive = true }) {
+                        IconButton(onClick = { isSearchActive.value = true }) {
                             Icon(Icons.Default.Search, contentDescription = "Search breeds")
                         }
                         IconButton(onClick = { isNewBreedActive = true }) {
@@ -205,13 +195,13 @@ fun BreedListScreen(
                     columns = StaggeredGridCells.Fixed(2),
                     state = lazyGridState,
                     modifier = Modifier.fillMaxSize(),
-                    verticalItemSpacing = AppDimensions.InterItemSpacing,
-                    horizontalArrangement = Arrangement.spacedBy(AppDimensions.InterItemSpacing),
+                    verticalItemSpacing = InterItemSpacing,
+                    horizontalArrangement = Arrangement.spacedBy(InterItemSpacing),
                     contentPadding = PaddingValues(
-                        start = AppDimensions.ScreenPadding,
-                        top = AppDimensions.ScreenPadding,
-                        end = AppDimensions.ScreenPadding,
-                        bottom = AppDimensions.LazyColumnBottomPaddingForNav
+                        start = ScreenPadding,
+                        top = ScreenPadding,
+                        end = ScreenPadding,
+                        bottom = LazyColumnBottomPaddingForNav
                     )
                 ) {
                     items(filteredBreeds) { breed ->
@@ -505,7 +495,7 @@ fun SelectTemperamentChip(
 }
 
 @Composable
-fun BreedCard(
+private fun BreedCard(
     breed: Breed,
     onClick: () -> Unit,
     onFavoriteClick: () -> Unit
@@ -514,9 +504,9 @@ fun BreedCard(
         modifier = Modifier
             .clickable { onClick() }
             .shadow(
-                elevation = AppDimensions.BarShadow,
+                elevation = BarShadow,
                 spotColor = ShadowColor,
-                shape = RoundedCornerShape(AppDimensions.CardCornerRadius)
+                shape = RoundedCornerShape(CardCornerRadius)
             ),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
@@ -531,8 +521,8 @@ fun BreedCard(
                     .fillMaxWidth()
                     .clip(
                         RoundedCornerShape(
-                            topStart = AppDimensions.CardCornerRadius,
-                            topEnd = AppDimensions.CardCornerRadius
+                            topStart = CardCornerRadius,
+                            topEnd = CardCornerRadius
                         )
                     ),
                 placeholder = painterResource(id = R.drawable.ic_cat_placeholder),
@@ -543,18 +533,18 @@ fun BreedCard(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(AppDimensions.SecondaryCardPadding),
+                    .padding(SecondaryCardPadding),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(modifier = Modifier.weight(1f)) {
+                Column(modifier = Modifier.weight(DefaultWeight)) {
                     Text(
                         text = breed.name,
-                        style = MaterialTheme.typography.titleMedium
+                        style = titleMedium
                     )
                     Text(
                         text = breed.origin,
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }

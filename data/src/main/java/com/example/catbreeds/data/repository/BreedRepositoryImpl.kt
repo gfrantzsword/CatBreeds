@@ -42,15 +42,15 @@ class BreedRepositoryImpl(
         try {
             val networkBreeds = remoteSource.getBreeds()
 
-            val breedEntities = networkBreeds.map { breed ->
+            val breedEntities = networkBreeds.map { breedDto ->
                 BreedEntity(
-                    id = breed.id,
-                    name = breed.name,
-                    origin = breed.origin,
-                    description = breed.description,
-                    temperament = breed.temperament,
-                    life_span = breed.life_span,
-                    reference_image_id = breed.reference_image_id.toString()
+                    id = breedDto.id,
+                    name = breedDto.name,
+                    origin = breedDto.origin,
+                    description = breedDto.description,
+                    temperament = breedDto.temperament,
+                    life_span = breedDto.life_span,
+                    reference_image_id = breedDto.reference_image_id.toString()
                 )
             }
             localSource.insertAll(breedEntities)
@@ -83,9 +83,8 @@ class BreedRepositoryImpl(
             val breed = getBreedById(breedId)
             if (breed != null) {
                 val allBreeds = getBreeds().first()
-                val temperamentList = breed.temperament.split(", ")
                 val similar = allBreeds.filter {
-                    it.id != breed.id && (it.origin == breed.origin || it.temperament.split(", ").count { temperament -> temperamentList.contains(temperament) } >= 3)
+                    it.id != breed.id && (it.origin == breed.origin || it.temperament.count { temp -> breed.temperament.contains(temp) } >= 3)
                 }.take(6)
                 emit(similar)
             } else {

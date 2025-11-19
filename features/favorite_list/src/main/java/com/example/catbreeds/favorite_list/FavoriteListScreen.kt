@@ -20,8 +20,22 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
-import com.example.catbreeds.core.ui.theme.AppDimensions
-import com.example.catbreeds.core.ui.theme.AppTypography
+import com.example.catbreeds.core.ui.theme.AppDimensions.BarShadow
+import com.example.catbreeds.core.ui.theme.AppDimensions.CardCornerRadius
+import com.example.catbreeds.core.ui.theme.AppDimensions.CardPadding
+import com.example.catbreeds.core.ui.theme.AppDimensions.DefaultWeight
+import com.example.catbreeds.core.ui.theme.AppDimensions.InnerCornerRadius
+import com.example.catbreeds.core.ui.theme.AppDimensions.InterItemSpacing
+import com.example.catbreeds.core.ui.theme.AppDimensions.LazyColumnBottomPaddingForNav
+import com.example.catbreeds.core.ui.theme.AppDimensions.NoFavoritesMessageIconPadding
+import com.example.catbreeds.core.ui.theme.AppDimensions.ScreenPadding
+import com.example.catbreeds.core.ui.theme.AppDimensions.SecondaryCardPadding
+import com.example.catbreeds.core.ui.theme.AppDimensions.TertiaryItemImageSize
+import com.example.catbreeds.core.ui.theme.AppDimensions.ThinBorderEffect
+import com.example.catbreeds.core.ui.theme.AppTypography.bodyMedium
+import com.example.catbreeds.core.ui.theme.AppTypography.bodySmall
+import com.example.catbreeds.core.ui.theme.AppTypography.headlineMedium
+import com.example.catbreeds.core.ui.theme.AppTypography.titleMedium
 import com.example.catbreeds.core.ui.theme.BrandRed
 import com.example.catbreeds.core.ui.theme.ShadowColor
 import com.example.catbreeds.core.util.ErrorHandler
@@ -47,7 +61,7 @@ fun FavoriteListScreen(
 
     // Scroll state for dynamic shadow
     val lazyListState = rememberLazyListState()
-    val showTopBarShadow by remember {
+    val showTopBarShadow = remember {
         derivedStateOf {
             lazyListState.firstVisibleItemIndex > 0 || lazyListState.firstVisibleItemScrollOffset > 0
         }
@@ -57,9 +71,9 @@ fun FavoriteListScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                modifier = if (showTopBarShadow) {
+                modifier = if (showTopBarShadow.value) {
                     Modifier.shadow(
-                        elevation = AppDimensions.BarShadow,
+                        elevation = BarShadow,
                         spotColor = ShadowColor
                     )
                 } else {
@@ -71,7 +85,7 @@ fun FavoriteListScreen(
                 title = {
                     Text(
                         text = "Favorites",
-                        style = MaterialTheme.typography.headlineMedium
+                        style = headlineMedium
                     )
                 }
             )
@@ -97,18 +111,18 @@ fun FavoriteListScreen(
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(AppDimensions.InterItemSpacing)
+                        verticalArrangement = Arrangement.spacedBy(InterItemSpacing)
                     ) {
                         // When there are no favorite breeds
                         Icon(
                             Icons.Default.Favorite,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(AppDimensions.NoFavoritesMessageIconPadding)
+                            modifier = Modifier.padding(NoFavoritesMessageIconPadding)
                         )
                         Text(
                             text = "No favorite breeds yet",
-                            style = MaterialTheme.typography.titleMedium,
+                            style = titleMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center
                         )
@@ -121,12 +135,12 @@ fun FavoriteListScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues),
-                    verticalArrangement = Arrangement.spacedBy(AppDimensions.InterItemSpacing),
+                    verticalArrangement = Arrangement.spacedBy(InterItemSpacing),
                     contentPadding = PaddingValues(
-                        start = AppDimensions.ScreenPadding,
-                        top = AppDimensions.ScreenPadding,
-                        end = AppDimensions.ScreenPadding,
-                        bottom = AppDimensions.LazyColumnBottomPaddingForNav
+                        start = ScreenPadding,
+                        top = ScreenPadding,
+                        end = ScreenPadding,
+                        bottom = LazyColumnBottomPaddingForNav
                     )
                 ) {
                     items(favoriteBreeds) { breed ->
@@ -143,7 +157,7 @@ fun FavoriteListScreen(
 }
 
 @Composable
-fun FavoriteBreedCard(
+private fun FavoriteBreedCard(
     breed: Breed,
     onBreedClick: () -> Unit,
     onRemoveFromFavorites: () -> Unit
@@ -153,9 +167,9 @@ fun FavoriteBreedCard(
             .fillMaxWidth()
             .clickable { onBreedClick() }
             .shadow(
-                elevation = AppDimensions.BarShadow,
+                elevation = BarShadow,
                 spotColor = ShadowColor,
-                shape = RoundedCornerShape(AppDimensions.CardCornerRadius)
+                shape = RoundedCornerShape(CardCornerRadius)
             ),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
@@ -171,16 +185,16 @@ fun FavoriteBreedCard(
                 model = "https://cdn2.thecatapi.com/images/${breed.reference_image_id}.jpg",
                 contentDescription = "Image of ${breed.name}",
                 modifier = Modifier
-                    .size(AppDimensions.TertiaryItemImageSize)
+                    .size(TertiaryItemImageSize)
                     .padding(
-                        start = AppDimensions.ThinBorderEffect,
-                        top = AppDimensions.ThinBorderEffect,
-                        bottom = AppDimensions.ThinBorderEffect,
-                        end = AppDimensions.CardPadding
+                        start = ThinBorderEffect,
+                        top = ThinBorderEffect,
+                        bottom = ThinBorderEffect,
+                        end = CardPadding
                     )
                     .clip(RoundedCornerShape(
-                        topStart = AppDimensions.InnerCornerRadius,
-                        bottomStart = AppDimensions.InnerCornerRadius,
+                        topStart = InnerCornerRadius,
+                        bottomStart = InnerCornerRadius,
                     )),
                 contentScale = ContentScale.Crop,
                 placeholder = painterResource(id = R.drawable.ic_cat_placeholder),
@@ -190,16 +204,16 @@ fun FavoriteBreedCard(
             // Name, origin, and average lifespan
             Column(
                 modifier = Modifier
-                    .weight(1f)
-                    .padding(AppDimensions.SecondaryCardPadding)
+                    .weight(DefaultWeight)
+                    .padding(SecondaryCardPadding)
             ) {
                 Text(
                     text = breed.name,
-                    style = AppTypography.titleMedium
+                    style = titleMedium
                 )
                 Text(
                     text = breed.origin,
-                    style = AppTypography.bodyMedium,
+                    style = bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
@@ -208,7 +222,7 @@ fun FavoriteBreedCard(
                 lowerLifeSpan?.let {
                     Text(
                         text = "Average lifespan: $it years",
-                        style = AppTypography.bodySmall,
+                        style = bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
