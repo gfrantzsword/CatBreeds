@@ -46,7 +46,6 @@ import com.example.catbreeds.core.ui.theme.AppDimensions.LazyColumnBottomPadding
 import com.example.catbreeds.core.ui.theme.AppDimensions.MaxCharCountLarge
 import com.example.catbreeds.core.ui.theme.AppDimensions.MaxCharCountSmall
 import com.example.catbreeds.core.ui.theme.AppDimensions.MaxChipsToSelect
-import com.example.catbreeds.core.ui.theme.AppDimensions.MaxChipsToShow
 import com.example.catbreeds.core.ui.theme.AppDimensions.ScreenPadding
 import com.example.catbreeds.core.ui.theme.AppDimensions.SecondaryCardPadding
 import com.example.catbreeds.core.ui.theme.AppDimensions.SheetTopPadding
@@ -259,7 +258,6 @@ private fun NewBreedSheetContent(
 
     val selectedTemperaments = remember { mutableStateOf(setOf<String>()) }
     val isTemperamentsExpanded = remember { mutableStateOf(false) }
-    val maxCollapsedTemperaments = MaxChipsToShow
     val isOriginDropdownActive = remember { mutableStateOf(false) }
 
     val hasSubmitted = remember { mutableStateOf(false) }
@@ -296,12 +294,6 @@ private fun NewBreedSheetContent(
         }
     }
     val descriptionError by remember { derivedStateOf { validate(description.value) } }
-
-    val temperamentsToShow = if (!isTemperamentsExpanded.value) {
-        allTemperaments.take(maxCollapsedTemperaments)
-    } else {
-        allTemperaments
-    }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -365,19 +357,31 @@ private fun NewBreedSheetContent(
             FlowRow(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .animateContentSize(),
+                    .animateContentSize()
+                    .padding(bottom = ScreenPadding),
                 horizontalArrangement = Arrangement.spacedBy(
                     InterItemSpacing,
                     Alignment.Start
                 ),
-                verticalArrangement = Arrangement.spacedBy(InterItemSpacing)
+                verticalArrangement = Arrangement.spacedBy(InterItemSpacing),
+                maxLines = if (isTemperamentsExpanded.value) Int.MAX_VALUE else 2,
+                overflow = FlowRowOverflow.expandIndicator {
+                    SelectChip(
+                        text = "See more",
+                        backgroundColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textColor = Color.White,
+                        onClick = { isTemperamentsExpanded.value = true }
+                    )
+                }
             ) {
-                temperamentsToShow.forEach { temperament ->
-                    SelectTemperamentChip(
+                allTemperaments.forEach { temperament ->
+                    val isSelected = selectedTemperaments.value.contains(temperament)
+                    SelectChip(
                         text = temperament,
-                        isSelected = selectedTemperaments.value.contains(temperament),
+                        backgroundColor = if (isSelected) BrandBlue else MaterialTheme.colorScheme.tertiary,
+                        textColor = if (isSelected) Color.White else BrandBlue,
                         onClick = {
-                            if (selectedTemperaments.value.contains(temperament)) {
+                            if (isSelected) {
                                 selectedTemperaments.value -= temperament
                             } else if (selectedTemperaments.value.size < MaxChipsToSelect) {
                                 selectedTemperaments.value += temperament
@@ -385,19 +389,13 @@ private fun NewBreedSheetContent(
                         }
                     )
                 }
-            }
 
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                TextButton(
-                    onClick = { isTemperamentsExpanded.value = !isTemperamentsExpanded.value },
-                ) {
-                    Text(
-                        text = if (isTemperamentsExpanded.value) "Show less" else "Show more",
-                        style = titleSmall,
-                        color = MaterialTheme.colorScheme.secondary
+                if (isTemperamentsExpanded.value) {
+                    SelectChip(
+                        text = "Show less",
+                        backgroundColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textColor = Color.White,
+                        onClick = { isTemperamentsExpanded.value = false }
                     )
                 }
             }
@@ -616,14 +614,12 @@ private fun NewBreedTextField(
 }
 
 @Composable
-private fun SelectTemperamentChip(
+private fun SelectChip(
     text: String,
-    isSelected: Boolean,
+    backgroundColor: Color,
+    textColor: Color,
     onClick: () -> Unit
 ) {
-    val backgroundColor = if (isSelected) BrandBlue else MaterialTheme.colorScheme.tertiary
-    val textColor = if (isSelected) Color.White else BrandBlue
-
     Surface(
         modifier = Modifier.clickable { onClick() },
         shape = RoundedCornerShape(InnerCornerRadius),
