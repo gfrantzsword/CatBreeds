@@ -63,7 +63,7 @@ class BreedListViewModel @Inject constructor(
                     .sorted()
 
                 _allTemperaments.value = breedList
-                    .flatMap { it.temperament.split(", ") }
+                    .flatMap { it.temperament }
                     .map { it.trim().lowercase() }
                     .filter { it.isNotEmpty() }
                     .distinct()

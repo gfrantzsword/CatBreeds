@@ -1,5 +1,6 @@
 package com.example.catbreeds.breed_list
 
+import androidx.compose.animation.animateContentSize
 import com.example.catbreeds.core.R
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -7,11 +8,15 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Search
@@ -28,9 +33,25 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
-import com.example.catbreeds.core.ui.theme.AppDimensions
+import com.example.catbreeds.core.ui.theme.AppDimensions.BarShadow
+import com.example.catbreeds.core.ui.theme.AppDimensions.CardCornerRadius
+import com.example.catbreeds.core.ui.theme.AppDimensions.DefaultWeight
+import com.example.catbreeds.core.ui.theme.AppDimensions.InnerCornerRadius
+import com.example.catbreeds.core.ui.theme.AppDimensions.InterItemSpacing
+import com.example.catbreeds.core.ui.theme.AppDimensions.LazyColumnBottomPaddingForNav
+import com.example.catbreeds.core.ui.theme.AppDimensions.MaxChipsToSelect
+import com.example.catbreeds.core.ui.theme.AppDimensions.MaxChipsToShow
+import com.example.catbreeds.core.ui.theme.AppDimensions.ScreenPadding
+import com.example.catbreeds.core.ui.theme.AppDimensions.SecondaryCardPadding
+import com.example.catbreeds.core.ui.theme.AppDimensions.SheetTopPadding
+import com.example.catbreeds.core.ui.theme.AppTypography.bodyMedium
+import com.example.catbreeds.core.ui.theme.AppTypography.headlineMedium
+import com.example.catbreeds.core.ui.theme.AppTypography.titleMedium
+import com.example.catbreeds.core.ui.theme.AppTypography.titleSmall
+import com.example.catbreeds.core.ui.theme.BrandBlue
 import com.example.catbreeds.core.ui.theme.BrandRed
 import com.example.catbreeds.core.ui.theme.ShadowColor
 import com.example.catbreeds.core.util.ErrorHandler
@@ -47,7 +68,7 @@ fun BreedListScreen(
     val filteredBreeds by viewModel.filteredBreeds
     val isSearchActive = remember { mutableStateOf(false) }
 
-    var isNewBreedActive by remember { mutableStateOf(false) }
+    val isNewBreedActive = remember { mutableStateOf(false) }
     val newBreedSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
@@ -82,17 +103,17 @@ fun BreedListScreen(
         }
     }
 
-    if (isNewBreedActive) {
+    if (isNewBreedActive.value) {
         ModalBottomSheet(
-            onDismissRequest = { isNewBreedActive = false },
+            onDismissRequest = { isNewBreedActive.value = false },
             sheetState = newBreedSheetState,
-            modifier = Modifier.padding(top = AppDimensions.SheetTopPadding),
+            modifier = Modifier.padding(top = SheetTopPadding),
             containerColor = MaterialTheme.colorScheme.background
         ) {
             NewBreedSheetContent(
                 allTemperaments = allTemperaments,
                 allOrigins = allOrigins,
-                onDismiss = { isNewBreedActive = false}
+                onDismiss = { isNewBreedActive.value = false}
             )
         }
     }
@@ -167,7 +188,7 @@ fun BreedListScreen(
                         IconButton(onClick = { isSearchActive.value = true }) {
                             Icon(Icons.Default.Search, contentDescription = "Search breeds")
                         }
-                        IconButton(onClick = { isNewBreedActive = true }) {
+                        IconButton(onClick = { isNewBreedActive.value = true }) {
                             Icon(Icons.Default.Add, contentDescription = "New breed")
                         }
                     }
@@ -219,22 +240,22 @@ fun BreedListScreen(
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun NewBreedSheetContent(
+private fun NewBreedSheetContent(
     allTemperaments: List<String>,
     allOrigins: List<String>,
     onDismiss: () -> Unit
 ) {
-    var name by remember { mutableStateOf("") }
-    var origin by remember { mutableStateOf("") }
-    var minLife by remember { mutableStateOf("") }
-    var maxLife by remember { mutableStateOf("") }
+    val name = remember { mutableStateOf("") }
+    val origin = remember { mutableStateOf("") }
+    val minLife = remember { mutableStateOf("") }
+    val maxLife = remember { mutableStateOf("") }
 
-    var selectedTemperaments by remember { mutableStateOf(setOf<String>()) }
-    var isTemperamentsExpanded by remember { mutableStateOf(false) }
-    val maxCollapsedTemperaments = AppDimensions.MaxChipsToShow
-    var isOriginDropdownActive by remember { mutableStateOf(false) }
+    val selectedTemperaments = remember { mutableStateOf(setOf<String>()) }
+    val isTemperamentsExpanded = remember { mutableStateOf(false) }
+    val maxCollapsedTemperaments = MaxChipsToShow
+    val isOriginDropdownActive = remember { mutableStateOf(false) }
 
-    val temperamentsToShow = if (!isTemperamentsExpanded) {
+    val temperamentsToShow = if (!isTemperamentsExpanded.value) {
         allTemperaments.take(maxCollapsedTemperaments)
     } else {
         allTemperaments
@@ -250,7 +271,7 @@ fun NewBreedSheetContent(
                 title = {
                     Text(
                         text = "Add a new breed",
-                        style = MaterialTheme.typography.headlineMedium
+                        style = headlineMedium
                     )
                 },
                 actions = {
@@ -265,24 +286,24 @@ fun NewBreedSheetContent(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(AppDimensions.ScreenPadding)
+                .padding(ScreenPadding)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(AppDimensions.InterItemSpacing)
+            verticalArrangement = Arrangement.spacedBy(InterItemSpacing)
         ) {
             // Name
             NewBreedTextField(
-                value = name,
-                onValueChange = { name = it },
+                value = name.value,
+                onValueChange = { name.value = it },
                 label = "Name",
                 modifier = Modifier.fillMaxWidth()
             )
 
             // Origin
             NewBreedDropdownTextField(
-                value = origin,
-                onValueChange = { origin = it },
-                expanded = isOriginDropdownActive,
-                onExpandedChange = { isOriginDropdownActive = it },
+                value = origin.value,
+                onValueChange = { origin.value = it },
+                expanded = isOriginDropdownActive.value,
+                onExpandedChange = { isOriginDropdownActive.value = it },
                 label = "Origin",
                 options = allOrigins,
                 modifier = Modifier.fillMaxWidth()
@@ -294,20 +315,20 @@ fun NewBreedSheetContent(
                     .fillMaxWidth()
                     .animateContentSize(),
                 horizontalArrangement = Arrangement.spacedBy(
-                    AppDimensions.InterItemSpacing,
+                    InterItemSpacing,
                     Alignment.CenterHorizontally
                 ),
-                verticalArrangement = Arrangement.spacedBy(AppDimensions.InterItemSpacing)
+                verticalArrangement = Arrangement.spacedBy(InterItemSpacing)
             ) {
                 temperamentsToShow.forEach { temperament ->
                     SelectTemperamentChip(
                         text = temperament,
-                        isSelected = selectedTemperaments.contains(temperament),
+                        isSelected = selectedTemperaments.value.contains(temperament),
                         onClick = {
-                            if (selectedTemperaments.contains(temperament)) {
-                                selectedTemperaments = selectedTemperaments - temperament
-                            } else if (selectedTemperaments.size < AppDimensions.MaxChipsToSelect) {
-                                selectedTemperaments = selectedTemperaments + temperament
+                            if (selectedTemperaments.value.contains(temperament)) {
+                                selectedTemperaments.value -= temperament
+                            } else if (selectedTemperaments.value.size < MaxChipsToSelect) {
+                                selectedTemperaments.value += temperament
                             }
                         }
                     )
@@ -319,11 +340,11 @@ fun NewBreedSheetContent(
                 contentAlignment = Alignment.Center
             ) {
                 TextButton(
-                    onClick = { isTemperamentsExpanded = !isTemperamentsExpanded },
+                    onClick = { isTemperamentsExpanded.value = !isTemperamentsExpanded.value },
                 ) {
                     Text(
-                        text = if (isTemperamentsExpanded) "Show less -" else "Show more +",
-                        style = AppTypography.titleSmall,
+                        text = if (isTemperamentsExpanded.value) "Show less -" else "Show more +",
+                        style = titleSmall,
                         color = MaterialTheme.colorScheme.secondary
                     )
                 }
@@ -333,13 +354,13 @@ fun NewBreedSheetContent(
             Row(
                 modifier = Modifier
                     .fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(AppDimensions.InterItemSpacing),
+                horizontalArrangement = Arrangement.spacedBy(InterItemSpacing),
             ) {
                 // Min
                 NewBreedTextField(
-                    value = minLife,
+                    value = minLife.value,
                     onValueChange = { newValue ->
-                        minLife = newValue.filter { it.isDigit() }
+                        minLife.value = newValue.filter { it.isDigit() }
                     },
                     label = "Min",
                     modifier = Modifier.weight(1f),
@@ -347,9 +368,9 @@ fun NewBreedSheetContent(
                 )
                 // Max
                 NewBreedTextField(
-                    value = maxLife,
+                    value = maxLife.value,
                     onValueChange = { newValue ->
-                        maxLife = newValue.filter { it.isDigit() }
+                        maxLife.value = newValue.filter { it.isDigit() }
                     },
                     label = "Max",
                     modifier = Modifier.weight(1f),
@@ -371,14 +392,14 @@ fun NewBreedSheetContent(
             ) {
                 Text("Add new breed")
             }
-            Spacer(modifier = Modifier.height(AppDimensions.ScreenPadding))
+            Spacer(modifier = Modifier.height(ScreenPadding))
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewBreedDropdownTextField(
+private fun NewBreedDropdownTextField(
     value: String,
     onValueChange: (String) -> Unit,
     expanded: Boolean,
@@ -432,7 +453,7 @@ fun NewBreedDropdownTextField(
 }
 
 @Composable
-fun NewBreedTextField(
+private fun NewBreedTextField(
     value: String,
     onValueChange: (String) -> Unit,
     label: String = "",
@@ -449,7 +470,7 @@ fun NewBreedTextField(
         onValueChange = onValueChange,
         label = { Text(label) },
         modifier = modifier,
-        shape = RoundedCornerShape(AppDimensions.CardCornerRadius),
+        shape = RoundedCornerShape(CardCornerRadius),
         keyboardOptions = keyboardOptions,
         isError = isError,
         supportingText = { if (isError) {
@@ -472,7 +493,7 @@ fun NewBreedTextField(
 }
 
 @Composable
-fun SelectTemperamentChip(
+private fun SelectTemperamentChip(
     text: String,
     isSelected: Boolean,
     onClick: () -> Unit
@@ -482,14 +503,14 @@ fun SelectTemperamentChip(
 
     Surface(
         modifier = Modifier.clickable { onClick() },
-        shape = RoundedCornerShape(AppDimensions.InnerCornerRadius),
+        shape = RoundedCornerShape(InnerCornerRadius),
         color = backgroundColor,
     ) {
         Text(
             text = text,
-            style = AppTypography.titleSmall,
+            style = titleSmall,
             color = textColor,
-            modifier = Modifier.padding(AppDimensions.SecondaryCardPadding)
+            modifier = Modifier.padding(SecondaryCardPadding)
         )
     }
 }
