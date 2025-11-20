@@ -72,7 +72,20 @@ fun BreedListScreen(
     val isSearchActive = remember { mutableStateOf(false) }
 
     val isNewBreedActive = remember { mutableStateOf(false) }
-    val newBreedSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val isSheetDirty = remember { mutableStateOf(false) }
+    val showUnsavedChangesDialog = remember { mutableStateOf(false) }
+
+    val newBreedSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true,
+        confirmValueChange = { sheetValue ->
+            if (sheetValue == SheetValue.Hidden && isSheetDirty.value) {
+                showUnsavedChangesDialog.value = true
+                false
+            } else {
+                true
+            }
+        }
+    )
     val scope = rememberCoroutineScope()
 
     val allNames by viewModel.allNames
@@ -106,14 +119,22 @@ fun BreedListScreen(
         }
     }
 
-    if (isNewBreedActive.value) {
-        val hideSheet = {
+    val handleSheetClose: (Boolean) -> Unit = { force ->
+        if (force || !isSheetDirty.value) {
             scope.launch {
+                isSheetDirty.value = false
                 newBreedSheetState.hide()
-                isNewBreedActive.value = false
+            }.invokeOnCompletion {
+                if (!newBreedSheetState.isVisible) {
+                    isNewBreedActive.value = false
+                }
             }
+        } else {
+            showUnsavedChangesDialog.value = true
         }
+    }
 
+    if (isNewBreedActive.value) {
         ModalBottomSheet(
             onDismissRequest = { isNewBreedActive.value = false },
             sheetState = newBreedSheetState,
@@ -124,9 +145,32 @@ fun BreedListScreen(
                 allNames = allNames,
                 allOrigins = allOrigins,
                 allTemperaments = allTemperaments,
-                onDismiss = { hideSheet() }
+                onDismiss = { handleSheetClose(false) },
+                onDirtyChange = { isSheetDirty.value = it },
+                onSuccess = { handleSheetClose(true) }
             )
         }
+    }
+
+    if (showUnsavedChangesDialog.value) {
+        AlertDialog(
+            onDismissRequest = { showUnsavedChangesDialog.value = false },
+            title = { Text("Unsaved Changes") },
+            text = { Text("You have unsaved changes. Are you sure you want to discard them?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showUnsavedChangesDialog.value = false
+                    handleSheetClose(true)
+                }) {
+                    Text("Discard", color = BrandRed)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showUnsavedChangesDialog.value = false }) {
+                    Text("Keep Editing")
+                }
+            }
+        )
     }
 
     // Content
@@ -255,7 +299,9 @@ private fun NewBreedSheetContent(
     allNames: List<String>,
     allOrigins: List<String>,
     allTemperaments: List<String>,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onDirtyChange: (Boolean) -> Unit,
+    onSuccess: () -> Unit
 ) {
     val name = remember { mutableStateOf("") }
     val origin = remember { mutableStateOf("") }
@@ -268,6 +314,21 @@ private fun NewBreedSheetContent(
     val isOriginDropdownActive = remember { mutableStateOf(false) }
 
     val hasSubmitted = remember { mutableStateOf(false) }
+
+    val isDirty by remember {
+        derivedStateOf {
+            name.value.isNotBlank() ||
+                    origin.value.isNotBlank() ||
+                    minLife.value.isNotBlank() ||
+                    maxLife.value.isNotBlank() ||
+                    description.value.isNotBlank() ||
+                    selectedTemperaments.value.isNotEmpty()
+        }
+    }
+
+    LaunchedEffect(isDirty) {
+        onDirtyChange(isDirty)
+    }
 
     // Validation
     val isNameDuplicate by remember {
@@ -476,7 +537,7 @@ private fun NewBreedSheetContent(
 
                     if (!hasLogicErrors && !hasEmptyFields) {
                         // TODO: Add new breed logic here
-                        onDismiss()
+                        onSuccess()
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
