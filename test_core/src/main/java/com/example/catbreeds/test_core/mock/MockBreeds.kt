@@ -9,8 +9,8 @@ val mockSiberianBreed = Breed(
     description = MOCK_SIBERIAN_DESCRIPTION,
     temperament = MOCK_SIBERIAN_TEMPERAMENT,
     origin = MOCK_SIBERIAN_ORIGIN,
-    life_span = MOCK_SIBERIAN_LIFESPAN,
-    reference_image_id = MOCK_SIBERIAN_REF_ID,
+    lifeSpan = MOCK_SIBERIAN_LIFESPAN,
+    referenceImageId = MOCK_SIBERIAN_REF_ID,
     isFavorite = false
 )
 val mockPersianBreed = Breed(
@@ -19,8 +19,8 @@ val mockPersianBreed = Breed(
     description = MOCK_PERSIAN_DESCRIPTION,
     temperament = MOCK_PERSIAN_TEMPERAMENT,
     origin = MOCK_PERSIAN_ORIGIN,
-    life_span = MOCK_PERSIAN_LIFESPAN,
-    reference_image_id = MOCK_PERSIAN_REF_ID,
+    lifeSpan = MOCK_PERSIAN_LIFESPAN,
+    referenceImageId = MOCK_PERSIAN_REF_ID,
     isFavorite = false
 )
 val mockBengalBreed = Breed(
@@ -29,8 +29,8 @@ val mockBengalBreed = Breed(
     description = MOCK_BENGAL_DESCRIPTION,
     temperament = MOCK_BENGAL_TEMPERAMENT,
     origin = MOCK_BENGAL_ORIGIN,
-    life_span = MOCK_BENGAL_LIFESPAN,
-    reference_image_id = MOCK_BENGAL_REF_ID,
+    lifeSpan = MOCK_BENGAL_LIFESPAN,
+    referenceImageId = MOCK_BENGAL_REF_ID,
     isFavorite = false
 )
 val mockMaineCoonBreed = Breed(
@@ -39,8 +39,8 @@ val mockMaineCoonBreed = Breed(
     description = MOCK_MCOON_DESCRIPTION,
     temperament = MOCK_MCOON_TEMPERAMENT,
     origin = MOCK_MCOON_ORIGIN,
-    life_span = MOCK_MCOON_LIFESPAN,
-    reference_image_id = MOCK_MCOON_REF_ID,
+    lifeSpan = MOCK_MCOON_LIFESPAN,
+    referenceImageId = MOCK_MCOON_REF_ID,
     isFavorite = false
 )
 val mockBreedsList = listOf(
@@ -69,8 +69,8 @@ fun getBreed(
         origin = origin,
         description = description,
         temperament = temperament,
-        life_span = life_span,
-        reference_image_id = reference_image_id,
+        lifeSpan = life_span,
+        referenceImageId = reference_image_id,
         isFavorite = isFavorite
     )
 }
