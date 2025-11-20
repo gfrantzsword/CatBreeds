@@ -58,6 +58,7 @@ import com.example.catbreeds.core.ui.theme.BrandRed
 import com.example.catbreeds.core.ui.theme.ShadowColor
 import com.example.catbreeds.core.util.ErrorHandler
 import com.example.catbreeds.domain.models.Breed
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -71,9 +72,8 @@ fun BreedListScreen(
     val isSearchActive = remember { mutableStateOf(false) }
 
     val isNewBreedActive = remember { mutableStateOf(false) }
-    val newBreedSheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true
-    )
+    val newBreedSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val scope = rememberCoroutineScope()
 
     val allNames by viewModel.allNames
     val allTemperaments by viewModel.allTemperaments
@@ -107,6 +107,13 @@ fun BreedListScreen(
     }
 
     if (isNewBreedActive.value) {
+        val hideSheet = {
+            scope.launch {
+                newBreedSheetState.hide()
+                isNewBreedActive.value = false
+            }
+        }
+
         ModalBottomSheet(
             onDismissRequest = { isNewBreedActive.value = false },
             sheetState = newBreedSheetState,
@@ -117,7 +124,7 @@ fun BreedListScreen(
                 allNames = allNames,
                 allOrigins = allOrigins,
                 allTemperaments = allTemperaments,
-                onDismiss = { isNewBreedActive.value = false }
+                onDismiss = { hideSheet() }
             )
         }
     }
