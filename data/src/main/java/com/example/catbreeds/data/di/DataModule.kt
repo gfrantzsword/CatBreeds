@@ -34,7 +34,9 @@ object DataModule {
             context,
             AppDatabase::class.java,
             "breed_database"
-        ).build()
+        )
+            .fallbackToDestructiveMigration(true)
+            .build()
     }
 
     @Provides
