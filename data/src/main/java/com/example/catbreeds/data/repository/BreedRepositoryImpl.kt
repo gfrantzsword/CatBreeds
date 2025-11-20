@@ -50,7 +50,7 @@ class BreedRepositoryImpl(
                     description = breedDto.description,
                     temperament = breedDto.temperament,
                     lifeSpan = breedDto.lifeSpan,
-                    referenceImageId = breedDto.referenceImageId.toString()
+                    imageUrl = "https://cdn2.thecatapi.com/images/${breedDto.referenceImageId}.jpg"
                 )
             }
             localSource.insertAll(breedEntities)

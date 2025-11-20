@@ -7,6 +7,6 @@ data class Breed(
     val temperament: List<String>,
     val origin: String,
     val lifeSpan: String,
-    val referenceImageId: String? = "0SxW2SQ_S", //Generic image
+    val imageUrl: String? = "",
     val isFavorite: Boolean = false
 )

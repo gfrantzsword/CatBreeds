@@ -119,7 +119,7 @@ fun BreedDetailScreen(
             ) {
                 // Cat image
                 AsyncImage(
-                    model = "https://cdn2.thecatapi.com/images/${breed.referenceImageId}.jpg",
+                    model = breed.imageUrl,
                     contentDescription = "Image of ${breed.name}",
                     modifier = Modifier
                         .fillMaxWidth()
@@ -279,7 +279,7 @@ private fun SimilarBreedCard(
     ) {
         Column {
             AsyncImage(
-                model = "https://cdn2.thecatapi.com/images/${breed.referenceImageId}.jpg",
+                model = breed.imageUrl,
                 contentDescription = "Image of ${breed.name}",
                 modifier = Modifier
                     .size(SecondaryItemImageSize)
