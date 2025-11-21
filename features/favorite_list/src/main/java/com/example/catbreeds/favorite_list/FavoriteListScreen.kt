@@ -1,48 +1,45 @@
 package com.example.catbreeds.favorite_list
 
-import android.R
+import com.example.catbreeds.core.R
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material3.Card
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.AsyncImage
-import com.example.catbreeds.domain.models.Breed
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.runtime.remember
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
+import com.example.catbreeds.core.ui.theme.AppDimensions.BarShadow
+import com.example.catbreeds.core.ui.theme.AppDimensions.CardCornerRadius
+import com.example.catbreeds.core.ui.theme.AppDimensions.CardPadding
+import com.example.catbreeds.core.ui.theme.AppDimensions.DefaultWeight
+import com.example.catbreeds.core.ui.theme.AppDimensions.InnerCornerRadius
+import com.example.catbreeds.core.ui.theme.AppDimensions.InterItemSpacing
+import com.example.catbreeds.core.ui.theme.AppDimensions.LazyColumnBottomPaddingForNav
+import com.example.catbreeds.core.ui.theme.AppDimensions.NoFavoritesMessageIconPadding
+import com.example.catbreeds.core.ui.theme.AppDimensions.ScreenPadding
+import com.example.catbreeds.core.ui.theme.AppDimensions.SecondaryCardPadding
+import com.example.catbreeds.core.ui.theme.AppDimensions.TertiaryItemImageSize
+import com.example.catbreeds.core.ui.theme.AppDimensions.ThinBorderEffect
+import com.example.catbreeds.core.ui.theme.AppTypography.bodyMedium
+import com.example.catbreeds.core.ui.theme.AppTypography.bodySmall
+import com.example.catbreeds.core.ui.theme.AppTypography.headlineMedium
+import com.example.catbreeds.core.ui.theme.AppTypography.titleMedium
+import com.example.catbreeds.core.ui.theme.BrandRed
+import com.example.catbreeds.core.ui.theme.ShadowColor
 import com.example.catbreeds.core.util.ErrorHandler
+import com.example.catbreeds.domain.models.Breed
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,11 +59,35 @@ fun FavoriteListScreen(
         onErrorShown = viewModel::clearError
     )
 
+    // Scroll state for dynamic shadow
+    val lazyListState = rememberLazyListState()
+    val showTopBarShadow = remember {
+        derivedStateOf {
+            lazyListState.firstVisibleItemIndex > 0 || lazyListState.firstVisibleItemScrollOffset > 0
+        }
+    }
+
     // Content
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Favorites") }
+                modifier = if (showTopBarShadow.value) {
+                    Modifier.shadow(
+                        elevation = BarShadow,
+                        spotColor = ShadowColor
+                    )
+                } else {
+                    Modifier
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer
+                ),
+                title = {
+                    Text(
+                        text = "Favorites",
+                        style = headlineMedium
+                    )
+                }
             )
         }
     ) { paddingValues ->
@@ -90,18 +111,18 @@ fun FavoriteListScreen(
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                        verticalArrangement = Arrangement.spacedBy(InterItemSpacing)
                     ) {
                         // When there are no favorite breeds
                         Icon(
                             Icons.Default.Favorite,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(16.dp)
+                            modifier = Modifier.padding(NoFavoritesMessageIconPadding)
                         )
                         Text(
                             text = "No favorite breeds yet",
-                            fontSize = 18.sp,
+                            style = titleMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center
                         )
@@ -110,11 +131,17 @@ fun FavoriteListScreen(
             }
             else -> {
                 LazyColumn(
+                    state = lazyListState,
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(16.dp)
+                    verticalArrangement = Arrangement.spacedBy(InterItemSpacing),
+                    contentPadding = PaddingValues(
+                        start = ScreenPadding,
+                        top = ScreenPadding,
+                        end = ScreenPadding,
+                        bottom = LazyColumnBottomPaddingForNav
+                    )
                 ) {
                     items(favoriteBreeds) { breed ->
                         FavoriteBreedCard(
@@ -130,7 +157,7 @@ fun FavoriteListScreen(
 }
 
 @Composable
-fun FavoriteBreedCard(
+private fun FavoriteBreedCard(
     breed: Breed,
     onBreedClick: () -> Unit,
     onRemoveFromFavorites: () -> Unit
@@ -139,46 +166,63 @@ fun FavoriteBreedCard(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onBreedClick() }
+            .shadow(
+                elevation = BarShadow,
+                spotColor = ShadowColor,
+                shape = RoundedCornerShape(CardCornerRadius)
+            ),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Cat image
             AsyncImage(
-                model = "https://cdn2.thecatapi.com/images/${breed.reference_image_id}.jpg",
+                model = breed.imageUrl,
                 contentDescription = "Image of ${breed.name}",
                 modifier = Modifier
-                    .size(height = 100.dp, width = 100.dp)
-                    .padding(end = 16.dp)
-                    .clip(RoundedCornerShape(8.dp)),
+                    .size(TertiaryItemImageSize)
+                    .padding(
+                        start = ThinBorderEffect,
+                        top = ThinBorderEffect,
+                        bottom = ThinBorderEffect,
+                        end = CardPadding
+                    )
+                    .clip(RoundedCornerShape(
+                        topStart = InnerCornerRadius,
+                        bottomStart = InnerCornerRadius,
+                    )),
                 contentScale = ContentScale.Crop,
-                placeholder = painterResource(id = R.drawable.ic_menu_report_image),
-                error = painterResource(id = R.drawable.ic_menu_close_clear_cancel)
+                placeholder = painterResource(id = R.drawable.ic_cat_placeholder),
+                error = painterResource(id = R.drawable.ic_cat_error)
             )
 
             // Name, origin, and average lifespan
-            Column(modifier = Modifier.weight(1f)) {
+            Column(
+                modifier = Modifier
+                    .weight(DefaultWeight)
+                    .padding(SecondaryCardPadding)
+            ) {
                 Text(
                     text = breed.name,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
+                    style = titleMedium
                 )
                 Text(
                     text = breed.origin,
-                    fontSize = 14.sp,
+                    style = bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
                 // 'Average lifespan' actually uses the lower value of the range ('12 - 15' is 12)
-                val lowerLifeSpan = breed.life_span.split(" - ").firstOrNull()?.trim()
+                val lowerLifeSpan = breed.lifeSpan.split(" - ").firstOrNull()?.trim()
                 lowerLifeSpan?.let {
                     Text(
                         text = "Average lifespan: $it years",
-                        fontSize = 12.sp,
+                        style = bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -188,7 +232,7 @@ fun FavoriteBreedCard(
                 Icon(
                     Icons.Default.Favorite,
                     contentDescription = "Remove from favorites",
-                    tint = Color.Red
+                    tint = BrandRed
                 )
             }
         }

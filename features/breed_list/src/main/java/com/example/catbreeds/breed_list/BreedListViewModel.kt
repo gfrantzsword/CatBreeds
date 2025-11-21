@@ -93,7 +93,7 @@ class BreedListViewModel @Inject constructor(
             _breeds.value.filter { breed ->
                 breed.name.lowercase().contains(query) ||
                         breed.origin.lowercase().contains(query) ||
-                        breed.temperament.lowercase().contains(query)
+                        breed.temperament.any { it.lowercase().contains(query) }
             }.map { breed ->
                 breed.copy(isFavorite = favoriteIds.contains(breed.id))
             }

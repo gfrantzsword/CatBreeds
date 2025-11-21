@@ -10,6 +10,7 @@ import com.example.catbreeds.domain.repository.BreedRepository
 import com.example.catbreeds.core.util.ConnectivityChecker
 import com.example.catbreeds.core.util.ErrorMessages
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 
@@ -41,15 +42,15 @@ class BreedRepositoryImpl(
         try {
             val networkBreeds = remoteSource.getBreeds()
 
-            val breedEntities = networkBreeds.map { breed ->
+            val breedEntities = networkBreeds.map { breedDto ->
                 BreedEntity(
-                    id = breed.id,
-                    name = breed.name,
-                    origin = breed.origin,
-                    description = breed.description,
-                    temperament = breed.temperament,
-                    life_span = breed.life_span,
-                    reference_image_id = breed.reference_image_id.toString()
+                    id = breedDto.id,
+                    name = breedDto.name,
+                    origin = breedDto.origin,
+                    description = breedDto.description,
+                    temperament = breedDto.temperament,
+                    lifeSpan = breedDto.lifeSpan,
+                    imageUrl = "https://cdn2.thecatapi.com/images/${breedDto.referenceImageId}.jpg"
                 )
             }
             localSource.insertAll(breedEntities)
@@ -70,12 +71,25 @@ class BreedRepositoryImpl(
 
     // Gets all the breeds from the local database that are marked as favorites
     override fun getFavoriteBreeds(): Flow<List<Breed>> {
-        return flow {
-            val favoriteEntities = favoriteLocalSource.getAll()
-            val favoriteBreeds = favoriteEntities.mapNotNull { favoriteEntity ->
+        return favoriteLocalSource.getAll().map { favoriteEntities ->
+            favoriteEntities.mapNotNull { favoriteEntity ->
                 localSource.getById(favoriteEntity.id)?.toBreed(isFavorite = true)
             }
-            emit(favoriteBreeds)
+        }
+    }
+
+    override fun getSimilarBreeds(breedId: String): Flow<List<Breed>> {
+        return flow {
+            val breed = getBreedById(breedId)
+            if (breed != null) {
+                val allBreeds = getBreeds().first()
+                val similar = allBreeds.filter {
+                    it.id != breed.id && (it.origin == breed.origin || it.temperament.count { temp -> breed.temperament.contains(temp) } >= 3)
+                }.take(6)
+                emit(similar)
+            } else {
+                emit(emptyList())
+            }
         }
     }
 }
