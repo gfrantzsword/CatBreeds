@@ -35,7 +35,6 @@ object DataModule {
             AppDatabase::class.java,
             "breed_database"
         )
-            .fallbackToDestructiveMigration(true)
             .build()
     }
 
