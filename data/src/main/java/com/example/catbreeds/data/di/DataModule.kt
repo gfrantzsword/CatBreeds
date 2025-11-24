@@ -34,7 +34,8 @@ object DataModule {
             context,
             AppDatabase::class.java,
             "breed_database"
-        ).build()
+        )
+            .build()
     }
 
     @Provides
