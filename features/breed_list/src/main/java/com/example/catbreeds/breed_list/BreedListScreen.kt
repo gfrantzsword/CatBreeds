@@ -147,7 +147,20 @@ fun BreedListScreen(
                 allTemperaments = allTemperaments,
                 onDismiss = { handleSheetClose(false) },
                 onDirtyChange = { isSheetDirty.value = it },
-                onSuccess = { handleSheetClose(true) }
+                onSave = { name, origin, desc, temps, min, max ->
+                    viewModel.addNewBreed(
+                        name = name,
+                        origin = origin,
+                        description = desc,
+                        temperaments = temps,
+                        minLife = min,
+                        maxLife = max,
+                        onSuccess = { newId ->
+                            handleSheetClose(true)
+                            onBreedClick(newId)
+                        }
+                    )
+                }
             )
         }
     }
@@ -301,7 +314,7 @@ private fun NewBreedSheetContent(
     allTemperaments: List<String>,
     onDismiss: () -> Unit,
     onDirtyChange: (Boolean) -> Unit,
-    onSuccess: () -> Unit
+    onSave: (String, String, String, List<String>, String, String) -> Unit
 ) {
     val name = remember { mutableStateOf("") }
     val origin = remember { mutableStateOf("") }
@@ -536,8 +549,14 @@ private fun NewBreedSheetContent(
                             description.value.isBlank()
 
                     if (!hasLogicErrors && !hasEmptyFields) {
-                        // TODO: Add new breed logic here
-                        onSuccess()
+                        onSave(
+                            name.value.trim(),
+                            origin.value.trim(),
+                            description.value.trim(),
+                            selectedTemperaments.value.toList(),
+                            minLife.value.trim(),
+                            maxLife.value.trim()
+                        )
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),

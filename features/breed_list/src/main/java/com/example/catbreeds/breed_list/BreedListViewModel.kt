@@ -10,6 +10,7 @@ import com.example.catbreeds.domain.repository.BreedRepository
 import com.example.catbreeds.core.util.ErrorMessages
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
@@ -153,5 +154,37 @@ class BreedListViewModel @Inject constructor(
 
     fun clearError() {
         _errorMessage.value = null
+    }
+
+    fun addNewBreed(
+        name: String,
+        origin: String,
+        description: String,
+        temperaments: List<String>,
+        minLife: String,
+        maxLife: String,
+        imageUrl: String = "",
+        isFavorite: Boolean = false,
+        onSuccess: (String) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val id = UUID.randomUUID().toString()
+                val newBreed = Breed(
+                    id = id,
+                    name = name,
+                    origin = origin,
+                    description = description,
+                    temperament = temperaments,
+                    lifeSpan = "$minLife - $maxLife",
+                    imageUrl = imageUrl,
+                    isFavorite = isFavorite
+                )
+                breedRepository.addBreed(newBreed)
+                onSuccess(id)
+            } catch (_: Exception) {
+                _errorMessage.value = ErrorMessages.LOCAL_ERROR
+            }
+        }
     }
 }
