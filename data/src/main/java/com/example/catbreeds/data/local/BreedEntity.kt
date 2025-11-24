@@ -12,8 +12,8 @@ data class BreedEntity(
     @ColumnInfo(name = "origin") val origin: String,
     @ColumnInfo(name = "description") val description: String,
     @ColumnInfo(name = "temperament") val temperament: String,
-    @ColumnInfo(name = "life_span") val life_span: String,
-    @ColumnInfo(name = "reference_image_id") val reference_image_id: String
+    @ColumnInfo(name = "life_span") val lifeSpan: String,
+    @ColumnInfo(name = "image_url") val imageUrl: String
 ) {
     fun toBreed(isFavorite: Boolean = false): Breed {
         return Breed(
@@ -22,8 +22,8 @@ data class BreedEntity(
             origin = origin,
             description = description,
             temperament = temperament.split(",").map { it.trim() },
-            life_span = life_span,
-            reference_image_id = reference_image_id,
+            lifeSpan = lifeSpan,
+            imageUrl = imageUrl,
             isFavorite = isFavorite
         )
     }

@@ -38,8 +38,8 @@ private fun getSampleBreedEntity(
     origin = "Test Origin",
     description = "Test Desc",
     temperament = "Test Temperament",
-    life_span = "10 - 12",
-    reference_image_id = "test_ref"
+    lifeSpan = "10 - 12",
+    imageUrl = "https://cdn2.thecatapi.com/images/test_url.jpg"
 )
 
 private fun getSampleBreedEntities() = listOf(getSampleBreedEntity())
@@ -98,8 +98,8 @@ class RepositoryTest {
                 description = breed.description,
                 temperament = breed.temperament.joinToString(", "),
                 origin = breed.origin,
-                life_span = breed.life_span,
-                reference_image_id = breed.reference_image_id
+                lifeSpan = breed.lifeSpan,
+                referenceImageId = breed.imageUrl
             )
         }
     }

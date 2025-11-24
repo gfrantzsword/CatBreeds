@@ -182,7 +182,7 @@ private fun FavoriteBreedCard(
         ) {
             // Cat image
             AsyncImage(
-                model = "https://cdn2.thecatapi.com/images/${breed.reference_image_id}.jpg",
+                model = breed.imageUrl,
                 contentDescription = "Image of ${breed.name}",
                 modifier = Modifier
                     .size(TertiaryItemImageSize)
@@ -218,7 +218,7 @@ private fun FavoriteBreedCard(
                 )
 
                 // 'Average lifespan' actually uses the lower value of the range ('12 - 15' is 12)
-                val lowerLifeSpan = breed.life_span.split(" - ").firstOrNull()?.trim()
+                val lowerLifeSpan = breed.lifeSpan.split(" - ").firstOrNull()?.trim()
                 lowerLifeSpan?.let {
                     Text(
                         text = "Average lifespan: $it years",

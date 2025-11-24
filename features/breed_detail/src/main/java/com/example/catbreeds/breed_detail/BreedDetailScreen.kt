@@ -119,7 +119,7 @@ fun BreedDetailScreen(
             ) {
                 // Cat image
                 AsyncImage(
-                    model = "https://cdn2.thecatapi.com/images/${breed.reference_image_id}.jpg",
+                    model = breed.imageUrl,
                     contentDescription = "Image of ${breed.name}",
                     modifier = Modifier
                         .fillMaxWidth()
@@ -146,7 +146,7 @@ fun BreedDetailScreen(
                     StatCard(
                         modifier = Modifier.weight(DefaultWeight),
                         label = "Life Expectancy",
-                        value = breed.life_span
+                        value = breed.lifeSpan
                     )
                 }
 
@@ -279,7 +279,7 @@ private fun SimilarBreedCard(
     ) {
         Column {
             AsyncImage(
-                model = "https://cdn2.thecatapi.com/images/${breed.reference_image_id}.jpg",
+                model = breed.imageUrl,
                 contentDescription = "Image of ${breed.name}",
                 modifier = Modifier
                     .size(SecondaryItemImageSize)
