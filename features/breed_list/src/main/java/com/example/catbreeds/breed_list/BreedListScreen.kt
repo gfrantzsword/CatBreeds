@@ -356,7 +356,7 @@ private fun NewBreedSheetContent(
     }
     val originError = remember { derivedStateOf { validate(origin.value) } }
     val minLifeError = remember { derivedStateOf { validate(minLife.value) } }
-    val maxLifeError = remember {
+    val maxLifeError = remember(isMaxLessThanMin) {
         derivedStateOf {
             validate(maxLife.value, if (isMaxLessThanMin) "Must be >= Min" else null)
         }
