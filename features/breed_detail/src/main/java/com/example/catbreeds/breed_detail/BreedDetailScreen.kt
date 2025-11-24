@@ -134,7 +134,8 @@ fun BreedDetailScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = ScreenPadding),
+                        .padding(horizontal = ScreenPadding)
+                        .height(IntrinsicSize.Max),
                     horizontalArrangement = Arrangement.spacedBy(InterItemSpacing),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -161,14 +162,18 @@ fun BreedDetailScreen(
                     ),
                     verticalArrangement = Arrangement.spacedBy(InterItemSpacing)
                 ) {
-                    breed.temperament.forEach { temperament ->
-                        TemperamentChip(text = temperament)
-                    }
+                    breed.temperament
+                        .filter { it.isNotEmpty() }
+                        .forEach { temperament ->
+                            TemperamentChip(text = temperament)
+                        }
                 }
 
                 // Description
                 StatCard(
-                    modifier = Modifier.padding(horizontal = ScreenPadding),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = ScreenPadding),
                     label = "About the ${breed.name}",
                     value = breed.description
                 )
