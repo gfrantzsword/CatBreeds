@@ -331,7 +331,7 @@ private fun NewBreedSheetContent(
     }
 
     // Validation
-    val isNameDuplicate by remember {
+    val isNameDuplicate = remember {
         derivedStateOf {
             name.value.trim().isNotEmpty() &&
                     allNames.any { it.equals(name.value.trim(), ignoreCase = true) }
@@ -349,19 +349,19 @@ private fun NewBreedSheetContent(
     }
 
     // Errors
-    val nameError by remember {
+    val nameError = remember {
         derivedStateOf {
-            validate(name.value, if (isNameDuplicate) "Name already exists" else null)
+            validate(name.value, if (isNameDuplicate.value) "Name already exists" else null)
         }
     }
-    val originError by remember { derivedStateOf { validate(origin.value) } }
-    val minLifeError by remember { derivedStateOf { validate(minLife.value) } }
-    val maxLifeError by remember {
+    val originError = remember { derivedStateOf { validate(origin.value) } }
+    val minLifeError = remember { derivedStateOf { validate(minLife.value) } }
+    val maxLifeError = remember {
         derivedStateOf {
             validate(maxLife.value, if (isMaxLessThanMin) "Must be >= Min" else null)
         }
     }
-    val descriptionError by remember { derivedStateOf { validate(description.value) } }
+    val descriptionError = remember { derivedStateOf { validate(description.value) } }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -399,8 +399,8 @@ private fun NewBreedSheetContent(
                 label = "Name",
                 modifier = Modifier.fillMaxWidth(),
                 maxCharCount = MaxCharCountSmall,
-                isError = nameError.isNotEmpty(),
-                errorMessage = nameError
+                isError = nameError.value.isNotEmpty(),
+                errorMessage = nameError.value
             )
 
             // Origin
@@ -413,8 +413,8 @@ private fun NewBreedSheetContent(
                 options = allOrigins,
                 modifier = Modifier.fillMaxWidth(),
                 maxCharCount = MaxCharCountSmall,
-                isError = originError.isNotEmpty(),
-                errorMessage = originError
+                isError = originError.value.isNotEmpty(),
+                errorMessage = originError.value
             )
 
             // Temperaments
@@ -489,8 +489,8 @@ private fun NewBreedSheetContent(
                     label = "Min",
                     modifier = Modifier.weight(DefaultWeight),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    isError = minLifeError.isNotEmpty(),
-                    errorMessage = minLifeError
+                    isError = minLifeError.value.isNotEmpty(),
+                    errorMessage = minLifeError.value
                 )
                 // Max
                 NewBreedTextField(
@@ -503,8 +503,8 @@ private fun NewBreedSheetContent(
                     label = "Max",
                     modifier = Modifier.weight(DefaultWeight),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    isError = maxLifeError.isNotEmpty(),
-                    errorMessage = maxLifeError
+                    isError = maxLifeError.value.isNotEmpty(),
+                    errorMessage = maxLifeError.value
                 )
             }
 
@@ -517,8 +517,8 @@ private fun NewBreedSheetContent(
                 maxCharCount = MaxCharCountLarge,
                 singleLine = false,
                 minLines = 3,
-                isError = descriptionError.isNotEmpty(),
-                errorMessage = descriptionError
+                isError = descriptionError.value.isNotEmpty(),
+                errorMessage = descriptionError.value
             )
 
             Spacer(Modifier.weight(DefaultWeight))
@@ -527,7 +527,7 @@ private fun NewBreedSheetContent(
                 onClick = {
                     hasSubmitted.value = true
 
-                    val hasLogicErrors = isNameDuplicate || isMaxLessThanMin
+                    val hasLogicErrors = isNameDuplicate.value || isMaxLessThanMin
 
                     val hasEmptyFields = name.value.isBlank() ||
                             origin.value.isBlank() ||
