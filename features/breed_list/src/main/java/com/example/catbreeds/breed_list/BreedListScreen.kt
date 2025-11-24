@@ -394,10 +394,10 @@ private fun NewBreedSheetContent(
         ) {
             // Name
             NewBreedTextField(
+                modifier = Modifier.fillMaxWidth(),
                 value = name.value,
                 onValueChange = { name.value = it },
                 label = "Name",
-                modifier = Modifier.fillMaxWidth(),
                 maxCharCount = MaxCharCountSmall,
                 isError = nameError.value.isNotEmpty(),
                 errorMessage = nameError.value
@@ -405,13 +405,13 @@ private fun NewBreedSheetContent(
 
             // Origin
             NewBreedDropdownTextField(
+                modifier = Modifier.fillMaxWidth(),
                 value = origin.value,
                 onValueChange = { origin.value = it },
                 expanded = isOriginDropdownActive.value,
                 onExpandedChange = { isOriginDropdownActive.value = it },
                 label = "Origin",
                 options = allOrigins,
-                modifier = Modifier.fillMaxWidth(),
                 maxCharCount = MaxCharCountSmall,
                 isError = originError.value.isNotEmpty(),
                 errorMessage = originError.value
@@ -480,6 +480,7 @@ private fun NewBreedSheetContent(
             ) {
                 // Min
                 NewBreedTextField(
+                    modifier = Modifier.weight(DefaultWeight),
                     value = minLife.value,
                     onValueChange = { newValue ->
                         if (newValue.length <= 2) {
@@ -487,13 +488,13 @@ private fun NewBreedSheetContent(
                         }
                     },
                     label = "Min",
-                    modifier = Modifier.weight(DefaultWeight),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     isError = minLifeError.value.isNotEmpty(),
                     errorMessage = minLifeError.value
                 )
                 // Max
                 NewBreedTextField(
+                    modifier = Modifier.weight(DefaultWeight),
                     value = maxLife.value,
                     onValueChange = { newValue ->
                         if (newValue.length <= 2) {
@@ -501,7 +502,6 @@ private fun NewBreedSheetContent(
                         }
                     },
                     label = "Max",
-                    modifier = Modifier.weight(DefaultWeight),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     isError = maxLifeError.value.isNotEmpty(),
                     errorMessage = maxLifeError.value
@@ -510,10 +510,10 @@ private fun NewBreedSheetContent(
 
             // Description
             NewBreedTextField(
+                modifier = Modifier.fillMaxWidth(),
                 value = description.value,
                 onValueChange = { description.value = it },
                 label = "Description",
-                modifier = Modifier.fillMaxWidth(),
                 maxCharCount = MaxCharCountLarge,
                 singleLine = false,
                 minLines = 3,
@@ -555,13 +555,13 @@ private fun NewBreedSheetContent(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun NewBreedDropdownTextField(
+    modifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
     expanded: Boolean,
     onExpandedChange: (Boolean) -> Unit,
     label: String = "",
     options: List<String>,
-    modifier: Modifier = Modifier,
     maxCharCount: Int? = null,
     isError: Boolean = false,
     errorMessage: String = ""
@@ -580,15 +580,15 @@ private fun NewBreedDropdownTextField(
         modifier = modifier
     ) {
         NewBreedTextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .menuAnchor(MenuAnchorType.PrimaryEditable, true),
             value = value,
             onValueChange = {
                 onValueChange(it)
                 onExpandedChange(true)
             },
             label = label,
-            modifier = Modifier
-                .fillMaxWidth()
-                .menuAnchor(MenuAnchorType.PrimaryEditable, true),
             maxCharCount = maxCharCount,
             isError = isError,
             errorMessage = errorMessage
@@ -615,10 +615,10 @@ private fun NewBreedDropdownTextField(
 
 @Composable
 private fun NewBreedTextField(
+    modifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
     label: String = "",
-    modifier: Modifier = Modifier,
     isError: Boolean = false,
     errorMessage: String = "",
     supportingText: String = "",
