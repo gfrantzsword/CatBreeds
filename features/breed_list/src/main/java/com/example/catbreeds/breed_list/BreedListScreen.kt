@@ -401,8 +401,8 @@ private fun NewBreedSheetContent(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(ScreenPadding)
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(rememberScrollState())
+                .padding(ScreenPadding),
             verticalArrangement = Arrangement.spacedBy(InterItemSpacing)
         ) {
             // Name
