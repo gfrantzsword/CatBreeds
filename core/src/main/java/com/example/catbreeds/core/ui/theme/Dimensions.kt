@@ -13,6 +13,8 @@ private object BaseValues {
     val CornerRadius = 16.dp
     val ImageSizeSmall = 120.dp
     val ImageSizeMedium = 160.dp
+    val SmallIconSize = 16.dp
+    val MediumIconSize = 32.dp
 
     val ShadowSmall = 6.dp
 
@@ -44,12 +46,13 @@ object AppDimensions {
     // Sizes
     val SecondaryItemImageSize = BaseValues.ImageSizeMedium
     val TertiaryItemImageSize = BaseValues.ImageSizeSmall
+    val SmallIconSize = BaseValues.SmallIconSize
+    val MediumIconSize = BaseValues.MediumIconSize
 
     val BarShadow = BaseValues.ShadowSmall
 
     // Constants
     val MaxChipsToSelect = BaseValues.ConstNumberSmall
-    val MaxChipsToShow = BaseValues.ConstNumberMedium
     val MaxCharCountSmall = BaseValues.MaxCharCountSmall
     val MaxCharCountLarge = BaseValues.MaxCharCountLarge
 

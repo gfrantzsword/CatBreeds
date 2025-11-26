@@ -59,6 +59,14 @@ import com.example.catbreeds.core.ui.theme.ShadowColor
 import com.example.catbreeds.core.util.ErrorHandler
 import com.example.catbreeds.domain.models.Breed
 import kotlinx.coroutines.launch
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.ui.layout.ContentScale
+import com.example.catbreeds.core.ui.theme.AppDimensions.MediumIconSize
+import com.example.catbreeds.core.ui.theme.AppDimensions.SecondaryItemImageSize
+import com.example.catbreeds.core.ui.theme.AppDimensions.SmallIconSize
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -147,7 +155,7 @@ fun BreedListScreen(
                 allTemperaments = allTemperaments,
                 onDismiss = { handleSheetClose(false) },
                 onDirtyChange = { isSheetDirty.value = it },
-                onSave = { name, origin, desc, temps, min, max ->
+                onSave = { name, origin, desc, temps, min, max, imageUrl ->
                     viewModel.addNewBreed(
                         name = name,
                         origin = origin,
@@ -155,6 +163,7 @@ fun BreedListScreen(
                         temperaments = temps,
                         minLife = min,
                         maxLife = max,
+                        imageUrl = imageUrl,
                         onSuccess = { newId ->
                             handleSheetClose(true)
                             onBreedClick(newId)
@@ -314,7 +323,7 @@ private fun NewBreedSheetContent(
     allTemperaments: List<String>,
     onDismiss: () -> Unit,
     onDirtyChange: (Boolean) -> Unit,
-    onSave: (String, String, String, List<String>, String, String) -> Unit
+    onSave: (String, String, String, List<String>, String, String, String) -> Unit
 ) {
     val name = remember { mutableStateOf("") }
     val origin = remember { mutableStateOf("") }
@@ -326,6 +335,13 @@ private fun NewBreedSheetContent(
     val isTemperamentsExpanded = remember { mutableStateOf(false) }
     val isOriginDropdownActive = remember { mutableStateOf(false) }
 
+    val selectedImageUri = remember { mutableStateOf<android.net.Uri?>(null) }
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        selectedImageUri.value = uri
+    }
+
     val hasSubmitted = remember { mutableStateOf(false) }
 
     val isDirty by remember {
@@ -335,7 +351,8 @@ private fun NewBreedSheetContent(
                     minLife.value.isNotBlank() ||
                     maxLife.value.isNotBlank() ||
                     description.value.isNotBlank() ||
-                    selectedTemperaments.value.isNotEmpty()
+                    selectedTemperaments.value.isNotEmpty() ||
+                    selectedImageUri.value != null
         }
     }
 
@@ -405,6 +422,16 @@ private fun NewBreedSheetContent(
                 .padding(ScreenPadding),
             verticalArrangement = Arrangement.spacedBy(InterItemSpacing)
         ) {
+            NewBreedImageField(
+                modifier = Modifier.fillMaxWidth(),
+                imageUri = selectedImageUri.value,
+                onClick = {
+                    imagePickerLauncher.launch(
+                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                    )
+                }
+            )
+
             // Name
             NewBreedTextField(
                 modifier = Modifier.fillMaxWidth(),
@@ -555,7 +582,8 @@ private fun NewBreedSheetContent(
                             description.value.trim(),
                             selectedTemperaments.value.toList(),
                             minLife.value.trim(),
-                            maxLife.value.trim()
+                            maxLife.value.trim(),
+                            selectedImageUri.value?.toString() ?: ""
                         )
                     }
                 },
@@ -698,6 +726,86 @@ private fun NewBreedTextField(
             errorLabelColor = BrandRed
         )
     )
+}
+
+@Composable
+private fun NewBreedImageField(
+    modifier: Modifier = Modifier,
+    imageUri: android.net.Uri?,
+    onClick: () -> Unit,
+    label: String = "Add Photo"
+) {
+    Column(modifier = modifier) {
+        Surface(
+            onClick = onClick,
+            modifier = Modifier.height(SecondaryItemImageSize),
+            shape = RoundedCornerShape(CardCornerRadius),
+            color = MaterialTheme.colorScheme.surface,
+        ) {
+            if (imageUri != null) {
+                Box(contentAlignment = Alignment.BottomEnd) {
+                    AsyncImage(
+                        model = imageUri,
+                        contentDescription = "Selected Image",
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .wrapContentWidth(),
+                        contentScale = ContentScale.FillHeight
+                    )
+
+                    // Edit Overlay
+                    Surface(
+                        modifier = Modifier.padding(SecondaryCardPadding),
+                        shape = RoundedCornerShape(InnerCornerRadius),
+                        color = MaterialTheme.colorScheme.surface
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(SecondaryCardPadding),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = "Edit Image",
+                                modifier = Modifier.size(SmallIconSize),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Spacer(modifier = Modifier.width(InterItemSpacing))
+                            Text(
+                                text = "Edit",
+                                style = titleSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
+            } else {
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .aspectRatio(DefaultWeight),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Add",
+                            modifier = Modifier.size(MediumIconSize),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(SecondaryCardPadding))
+                        Text(
+                            text = label,
+                            style = titleSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Composable
