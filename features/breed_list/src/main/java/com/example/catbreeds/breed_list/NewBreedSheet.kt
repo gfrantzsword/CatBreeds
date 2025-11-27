@@ -76,6 +76,7 @@ import com.example.catbreeds.core.ui.theme.AppDimensions.ScreenPadding
 import com.example.catbreeds.core.ui.theme.AppDimensions.SecondaryCardPadding
 import com.example.catbreeds.core.ui.theme.AppDimensions.SmallIconSize
 import com.example.catbreeds.core.ui.theme.AppDimensions.TertiaryItemImageSize
+import com.example.catbreeds.core.ui.theme.AppTypography.bodySmall
 import com.example.catbreeds.core.ui.theme.AppTypography.headlineMedium
 import com.example.catbreeds.core.ui.theme.AppTypography.titleSmall
 import com.example.catbreeds.core.ui.theme.BrandBlue
@@ -320,7 +321,10 @@ private fun TemperamentField(
     Column(
         verticalArrangement = Arrangement.spacedBy(InterItemSpacing)
     ) {
-        Text(text = "Temperaments", style = titleSmall)
+        FieldTitle(
+            title = "Temperament",
+            subtitle = "${selectedTemperaments.size} / $MaxChipsToSelect selected"
+        )
         FlowRow(
             modifier = Modifier
                 .fillMaxWidth()
@@ -379,7 +383,10 @@ private fun LifeExpectancyField(
     Column(
         verticalArrangement = Arrangement.spacedBy(InterItemSpacing)
     ) {
-        Text(text = "Life Expectancy", style = titleSmall)
+        FieldTitle(
+            title = "Life Expectancy",
+            subtitle = "Up to 99 years"
+        )
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(InterItemSpacing),
@@ -417,6 +424,10 @@ private fun NewBreedImageField(
     onGalleryClick: () -> Unit,
     onCameraClick: () -> Unit
 ) {
+    FieldTitle(
+        title = "Photo",
+        subtitle = "Choose from your gallery or use the camera"
+    )
     Row(
         modifier = modifier
             .height(TertiaryItemImageSize)
@@ -645,5 +656,22 @@ private fun SelectChip(
             color = textColor,
             modifier = Modifier.padding(SecondaryCardPadding)
         )
+    }
+}
+
+@Composable
+private fun FieldTitle(
+    title: String,
+    subtitle: String = ""
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(
+            InterItemSpacing,
+            Alignment.Start
+        ),
+        verticalAlignment = Alignment.Bottom
+    ) {
+        Text(text = title, style = titleSmall, color = MaterialTheme.colorScheme.onSurface)
+        Text(text = subtitle, style = bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
