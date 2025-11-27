@@ -20,6 +20,8 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.PhotoCamera
+import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -49,6 +51,7 @@ import com.example.catbreeds.core.ui.theme.AppDimensions.MaxCharCountSmall
 import com.example.catbreeds.core.ui.theme.AppDimensions.MaxChipsToSelect
 import com.example.catbreeds.core.ui.theme.AppDimensions.ScreenPadding
 import com.example.catbreeds.core.ui.theme.AppDimensions.SecondaryCardPadding
+import com.example.catbreeds.core.ui.theme.AppDimensions.TertiaryItemImageSize
 import com.example.catbreeds.core.ui.theme.AppDimensions.SheetTopPadding
 import com.example.catbreeds.core.ui.theme.AppTypography.bodyMedium
 import com.example.catbreeds.core.ui.theme.AppTypography.headlineMedium
@@ -64,12 +67,12 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts.TakePicture
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
-import androidx.compose.material.icons.filled.Edit
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.FileProvider
-import com.example.catbreeds.core.ui.theme.AppDimensions.MediumIconSize
-import com.example.catbreeds.core.ui.theme.AppDimensions.SecondaryItemImageSize
 import com.example.catbreeds.core.ui.theme.AppDimensions.SmallIconSize
 import java.io.File
 
@@ -344,13 +347,13 @@ private fun NewBreedSheetContent(
 
     val selectedImageUri = remember { mutableStateOf<Uri?>(null) }
     val tempImageUri = remember { mutableStateOf<Uri?>(null) }
-    val showImageSourceDialog = remember { mutableStateOf(false) }
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = PickVisualMedia()
     ) { uri ->
-        selectedImageUri.value = uri
+        if(uri != null) selectedImageUri.value = uri
     }
+
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = TakePicture()
     ) { success ->
@@ -358,6 +361,7 @@ private fun NewBreedSheetContent(
             selectedImageUri.value = tempImageUri.value
         }
     }
+
     fun createTempImageUri(): Uri {
         val tempFile = File.createTempFile("cat_breed_", ".jpg", context.externalCacheDir)
         return FileProvider.getUriForFile(
@@ -383,34 +387,6 @@ private fun NewBreedSheetContent(
 
     LaunchedEffect(isDirty) {
         onDirtyChange(isDirty)
-    }
-
-    if (showImageSourceDialog.value) {
-        AlertDialog(
-            onDismissRequest = { showImageSourceDialog.value = false },
-            title = { Text("Add Photo") },
-            text = { Text("Choose from your gallery or take a new one") },
-            confirmButton = {
-                TextButton(onClick = {
-                    showImageSourceDialog.value = false
-                    imagePickerLauncher.launch(
-                        PickVisualMediaRequest(PickVisualMedia.ImageOnly)
-                    )
-                }) {
-                    Text("Gallery")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = {
-                    showImageSourceDialog.value = false
-                    val uri = createTempImageUri()
-                    tempImageUri.value = uri
-                    cameraLauncher.launch(uri)
-                }) {
-                    Text("Camera")
-                }
-            }
-        )
     }
 
     // Validation
@@ -475,11 +451,19 @@ private fun NewBreedSheetContent(
                 .padding(ScreenPadding),
             verticalArrangement = Arrangement.spacedBy(InterItemSpacing)
         ) {
+
             NewBreedImageField(
                 modifier = Modifier.fillMaxWidth(),
                 imageUri = selectedImageUri.value,
-                onClick = {
-                    showImageSourceDialog.value = true
+                onGalleryClick = {
+                    imagePickerLauncher.launch(
+                        PickVisualMediaRequest(PickVisualMedia.ImageOnly)
+                    )
+                },
+                onCameraClick = {
+                    val uri = createTempImageUri()
+                    tempImageUri.value = uri
+                    cameraLauncher.launch(uri)
                 }
             )
 
@@ -783,78 +767,97 @@ private fun NewBreedTextField(
 private fun NewBreedImageField(
     modifier: Modifier = Modifier,
     imageUri: Uri?,
-    onClick: () -> Unit,
-    label: String = "Add Photo"
+    onGalleryClick: () -> Unit,
+    onCameraClick: () -> Unit
 ) {
-    Column(modifier = modifier) {
+    Row(
+        modifier = modifier
+            .height(TertiaryItemImageSize)
+            .padding(bottom = ScreenPadding),
+        horizontalArrangement = Arrangement.spacedBy(InterItemSpacing)
+    ) {
         Surface(
-            onClick = onClick,
-            modifier = Modifier.height(SecondaryItemImageSize),
+            modifier = Modifier
+                .weight(DefaultWeight)
+                .fillMaxHeight(),
             shape = RoundedCornerShape(CardCornerRadius),
-            color = MaterialTheme.colorScheme.surface,
+            color = MaterialTheme.colorScheme.background,
         ) {
             if (imageUri != null) {
-                Box(contentAlignment = Alignment.BottomEnd) {
-                    AsyncImage(
-                        model = imageUri,
-                        contentDescription = "Selected Image",
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .wrapContentWidth(),
-                        contentScale = ContentScale.FillHeight
-                    )
-
-                    // Edit Overlay
-                    Surface(
-                        modifier = Modifier.padding(SecondaryCardPadding),
-                        shape = RoundedCornerShape(InnerCornerRadius),
-                        color = MaterialTheme.colorScheme.surface
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(SecondaryCardPadding),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Edit,
-                                contentDescription = "Edit Image",
-                                modifier = Modifier.size(SmallIconSize),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Spacer(modifier = Modifier.width(InterItemSpacing))
-                            Text(
-                                text = "Edit",
-                                style = titleSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
-                }
+                AsyncImage(
+                    model = imageUri,
+                    contentDescription = "Selected Image",
+                    contentScale = ContentScale.FillHeight
+                )
             } else {
                 Box(
                     modifier = Modifier
-                        .fillMaxHeight()
-                        .aspectRatio(DefaultWeight),
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.surface),
                     contentAlignment = Alignment.Center
                 ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = "Add",
-                            modifier = Modifier.size(MediumIconSize),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Spacer(modifier = Modifier.height(SecondaryCardPadding))
-                        Text(
-                            text = label,
-                            style = titleSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_cat_placeholder),
+                        contentDescription = "Placeholder image"
+                    )
                 }
             }
+        }
+
+        Column(
+            modifier = Modifier
+                .weight(DefaultWeight)
+                .fillMaxHeight(),
+            verticalArrangement = Arrangement.spacedBy(InterItemSpacing)
+        ) {
+            ImageSourceOption(
+                label = "Gallery",
+                icon = Icons.Default.PhotoLibrary,
+                onClick = onGalleryClick,
+                modifier = Modifier.weight(DefaultWeight)
+            )
+            ImageSourceOption(
+                label = "Camera",
+                icon = Icons.Default.PhotoCamera,
+                onClick = onCameraClick,
+                modifier = Modifier.weight(DefaultWeight)
+            )
+        }
+    }
+}
+
+@Composable
+private fun ImageSourceOption(
+    label: String,
+    icon: ImageVector,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        onClick = onClick,
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(CardCornerRadius),
+        color = MaterialTheme.colorScheme.surface
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(horizontal = ScreenPadding)
+                .fillMaxHeight(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = label,
+                modifier = Modifier.size(SmallIconSize),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(modifier = Modifier.width(InterItemSpacing))
+            Text(
+                text = label,
+                style = titleSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
