@@ -62,12 +62,16 @@ import com.example.catbreeds.domain.models.Breed
 import kotlinx.coroutines.launch
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.contract.ActivityResultContracts.TakePicture
+import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.FileProvider
 import com.example.catbreeds.core.ui.theme.AppDimensions.MediumIconSize
 import com.example.catbreeds.core.ui.theme.AppDimensions.SecondaryItemImageSize
 import com.example.catbreeds.core.ui.theme.AppDimensions.SmallIconSize
+import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -326,6 +330,8 @@ private fun NewBreedSheetContent(
     onDirtyChange: (Boolean) -> Unit,
     onSave: (String, String, String, List<String>, String, String, String) -> Unit
 ) {
+    val context = LocalContext.current
+
     val name = remember { mutableStateOf("") }
     val origin = remember { mutableStateOf("") }
     val minLife = remember { mutableStateOf("") }
@@ -337,10 +343,28 @@ private fun NewBreedSheetContent(
     val isOriginDropdownActive = remember { mutableStateOf(false) }
 
     val selectedImageUri = remember { mutableStateOf<Uri?>(null) }
+    val tempImageUri = remember { mutableStateOf<Uri?>(null) }
+    val showImageSourceDialog = remember { mutableStateOf(false) }
+
     val imagePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia()
+        contract = PickVisualMedia()
     ) { uri ->
         selectedImageUri.value = uri
+    }
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = TakePicture()
+    ) { success ->
+        if (success) {
+            selectedImageUri.value = tempImageUri.value
+        }
+    }
+    fun createTempImageUri(): Uri {
+        val tempFile = File.createTempFile("cat_breed_", ".jpg", context.externalCacheDir)
+        return FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.fileprovider",
+            tempFile
+        )
     }
 
     val hasSubmitted = remember { mutableStateOf(false) }
@@ -359,6 +383,34 @@ private fun NewBreedSheetContent(
 
     LaunchedEffect(isDirty) {
         onDirtyChange(isDirty)
+    }
+
+    if (showImageSourceDialog.value) {
+        AlertDialog(
+            onDismissRequest = { showImageSourceDialog.value = false },
+            title = { Text("Add Photo") },
+            text = { Text("Choose from your gallery or take a new one") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showImageSourceDialog.value = false
+                    imagePickerLauncher.launch(
+                        PickVisualMediaRequest(PickVisualMedia.ImageOnly)
+                    )
+                }) {
+                    Text("Gallery")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showImageSourceDialog.value = false
+                    val uri = createTempImageUri()
+                    tempImageUri.value = uri
+                    cameraLauncher.launch(uri)
+                }) {
+                    Text("Camera")
+                }
+            }
+        )
     }
 
     // Validation
@@ -427,9 +479,7 @@ private fun NewBreedSheetContent(
                 modifier = Modifier.fillMaxWidth(),
                 imageUri = selectedImageUri.value,
                 onClick = {
-                    imagePickerLauncher.launch(
-                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                    )
+                    showImageSourceDialog.value = true
                 }
             )
 
