@@ -1,5 +1,6 @@
 package com.example.catbreeds.breed_list
 
+import android.net.Uri
 import androidx.compose.animation.animateContentSize
 import com.example.catbreeds.core.R
 import androidx.compose.foundation.clickable
@@ -335,7 +336,7 @@ private fun NewBreedSheetContent(
     val isTemperamentsExpanded = remember { mutableStateOf(false) }
     val isOriginDropdownActive = remember { mutableStateOf(false) }
 
-    val selectedImageUri = remember { mutableStateOf<android.net.Uri?>(null) }
+    val selectedImageUri = remember { mutableStateOf<Uri?>(null) }
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
@@ -731,7 +732,7 @@ private fun NewBreedTextField(
 @Composable
 private fun NewBreedImageField(
     modifier: Modifier = Modifier,
-    imageUri: android.net.Uri?,
+    imageUri: Uri?,
     onClick: () -> Unit,
     label: String = "Add Photo"
 ) {
