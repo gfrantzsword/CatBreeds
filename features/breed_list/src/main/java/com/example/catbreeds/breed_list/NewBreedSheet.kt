@@ -51,7 +51,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -83,7 +82,7 @@ import com.example.catbreeds.core.ui.theme.BrandBlue
 import com.example.catbreeds.core.ui.theme.BrandRed
 import java.io.File
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewBreedSheetContent(
     allNames: List<String>,
@@ -95,45 +94,22 @@ fun NewBreedSheetContent(
 ) {
     val context = LocalContext.current
 
+    // Field Value States
     val name = remember { mutableStateOf("") }
     val origin = remember { mutableStateOf("") }
     val minLife = remember { mutableStateOf("") }
     val maxLife = remember { mutableStateOf("") }
     val description = remember { mutableStateOf("") }
-
     val selectedTemperaments = remember { mutableStateOf(setOf<String>()) }
-    val isTemperamentsExpanded = remember { mutableStateOf(false) }
-    val isOriginDropdownActive = remember { mutableStateOf(false) }
-
     val selectedImageUri = remember { mutableStateOf<Uri?>(null) }
+
+    // Helper States
+    val isOriginDropdownActive = remember { mutableStateOf(false) }
+    val hasSubmitted = remember { mutableStateOf(false) }
     val tempImageUri = remember { mutableStateOf<Uri?>(null) }
 
-    val imagePickerLauncher = rememberLauncherForActivityResult(
-        contract = PickVisualMedia()
-    ) { uri ->
-        if(uri != null) selectedImageUri.value = uri
-    }
-
-    val cameraLauncher = rememberLauncherForActivityResult(
-        contract = TakePicture()
-    ) { success ->
-        if (success) {
-            selectedImageUri.value = tempImageUri.value
-        }
-    }
-
-    fun createTempImageUri(): Uri {
-        val tempFile = File.createTempFile("cat_breed_", ".jpg", context.externalCacheDir)
-        return FileProvider.getUriForFile(
-            context,
-            "${context.packageName}.fileprovider",
-            tempFile
-        )
-    }
-
-    val hasSubmitted = remember { mutableStateOf(false) }
-
-    val isDirty by remember {
+    // Validation
+    val isDirty = remember {
         derivedStateOf {
             name.value.isNotBlank() ||
                     origin.value.isNotBlank() ||
@@ -145,8 +121,8 @@ fun NewBreedSheetContent(
         }
     }
 
-    LaunchedEffect(isDirty) {
-        onDirtyChange(isDirty)
+    LaunchedEffect(isDirty.value) {
+        onDirtyChange(isDirty.value)
     }
 
     // Validation
@@ -156,32 +132,67 @@ fun NewBreedSheetContent(
                     allNames.any { it.equals(name.value.trim(), ignoreCase = true) }
         }
     }
-    val minLifeInt = minLife.value.toIntOrNull()
-    val maxLifeInt = maxLife.value.toIntOrNull()
-    val isMaxLessThanMin = if (minLifeInt != null && maxLifeInt != null) {
-        maxLifeInt < minLifeInt
-    } else false
+
+    val isMaxLessThanMin = remember {
+        derivedStateOf {
+            val min = minLife.value.toIntOrNull()
+            val max = maxLife.value.toIntOrNull()
+            if (min != null && max != null) max < min else false
+        }
+    }
 
     fun validate(value: String, customError: String? = null): String {
         if (customError != null) return customError
         return if (hasSubmitted.value && value.isBlank()) "Required" else ""
     }
 
-    // Errors
-    val nameError = remember {
-        derivedStateOf {
-            validate(name.value, if (isNameDuplicate.value) "Name already exists" else null)
-        }
-    }
+    // Error States
+    val nameError = remember { derivedStateOf { validate(name.value, if (isNameDuplicate.value) "Name already exists" else null) } }
     val originError = remember { derivedStateOf { validate(origin.value) } }
     val minLifeError = remember { derivedStateOf { validate(minLife.value) } }
-    val maxLifeError = remember(isMaxLessThanMin) {
-        derivedStateOf {
-            validate(maxLife.value, if (isMaxLessThanMin) "Must be >= Min" else null)
-        }
-    }
+    val maxLifeError = remember { derivedStateOf { validate(maxLife.value, if (isMaxLessThanMin.value) "Must be >= Min" else null) } }
     val descriptionError = remember { derivedStateOf { validate(description.value) } }
 
+    // Helper Methods
+    fun createTempImageUri(): Uri {
+        val tempFile = File.createTempFile("cat_breed_", ".jpg", context.externalCacheDir)
+        return FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.fileprovider",
+            tempFile
+        )
+    }
+
+    fun validateAndSubmit() {
+        hasSubmitted.value = true
+        val hasLogicErrors = isNameDuplicate.value || isMaxLessThanMin.value
+        val hasEmptyFields = name.value.isBlank() ||
+                origin.value.isBlank() ||
+                minLife.value.isBlank() ||
+                maxLife.value.isBlank() ||
+                description.value.isBlank()
+
+        if (!hasLogicErrors && !hasEmptyFields) {
+            onSave(
+                name.value.trim(),
+                origin.value.trim(),
+                description.value.trim(),
+                selectedTemperaments.value.toList(),
+                minLife.value.trim(),
+                maxLife.value.trim(),
+                selectedImageUri.value?.toString() ?: ""
+            )
+        }
+    }
+
+    val imagePickerLauncher = rememberLauncherForActivityResult(PickVisualMedia()) { uri ->
+        if (uri != null) selectedImageUri.value = uri
+    }
+    val cameraLauncher = rememberLauncherForActivityResult(TakePicture()) { success ->
+        if (success) selectedImageUri.value = tempImageUri.value
+    }
+
+    // Content
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
@@ -211,7 +222,7 @@ fun NewBreedSheetContent(
                 .padding(ScreenPadding),
             verticalArrangement = Arrangement.spacedBy(InterItemSpacing)
         ) {
-
+            // Image
             NewBreedImageField(
                 modifier = Modifier.fillMaxWidth(),
                 imageUri = selectedImageUri.value,
@@ -239,13 +250,12 @@ fun NewBreedSheetContent(
             )
 
             // Origin
-            NewBreedDropdownTextField(
+            OriginField(
                 modifier = Modifier.fillMaxWidth(),
                 value = origin.value,
                 onValueChange = { origin.value = it },
                 expanded = isOriginDropdownActive.value,
                 onExpandedChange = { isOriginDropdownActive.value = it },
-                label = "Origin",
                 options = allOrigins,
                 maxCharCount = MaxCharCountSmall,
                 isError = originError.value.isNotEmpty(),
@@ -253,95 +263,21 @@ fun NewBreedSheetContent(
             )
 
             // Temperaments
-            Text(
-                text = "Temperaments",
-                style = titleSmall
+            TemperamentField(
+                allTemperaments = allTemperaments,
+                selectedTemperaments = selectedTemperaments.value,
+                onSelectionChanged = { selectedTemperaments.value = it }
             )
-            FlowRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .animateContentSize()
-                    .padding(bottom = ScreenPadding),
-                horizontalArrangement = Arrangement.spacedBy(
-                    InterItemSpacing,
-                    Alignment.Start
-                ),
-                verticalArrangement = Arrangement.spacedBy(InterItemSpacing),
-                maxLines = if (isTemperamentsExpanded.value) Int.MAX_VALUE else 2,
-                overflow = FlowRowOverflow.expandIndicator {
-                    SelectChip(
-                        text = "See more",
-                        backgroundColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textColor = Color.White,
-                        onClick = { isTemperamentsExpanded.value = true }
-                    )
-                }
-            ) {
-                allTemperaments.forEach { temperament ->
-                    val isSelected = selectedTemperaments.value.contains(temperament)
-                    SelectChip(
-                        text = temperament,
-                        backgroundColor = if (isSelected) BrandBlue else MaterialTheme.colorScheme.tertiary,
-                        textColor = if (isSelected) Color.White else BrandBlue,
-                        onClick = {
-                            if (isSelected) {
-                                selectedTemperaments.value -= temperament
-                            } else if (selectedTemperaments.value.size < MaxChipsToSelect) {
-                                selectedTemperaments.value += temperament
-                            }
-                        }
-                    )
-                }
 
-                if (isTemperamentsExpanded.value) {
-                    SelectChip(
-                        text = "Show less",
-                        backgroundColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textColor = Color.White,
-                        onClick = { isTemperamentsExpanded.value = false }
-                    )
-                }
-            }
-
-            // Life expectancy
-            Text(
-                text = "Life Expectancy",
-                style = titleSmall
+            // Life Expectancy
+            LifeExpectancyField(
+                minLife = minLife.value,
+                onMinLifeChange = { minLife.value = it },
+                minLifeError = minLifeError.value,
+                maxLife = maxLife.value,
+                onMaxLifeChange = { maxLife.value = it },
+                maxLifeError = maxLifeError.value
             )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(InterItemSpacing),
-            ) {
-                // Min
-                NewBreedTextField(
-                    modifier = Modifier.weight(DefaultWeight),
-                    value = minLife.value,
-                    onValueChange = { newValue ->
-                        if (newValue.length <= 2) {
-                            minLife.value = newValue.filter { it.isDigit() }
-                        }
-                    },
-                    label = "Min",
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    isError = minLifeError.value.isNotEmpty(),
-                    errorMessage = minLifeError.value
-                )
-                // Max
-                NewBreedTextField(
-                    modifier = Modifier.weight(DefaultWeight),
-                    value = maxLife.value,
-                    onValueChange = { newValue ->
-                        if (newValue.length <= 2) {
-                            maxLife.value = newValue.filter { it.isDigit() }
-                        }
-                    },
-                    label = "Max",
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    isError = maxLifeError.value.isNotEmpty(),
-                    errorMessage = maxLifeError.value
-                )
-            }
 
             // Description
             NewBreedTextField(
@@ -358,34 +294,11 @@ fun NewBreedSheetContent(
 
             Spacer(Modifier.weight(DefaultWeight))
 
+            // Submit Button
             Button(
-                onClick = {
-                    hasSubmitted.value = true
-
-                    val hasLogicErrors = isNameDuplicate.value || isMaxLessThanMin
-
-                    val hasEmptyFields = name.value.isBlank() ||
-                            origin.value.isBlank() ||
-                            minLife.value.isBlank() ||
-                            maxLife.value.isBlank() ||
-                            description.value.isBlank()
-
-                    if (!hasLogicErrors && !hasEmptyFields) {
-                        onSave(
-                            name.value.trim(),
-                            origin.value.trim(),
-                            description.value.trim(),
-                            selectedTemperaments.value.toList(),
-                            minLife.value.trim(),
-                            maxLife.value.trim(),
-                            selectedImageUri.value?.toString() ?: ""
-                        )
-                    }
-                },
+                onClick = { validateAndSubmit() },
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = BrandRed
-                )
+                colors = ButtonDefaults.buttonColors(containerColor = BrandRed)
             ) {
                 Text("Add new breed")
             }
@@ -394,133 +307,107 @@ fun NewBreedSheetContent(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+// Field Composables
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun NewBreedDropdownTextField(
-    modifier: Modifier = Modifier,
-    value: String,
-    onValueChange: (String) -> Unit,
-    expanded: Boolean,
-    onExpandedChange: (Boolean) -> Unit,
-    label: String = "",
-    options: List<String>,
-    maxCharCount: Int? = null,
-    isError: Boolean = false,
-    errorMessage: String = ""
+private fun TemperamentField(
+    allTemperaments: List<String>,
+    selectedTemperaments: Set<String>,
+    onSelectionChanged: (Set<String>) -> Unit
 ) {
-    val filteredOptions = remember(value, options) {
-        if (value.isEmpty()) {
-            options
-        } else {
-            options.filter { it.contains(value, ignoreCase = true) }
-        }
-    }
+    val isExpanded = remember { mutableStateOf(false) }
 
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = onExpandedChange,
-        modifier = modifier
+    Column(
+        verticalArrangement = Arrangement.spacedBy(InterItemSpacing)
     ) {
-        NewBreedTextField(
+        Text(text = "Temperaments", style = titleSmall)
+        FlowRow(
             modifier = Modifier
                 .fillMaxWidth()
-                .menuAnchor(MenuAnchorType.PrimaryEditable, true),
-            value = value,
-            onValueChange = {
-                onValueChange(it)
-                onExpandedChange(true)
-            },
-            label = label,
-            maxCharCount = maxCharCount,
-            isError = isError,
-            errorMessage = errorMessage
-        )
-
-        if (filteredOptions.isNotEmpty()) {
-            ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { onExpandedChange(false) }
-            ) {
-                filteredOptions.forEach { option ->
-                    DropdownMenuItem(
-                        text = { Text(option) },
-                        onClick = {
-                            onValueChange(option)
-                            onExpandedChange(false)
-                        }
-                    )
-                }
+                .animateContentSize()
+                .padding(bottom = ScreenPadding),
+            horizontalArrangement = Arrangement.spacedBy(
+                InterItemSpacing,
+                Alignment.Start
+            ),
+            verticalArrangement = Arrangement.spacedBy(InterItemSpacing),
+            maxLines = if (isExpanded.value) Int.MAX_VALUE else 2,
+            overflow = FlowRowOverflow.expandIndicator {
+                SelectChip(
+                    text = "See more",
+                    backgroundColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textColor = Color.White,
+                    onClick = { isExpanded.value = true }
+                )
+            }
+        ) {
+            allTemperaments.forEach { temperament ->
+                val isSelected = selectedTemperaments.contains(temperament)
+                SelectChip(
+                    text = temperament,
+                    backgroundColor = if (isSelected) BrandBlue else MaterialTheme.colorScheme.tertiary,
+                    textColor = if (isSelected) Color.White else BrandBlue,
+                    onClick = {
+                        val newSelection = selectedTemperaments.toMutableSet()
+                        if (isSelected) newSelection.remove(temperament)
+                        else if (newSelection.size < MaxChipsToSelect) newSelection.add(temperament)
+                        onSelectionChanged(newSelection)
+                    }
+                )
+            }
+            if (isExpanded.value) {
+                SelectChip(
+                    text = "Show less",
+                    backgroundColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textColor = Color.White,
+                    onClick = { isExpanded.value = false }
+                )
             }
         }
     }
 }
 
 @Composable
-private fun NewBreedTextField(
-    modifier: Modifier = Modifier,
-    value: String,
-    onValueChange: (String) -> Unit,
-    label: String = "",
-    isError: Boolean = false,
-    errorMessage: String = "",
-    supportingText: String = "",
-    maxCharCount: Int? = null,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    singleLine: Boolean = true,
-    minLines: Int = 1,
-    trailingIcon: @Composable (() -> Unit)? = null
+private fun LifeExpectancyField(
+    minLife: String,
+    onMinLifeChange: (String) -> Unit,
+    minLifeError: String,
+    maxLife: String,
+    onMaxLifeChange: (String) -> Unit,
+    maxLifeError: String
 ) {
-    TextField(
-        value = value,
-        onValueChange = { newValue ->
-            if (maxCharCount == null || newValue.length <= maxCharCount) {
-                onValueChange(newValue)
+    Column(
+        verticalArrangement = Arrangement.spacedBy(InterItemSpacing)
+    ) {
+        Text(text = "Life Expectancy", style = titleSmall)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(InterItemSpacing),
+        ) {
+            val numberFilter = { input: String ->
+                if (input.length <= 2) input.filter { it.isDigit() } else null
             }
-        },
-        label = { Text(label) },
-        modifier = modifier,
-        shape = RoundedCornerShape(CardCornerRadius),
-        keyboardOptions = keyboardOptions,
-        isError = isError,
-        supportingText = {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Box(modifier = Modifier.weight(1f)) {
-                    if (isError) {
-                        Text(
-                            text = errorMessage,
-                            color = BrandRed
-                        )
-                    } else if (supportingText.isNotEmpty()) {
-                        Text(text = supportingText)
-                    }
-                }
-                if (maxCharCount != null) {
-                    Text(
-                        text = "${value.length} / $maxCharCount",
-                        textAlign = TextAlign.End,
-                        modifier = Modifier.padding(start = SecondaryCardPadding)
-                    )
-                }
-            }
-        },
-        singleLine = singleLine,
-        minLines = minLines,
-        trailingIcon = trailingIcon,
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = MaterialTheme.colorScheme.surface,
-            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
 
-            errorIndicatorColor = Color.Transparent,
-            errorContainerColor = MaterialTheme.colorScheme.surface,
-            errorCursorColor = BrandRed,
-            errorLabelColor = BrandRed
-        )
-    )
+            NewBreedTextField(
+                modifier = Modifier.weight(DefaultWeight),
+                value = minLife,
+                onValueChange = { numberFilter(it)?.let(onMinLifeChange) },
+                label = "Min",
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                isError = minLifeError.isNotEmpty(),
+                errorMessage = minLifeError
+            )
+            NewBreedTextField(
+                modifier = Modifier.weight(DefaultWeight),
+                value = maxLife,
+                onValueChange = { numberFilter(it)?.let(onMaxLifeChange) },
+                label = "Max",
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                isError = maxLifeError.isNotEmpty(),
+                errorMessage = maxLifeError
+            )
+        }
+    }
 }
 
 @Composable
@@ -558,12 +445,11 @@ private fun NewBreedImageField(
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.ic_cat_placeholder),
-                        contentDescription = "Placeholder image"
+                        contentDescription = "Placeholder"
                     )
                 }
             }
         }
-
         Column(
             modifier = Modifier
                 .weight(DefaultWeight)
@@ -586,6 +472,125 @@ private fun NewBreedImageField(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun OriginField(
+    modifier: Modifier = Modifier,
+    value: String,
+    onValueChange: (String) -> Unit,
+    expanded: Boolean,
+    onExpandedChange: (Boolean) -> Unit,
+    options: List<String>,
+    maxCharCount: Int? = null,
+    isError: Boolean = false,
+    errorMessage: String = ""
+) {
+    val filteredOptions = remember(value, options) {
+        if (value.isEmpty()) {
+            options
+        } else {
+            options.filter { it.contains(value, ignoreCase = true) }
+        }
+    }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = onExpandedChange,
+        modifier = modifier
+    ) {
+        NewBreedTextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .menuAnchor(MenuAnchorType.PrimaryEditable, true),
+            value = value,
+            onValueChange = {
+                onValueChange(it)
+                onExpandedChange(true)
+            },
+            label = "Origin",
+            maxCharCount = maxCharCount,
+            isError = isError,
+            errorMessage = errorMessage
+        )
+        if (filteredOptions.isNotEmpty()) {
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { onExpandedChange(false) }
+            ) {
+                filteredOptions.forEach { option ->
+                    DropdownMenuItem(
+                        text = { Text(option) },
+                        onClick = {
+                            onValueChange(option)
+                            onExpandedChange(false)
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun NewBreedTextField(
+    modifier: Modifier = Modifier,
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String = "",
+    isError: Boolean = false,
+    errorMessage: String = "",
+    maxCharCount: Int? = null,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    singleLine: Boolean = true,
+    minLines: Int = 1,
+    trailingIcon: @Composable (() -> Unit)? = null
+) {
+    TextField(
+        value = value,
+        onValueChange = {
+            if (maxCharCount == null || it.length <= maxCharCount) {
+                onValueChange(it)
+            }
+        },
+        label = { Text(label) },
+        modifier = modifier,
+        shape = RoundedCornerShape(CardCornerRadius),
+        keyboardOptions = keyboardOptions,
+        isError = isError,
+        supportingText = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Box(modifier = Modifier.weight(DefaultWeight)) {
+                    if (isError) Text(text = errorMessage, color = BrandRed)
+                }
+                if (maxCharCount != null) {
+                    Text(
+                        text = "${value.length} / $maxCharCount",
+                        textAlign = TextAlign.End,
+                        modifier = Modifier.padding(start = SecondaryCardPadding)
+                    )
+                }
+            }
+        },
+        singleLine = singleLine,
+        minLines = minLines,
+        trailingIcon = trailingIcon,
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = MaterialTheme.colorScheme.surface,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            errorIndicatorColor = Color.Transparent,
+            errorContainerColor = MaterialTheme.colorScheme.surface,
+            errorCursorColor = BrandRed,
+            errorLabelColor = BrandRed
+        )
+    )
+}
+
+// Helper Composables
 @Composable
 private fun ImageSourceOption(
     label: String,
