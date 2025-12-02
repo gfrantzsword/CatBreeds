@@ -29,14 +29,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.PhotoLibrary
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -74,6 +75,7 @@ import com.example.catbreeds.core.ui.theme.AppDimensions.MaxCharCountSmall
 import com.example.catbreeds.core.ui.theme.AppDimensions.MaxChipsToSelect
 import com.example.catbreeds.core.ui.theme.AppDimensions.ScreenPadding
 import com.example.catbreeds.core.ui.theme.AppDimensions.SecondaryCardPadding
+import com.example.catbreeds.core.ui.theme.AppDimensions.SheetBottomPadding
 import com.example.catbreeds.core.ui.theme.AppDimensions.SmallIconSize
 import com.example.catbreeds.core.ui.theme.AppDimensions.TertiaryItemImageSize
 import com.example.catbreeds.core.ui.theme.AppTypography.bodySmall
@@ -213,6 +215,19 @@ fun NewBreedSheetContent(
                     }
                 }
             )
+        },
+        floatingActionButtonPosition = FabPosition.Center,
+        floatingActionButton = {
+            ExtendedFloatingActionButton(
+                onClick = { validateAndSubmit() },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = ScreenPadding),
+                containerColor = BrandRed,
+                contentColor = Color.White,
+                icon = { Icon(Icons.Default.Check, contentDescription = "Checkmark") },
+                text = { Text("Add new breed") }
+            )
         }
     ) { paddingValues ->
         Column(
@@ -293,17 +308,7 @@ fun NewBreedSheetContent(
                 errorMessage = descriptionError.value
             )
 
-            Spacer(Modifier.weight(DefaultWeight))
-
-            // Submit Button
-            Button(
-                onClick = { validateAndSubmit() },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = BrandRed)
-            ) {
-                Text("Add new breed")
-            }
-            Spacer(modifier = Modifier.height(ScreenPadding))
+            Spacer(modifier = Modifier.height(SheetBottomPadding))
         }
     }
 }
