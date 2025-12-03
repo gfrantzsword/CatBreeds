@@ -33,7 +33,6 @@ import com.example.catbreeds.core.ui.theme.AppDimensions.SecondaryCardPadding
 import com.example.catbreeds.core.ui.theme.AppDimensions.TertiaryItemImageSize
 import com.example.catbreeds.core.ui.theme.AppDimensions.ThinBorderEffect
 import com.example.catbreeds.core.ui.theme.AppTypography.bodyMedium
-import com.example.catbreeds.core.ui.theme.AppTypography.bodySmall
 import com.example.catbreeds.core.ui.theme.AppTypography.headlineMedium
 import com.example.catbreeds.core.ui.theme.AppTypography.titleMedium
 import com.example.catbreeds.core.ui.theme.BrandRed
@@ -216,16 +215,6 @@ private fun FavoriteBreedCard(
                     style = bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-
-                // 'Average lifespan' actually uses the lower value of the range ('12 - 15' is 12)
-                val lowerLifeSpan = breed.lifeSpan.split(" - ").firstOrNull()?.trim()
-                lowerLifeSpan?.let {
-                    Text(
-                        text = "Average lifespan: $it years",
-                        style = bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
             }
             // Favorite button
             IconButton(onClick = onRemoveFromFavorites) {

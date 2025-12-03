@@ -147,7 +147,7 @@ fun BreedDetailScreen(
                     StatCard(
                         modifier = Modifier.weight(DefaultWeight),
                         label = "Life Expectancy",
-                        value = breed.lifeSpan
+                        value = "${breed.lifeSpan} years"
                     )
                 }
 
