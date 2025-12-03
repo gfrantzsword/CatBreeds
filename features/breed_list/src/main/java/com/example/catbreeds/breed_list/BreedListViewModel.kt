@@ -101,7 +101,7 @@ class BreedListViewModel @Inject constructor(
     }
 
     // Fetches new data from the API and loads into the local database
-    private fun refreshBreeds() {
+    fun refreshBreeds() {
         viewModelScope.launch {
             try {
                 breedRepository.refreshBreeds()
