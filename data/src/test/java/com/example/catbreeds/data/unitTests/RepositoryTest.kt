@@ -4,6 +4,7 @@ import com.example.catbreeds.core.util.ConnectivityChecker
 import com.example.catbreeds.data.local.BreedDao
 import com.example.catbreeds.data.local.BreedEntity
 import com.example.catbreeds.data.local.FavoriteDao
+import com.example.catbreeds.data.remote.BreedDto
 import com.example.catbreeds.data.remote.RemoteService
 import com.example.catbreeds.data.repository.BreedRepositoryImpl
 import com.example.catbreeds.domain.models.Breed
@@ -37,8 +38,8 @@ private fun getSampleBreedEntity(
     origin = "Test Origin",
     description = "Test Desc",
     temperament = "Test Temperament",
-    life_span = "10 - 12",
-    reference_image_id = "test_ref"
+    lifeSpan = "10 - 12",
+    imageUrl = "https://cdn2.thecatapi.com/images/test_url.jpg"
 )
 
 private fun getSampleBreedEntities() = listOf(getSampleBreedEntity())
@@ -89,8 +90,22 @@ class RepositoryTest {
         }
     }
 
+    private fun getMockBreedDto(setupBreeds: List<Breed>): List<BreedDto> {
+        return setupBreeds.map { breed ->
+            BreedDto(
+                id = breed.id,
+                name = breed.name,
+                description = breed.description,
+                temperament = breed.temperament.joinToString(", "),
+                origin = breed.origin,
+                lifeSpan = breed.lifeSpan,
+                referenceImageId = breed.imageUrl
+            )
+        }
+    }
+
     private fun setupRemoteService(setupBreeds: List<Breed> = networkBreeds) {
-        coEvery { remoteService.getBreeds() } returns setupBreeds
+        coEvery { remoteService.getBreeds() } returns getMockBreedDto(setupBreeds)
         coJustRun { breedDao.insertAll(any()) }
     }
 

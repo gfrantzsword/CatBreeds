@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FavoriteDao {
@@ -14,7 +15,7 @@ interface FavoriteDao {
     suspend fun delete(favorite: FavoriteEntity)
 
     @Query("SELECT * FROM favorites")
-    suspend fun getAll(): List<FavoriteEntity>
+    fun getAll(): Flow<List<FavoriteEntity>>
 
     @Query("SELECT EXISTS(SELECT 1 FROM favorites WHERE id = :id LIMIT 1)")
     suspend fun isFavorite(id: String): Boolean
