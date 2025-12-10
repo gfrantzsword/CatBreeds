@@ -10,11 +10,20 @@ import com.example.catbreeds.domain.repository.BreedRepository
 import com.example.catbreeds.core.util.ErrorMessages
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
+import java.util.UUID
 import javax.inject.Inject
+import android.content.Context
+import android.net.Uri
+import dagger.hilt.android.qualifiers.ApplicationContext
+import java.io.File
+import java.io.FileOutputStream
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class BreedListViewModel @Inject constructor(
-    private val breedRepository: BreedRepository
+    private val breedRepository: BreedRepository,
+    @param:ApplicationContext private val context: Context
 ): ViewModel() {
     private val _breeds = mutableStateOf<List<Breed>>(emptyList())
     val breeds: State<List<Breed>> = _breeds
@@ -26,6 +35,15 @@ class BreedListViewModel @Inject constructor(
     val filteredBreeds: State<List<Breed>> = _filteredBreeds
 
     private val _favoriteBreedIds = mutableStateOf<Set<String>>(emptySet())
+
+    private val _allNames = mutableStateOf<List<String>>(emptyList())
+    val allNames: State<List<String>> = _allNames
+
+    private val _allOrigins = mutableStateOf<List<String>>(emptyList())
+    val allOrigins: State<List<String>> = _allOrigins
+
+    private val _allTemperaments = mutableStateOf<List<String>>(emptyList())
+    val allTemperaments: State<List<String>> = _allTemperaments
 
     private val _errorMessage = mutableStateOf<String?>(null)
     val errorMessage: State<String?> = _errorMessage
@@ -40,6 +58,26 @@ class BreedListViewModel @Inject constructor(
         viewModelScope.launch {
             breedRepository.getBreeds().collectLatest { breedList ->
                 _breeds.value = breedList
+
+                _allNames.value = breedList
+                    .map { it.name.trim() }
+                    .filter { it.isNotEmpty() }
+                    .distinct()
+                    .sorted()
+
+                _allOrigins.value = breedList
+                    .map { it.origin.trim() }
+                    .filter { it.isNotEmpty() }
+                    .distinct()
+                    .sorted()
+
+                _allTemperaments.value = breedList
+                    .flatMap { it.temperament }
+                    .map { it.trim().lowercase() }
+                    .filter { it.isNotEmpty() }
+                    .distinct()
+                    .sorted()
+
                 filterBreeds()
             }
         }
@@ -63,7 +101,7 @@ class BreedListViewModel @Inject constructor(
     }
 
     // Fetches new data from the API and loads into the local database
-    private fun refreshBreeds() {
+    fun refreshBreeds() {
         viewModelScope.launch {
             try {
                 breedRepository.refreshBreeds()
@@ -124,5 +162,65 @@ class BreedListViewModel @Inject constructor(
 
     fun clearError() {
         _errorMessage.value = null
+    }
+
+    fun addNewBreed(
+        name: String,
+        origin: String,
+        description: String,
+        temperaments: List<String>,
+        minLife: String,
+        maxLife: String,
+        imageUrl: String = "",
+        isFavorite: Boolean = false,
+        onSuccess: (String) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val id = UUID.randomUUID().toString()
+
+                val imagePath = if (imageUrl.isNotEmpty()) {
+                    saveImage(Uri.parse(imageUrl), id)
+                } else {
+                    ""
+                }
+
+                val newBreed = Breed(
+                    id = id,
+                    name = name,
+                    origin = origin,
+                    description = description,
+                    temperament = temperaments,
+                    lifeSpan = "$minLife - $maxLife",
+                    imageUrl = imagePath,
+                    isFavorite = isFavorite
+                )
+                breedRepository.addBreed(newBreed)
+                onSuccess(id)
+            } catch (_: Exception) {
+                _errorMessage.value = ErrorMessages.LOCAL_ERROR
+            }
+        }
+    }
+
+    private suspend fun saveImage(uri: Uri, id: String): String {
+        return withContext(Dispatchers.IO) {
+            try {
+                val fileName = "breed_${id}.jpg"
+                val inputStream = context.contentResolver.openInputStream(uri)
+                val outputFile = File(context.filesDir, fileName)
+                val outputStream = FileOutputStream(outputFile)
+
+                inputStream?.use { input ->
+                    outputStream.use { output ->
+                        input.copyTo(output)
+                    }
+                }
+                outputFile.absolutePath
+            } catch (e: Exception) {
+                e.printStackTrace()
+                ""
+            }
+        }
     }
 }

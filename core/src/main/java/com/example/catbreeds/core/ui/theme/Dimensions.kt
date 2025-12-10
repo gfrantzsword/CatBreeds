@@ -6,14 +6,22 @@ private object BaseValues {
     val SpacingXSmall = 4.dp
     val SpacingSmall = 8.dp
     val SpacingMedium = 16.dp
-    val SpacingExtraLarge = 96.dp
+    val SpacingLarge = 32.dp
+    val SpacingXLarge = 64.dp
+    val SpacingXXLarge = 96.dp
 
     val InnerCornerRadius = 8.dp
     val CornerRadius = 16.dp
     val ImageSizeSmall = 120.dp
     val ImageSizeMedium = 160.dp
+    val SmallIconSize = 16.dp
 
     val ShadowSmall = 6.dp
+
+    val ConstNumberSmall = 6
+
+    val MaxCharCountSmall = 30
+    val MaxCharCountLarge = 300
 
     val DefaultWeight = 1f
 }
@@ -26,8 +34,10 @@ object AppDimensions {
     val InterItemSpacing = BaseValues.SpacingSmall
     val DetailsVerticalSpacing = BaseValues.SpacingMedium
     val NoFavoritesMessageIconPadding = BaseValues.SpacingMedium
-    val LazyColumnBottomPaddingForNav = BaseValues.SpacingExtraLarge
+    val LazyColumnBottomPaddingForNav = BaseValues.SpacingXXLarge
     val ThinBorderEffect = BaseValues.SpacingXSmall
+    val SheetTopPadding = BaseValues.SpacingLarge
+    val SheetBottomPadding = BaseValues.SpacingXLarge
 
     // Corners
     val CardCornerRadius = BaseValues.CornerRadius
@@ -36,8 +46,14 @@ object AppDimensions {
     // Sizes
     val SecondaryItemImageSize = BaseValues.ImageSizeMedium
     val TertiaryItemImageSize = BaseValues.ImageSizeSmall
+    val SmallIconSize = BaseValues.SmallIconSize
 
     val BarShadow = BaseValues.ShadowSmall
+
+    // Constants
+    val MaxChipsToSelect = BaseValues.ConstNumberSmall
+    val MaxCharCountSmall = BaseValues.MaxCharCountSmall
+    val MaxCharCountLarge = BaseValues.MaxCharCountLarge
 
     val DefaultWeight = BaseValues.DefaultWeight
 }
