@@ -83,6 +83,7 @@ import com.example.catbreeds.core.ui.theme.AppTypography.headlineMedium
 import com.example.catbreeds.core.ui.theme.AppTypography.titleSmall
 import com.example.catbreeds.core.ui.theme.BrandBlue
 import com.example.catbreeds.core.ui.theme.BrandRed
+import com.example.catbreeds.domain.models.Breed
 import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -93,7 +94,7 @@ fun NewBreedSheetContent(
     allTemperaments: List<String>,
     onDismiss: () -> Unit,
     onDirtyChange: (Boolean) -> Unit,
-    onSave: (String, String, String, List<String>, String, String, String) -> Unit
+    onSave: (Breed) -> Unit
 ) {
     val context = LocalContext.current
 
@@ -166,6 +167,17 @@ fun NewBreedSheetContent(
         )
     }
 
+    fun createBreed() = Breed(
+        id = "",
+        name = name.value.trim(),
+        origin = origin.value.trim(),
+        description = description.value.trim(),
+        temperament = selectedTemperaments.value.toList(),
+        lifeSpan = "${minLife.value.trim()} - ${maxLife.value.trim()}",
+        imageUrl = selectedImageUri.value?.toString(),
+        isFavorite = false
+    )
+
     fun validateAndSubmit() {
         hasSubmitted.value = true
         val hasLogicErrors = isNameDuplicate.value || isMaxLessThanMin.value
@@ -176,15 +188,7 @@ fun NewBreedSheetContent(
                 description.value.isBlank()
 
         if (!hasLogicErrors && !hasEmptyFields) {
-            onSave(
-                name.value.trim(),
-                origin.value.trim(),
-                description.value.trim(),
-                selectedTemperaments.value.toList(),
-                minLife.value.trim(),
-                maxLife.value.trim(),
-                selectedImageUri.value?.toString() ?: ""
-            )
+            onSave(createBreed())
         }
     }
 

@@ -165,38 +165,22 @@ class BreedListViewModel @Inject constructor(
     }
 
     fun addNewBreed(
-        name: String,
-        origin: String,
-        description: String,
-        temperaments: List<String>,
-        minLife: String,
-        maxLife: String,
-        imageUrl: String = "",
-        isFavorite: Boolean = false,
+        breed: Breed,
         onSuccess: (String) -> Unit
     ) {
         viewModelScope.launch {
             try {
-                val id = UUID.randomUUID().toString()
+                val newId = UUID.randomUUID().toString()
 
-                val imagePath = if (imageUrl.isNotEmpty()) {
-                    saveImage(Uri.parse(imageUrl), id)
+                val imagePath = if (!breed.imageUrl.isNullOrEmpty()) {
+                    saveImage(Uri.parse(breed.imageUrl), newId)
                 } else {
                     ""
                 }
 
-                val newBreed = Breed(
-                    id = id,
-                    name = name,
-                    origin = origin,
-                    description = description,
-                    temperament = temperaments,
-                    lifeSpan = "$minLife - $maxLife",
-                    imageUrl = imagePath,
-                    isFavorite = isFavorite
-                )
+                val newBreed = breed.copy(id = newId, imageUrl = imagePath)
                 breedRepository.addBreed(newBreed)
-                onSuccess(id)
+                onSuccess(newBreed.id)
             } catch (_: Exception) {
                 _errorMessage.value = ErrorMessages.LOCAL_ERROR
             }

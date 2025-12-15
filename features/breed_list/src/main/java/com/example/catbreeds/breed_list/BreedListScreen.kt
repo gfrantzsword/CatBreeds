@@ -184,15 +184,9 @@ fun BreedListScreen(
                 allTemperaments = allTemperaments,
                 onDismiss = { handleSheetClose(false) },
                 onDirtyChange = { isSheetDirty.value = it },
-                onSave = { name, origin, desc, temps, min, max, imageUrl ->
+                onSave = { breed ->
                     viewModel.addNewBreed(
-                        name = name,
-                        origin = origin,
-                        description = desc,
-                        temperaments = temps,
-                        minLife = min,
-                        maxLife = max,
-                        imageUrl = imageUrl,
+                        breed = breed,
                         onSuccess = { newId ->
                             handleSheetClose(true)
                             onBreedClick(newId)
