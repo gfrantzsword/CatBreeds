@@ -62,10 +62,6 @@ class BreedListViewModelTest {
         coJustRun { breedRepository.removeBreedFromFavorites(breedId) }
     }
 
-    private fun verifyRefreshBreedsCalled(times: Int = 1) {
-        coVerify(exactly = times) { breedRepository.refreshBreeds() }
-    }
-
     private fun verifyAddBreedToFavorites(breedId: String, times: Int = 1) {
         coVerify(exactly = times) { breedRepository.addBreedToFavorites(breedId) }
     }
@@ -102,19 +98,6 @@ class BreedListViewModelTest {
         // THEN
         assertEquals(testBreeds, vmUnderTest.breeds.value)
         assertEquals(testBreeds, vmUnderTest.filteredBreeds.value)
-    }
-
-    @Test
-    fun `WHEN initialized SHOULD call refreshBreeds`() = runTest {
-        // GIVEN
-        setupRepository(emptyList())
-
-        // WHEN
-        vmUnderTest
-        advanceUntilIdle()
-
-        // THEN
-        verifyRefreshBreedsCalled()
     }
 
     @Test

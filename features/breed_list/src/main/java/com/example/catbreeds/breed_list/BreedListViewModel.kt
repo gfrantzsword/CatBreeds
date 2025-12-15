@@ -51,7 +51,6 @@ class BreedListViewModel @Inject constructor(
     init {
         observeBreeds()
         observeFavorites()
-        refreshBreeds()
     }
 
     private fun observeBreeds() {
