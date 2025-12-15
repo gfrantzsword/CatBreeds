@@ -67,12 +67,12 @@ import androidx.core.content.FileProvider
 import coil.compose.AsyncImage
 import com.example.catbreeds.core.R
 import com.example.catbreeds.core.ui.theme.AppDimensions.CardCornerRadius
-import com.example.catbreeds.core.ui.theme.AppDimensions.DefaultWeight
+import com.example.catbreeds.core.ui.theme.AppConstants.DEFAULT_WEIGHT
 import com.example.catbreeds.core.ui.theme.AppDimensions.InnerCornerRadius
 import com.example.catbreeds.core.ui.theme.AppDimensions.InterItemSpacing
-import com.example.catbreeds.core.ui.theme.AppDimensions.MaxCharCountLarge
-import com.example.catbreeds.core.ui.theme.AppDimensions.MaxCharCountSmall
-import com.example.catbreeds.core.ui.theme.AppDimensions.MaxChipsToSelect
+import com.example.catbreeds.core.ui.theme.AppConstants.MAX_CHAR_COUNT_LARGE
+import com.example.catbreeds.core.ui.theme.AppConstants.MAX_CHAR_COUNT_SMALL
+import com.example.catbreeds.core.ui.theme.AppConstants.MAX_CHIPS_TO_COLLECT
 import com.example.catbreeds.core.ui.theme.AppDimensions.ScreenPadding
 import com.example.catbreeds.core.ui.theme.AppDimensions.SecondaryCardPadding
 import com.example.catbreeds.core.ui.theme.AppDimensions.SheetBottomPadding
@@ -260,7 +260,7 @@ fun NewBreedSheetContent(
                 value = name.value,
                 onValueChange = { name.value = it },
                 label = "Name",
-                maxCharCount = MaxCharCountSmall,
+                maxCharCount = MAX_CHAR_COUNT_SMALL,
                 isError = nameError.value.isNotEmpty(),
                 errorMessage = nameError.value
             )
@@ -273,7 +273,7 @@ fun NewBreedSheetContent(
                 expanded = isOriginDropdownActive.value,
                 onExpandedChange = { isOriginDropdownActive.value = it },
                 options = allOrigins,
-                maxCharCount = MaxCharCountSmall,
+                maxCharCount = MAX_CHAR_COUNT_SMALL,
                 isError = originError.value.isNotEmpty(),
                 errorMessage = originError.value
             )
@@ -301,7 +301,7 @@ fun NewBreedSheetContent(
                 value = description.value,
                 onValueChange = { description.value = it },
                 label = "Description",
-                maxCharCount = MaxCharCountLarge,
+                maxCharCount = MAX_CHAR_COUNT_LARGE,
                 singleLine = false,
                 minLines = 3,
                 isError = descriptionError.value.isNotEmpty(),
@@ -328,7 +328,7 @@ private fun TemperamentField(
     ) {
         FieldTitle(
             title = "Temperament",
-            subtitle = "${selectedTemperaments.size} / $MaxChipsToSelect selected"
+            subtitle = "${selectedTemperaments.size} / $MAX_CHIPS_TO_COLLECT selected"
         )
         FlowRow(
             modifier = Modifier
@@ -359,7 +359,7 @@ private fun TemperamentField(
                     onClick = {
                         val newSelection = selectedTemperaments.toMutableSet()
                         if (isSelected) newSelection.remove(temperament)
-                        else if (newSelection.size < MaxChipsToSelect) newSelection.add(temperament)
+                        else if (newSelection.size < MAX_CHIPS_TO_COLLECT) newSelection.add(temperament)
                         onSelectionChanged(newSelection)
                     }
                 )
@@ -401,7 +401,7 @@ private fun LifeExpectancyField(
             }
 
             NewBreedTextField(
-                modifier = Modifier.weight(DefaultWeight),
+                modifier = Modifier.weight(DEFAULT_WEIGHT),
                 value = minLife,
                 onValueChange = { numberFilter(it)?.let(onMinLifeChange) },
                 label = "Min",
@@ -410,7 +410,7 @@ private fun LifeExpectancyField(
                 errorMessage = minLifeError
             )
             NewBreedTextField(
-                modifier = Modifier.weight(DefaultWeight),
+                modifier = Modifier.weight(DEFAULT_WEIGHT),
                 value = maxLife,
                 onValueChange = { numberFilter(it)?.let(onMaxLifeChange) },
                 label = "Max",
@@ -441,7 +441,7 @@ private fun NewBreedImageField(
     ) {
         Surface(
             modifier = Modifier
-                .weight(DefaultWeight)
+                .weight(DEFAULT_WEIGHT)
                 .fillMaxHeight(),
             shape = RoundedCornerShape(CardCornerRadius),
             color = MaterialTheme.colorScheme.background,
@@ -468,7 +468,7 @@ private fun NewBreedImageField(
         }
         Column(
             modifier = Modifier
-                .weight(DefaultWeight)
+                .weight(DEFAULT_WEIGHT)
                 .fillMaxHeight(),
             verticalArrangement = Arrangement.spacedBy(InterItemSpacing)
         ) {
@@ -476,13 +476,13 @@ private fun NewBreedImageField(
                 label = "Gallery",
                 icon = Icons.Default.PhotoLibrary,
                 onClick = onGalleryClick,
-                modifier = Modifier.weight(DefaultWeight)
+                modifier = Modifier.weight(DEFAULT_WEIGHT)
             )
             ImageSourceOption(
                 label = "Camera",
                 icon = Icons.Default.PhotoCamera,
                 onClick = onCameraClick,
-                modifier = Modifier.weight(DefaultWeight)
+                modifier = Modifier.weight(DEFAULT_WEIGHT)
             )
         }
     }
@@ -578,7 +578,7 @@ private fun NewBreedTextField(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Box(modifier = Modifier.weight(DefaultWeight)) {
+                Box(modifier = Modifier.weight(DEFAULT_WEIGHT)) {
                     if (isError) Text(text = errorMessage, color = BrandRed)
                 }
                 if (maxCharCount != null) {

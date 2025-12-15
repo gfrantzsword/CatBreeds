@@ -69,7 +69,7 @@ import coil.compose.AsyncImage
 import com.example.catbreeds.core.R
 import com.example.catbreeds.core.ui.theme.AppDimensions.BarShadow
 import com.example.catbreeds.core.ui.theme.AppDimensions.CardCornerRadius
-import com.example.catbreeds.core.ui.theme.AppDimensions.DefaultWeight
+import com.example.catbreeds.core.ui.theme.AppConstants.DEFAULT_WEIGHT
 import com.example.catbreeds.core.ui.theme.AppDimensions.InterItemSpacing
 import com.example.catbreeds.core.ui.theme.AppDimensions.LazyColumnBottomPaddingForNav
 import com.example.catbreeds.core.ui.theme.AppDimensions.ScreenPadding
@@ -387,7 +387,7 @@ private fun BreedCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(modifier = Modifier.weight(DefaultWeight)) {
+                Column(modifier = Modifier.weight(DEFAULT_WEIGHT)) {
                     Text(
                         text = breed.name,
                         style = titleMedium

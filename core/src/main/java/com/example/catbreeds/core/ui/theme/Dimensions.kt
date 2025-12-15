@@ -17,13 +17,6 @@ private object BaseValues {
     val SmallIconSize = 16.dp
 
     val ShadowSmall = 6.dp
-
-    val ConstNumberSmall = 6
-
-    val MaxCharCountSmall = 30
-    val MaxCharCountLarge = 300
-
-    val DefaultWeight = 1f
 }
 
 object AppDimensions {
@@ -48,12 +41,6 @@ object AppDimensions {
     val TertiaryItemImageSize = BaseValues.ImageSizeSmall
     val SmallIconSize = BaseValues.SmallIconSize
 
+    // Others
     val BarShadow = BaseValues.ShadowSmall
-
-    // Constants
-    val MaxChipsToSelect = BaseValues.ConstNumberSmall
-    val MaxCharCountSmall = BaseValues.MaxCharCountSmall
-    val MaxCharCountLarge = BaseValues.MaxCharCountLarge
-
-    val DefaultWeight = BaseValues.DefaultWeight
 }
