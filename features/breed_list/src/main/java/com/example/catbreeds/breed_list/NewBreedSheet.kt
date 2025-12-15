@@ -383,11 +383,11 @@ private fun TemperamentField(
 @Composable
 private fun LifeExpectancyField(
     minLife: String,
-    onMinLifeChange: (String) -> Unit,
     minLifeError: String,
     maxLife: String,
-    onMaxLifeChange: (String) -> Unit,
-    maxLifeError: String
+    maxLifeError: String,
+    onMinLifeChange: (String) -> Unit,
+    onMaxLifeChange: (String) -> Unit
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(InterItemSpacing)
@@ -497,13 +497,13 @@ private fun NewBreedImageField(
 private fun OriginField(
     modifier: Modifier = Modifier,
     value: String,
-    onValueChange: (String) -> Unit,
     expanded: Boolean,
-    onExpandedChange: (Boolean) -> Unit,
     options: List<String>,
     maxCharCount: Int? = null,
     isError: Boolean = false,
-    errorMessage: String = ""
+    errorMessage: String = "",
+    onValueChange: (String) -> Unit,
+    onExpandedChange: (Boolean) -> Unit
 ) {
     val filteredOptions = remember(value, options) {
         if (value.isEmpty()) {
@@ -555,7 +555,6 @@ private fun OriginField(
 private fun NewBreedTextField(
     modifier: Modifier = Modifier,
     value: String,
-    onValueChange: (String) -> Unit,
     label: String = "",
     isError: Boolean = false,
     errorMessage: String = "",
@@ -563,6 +562,7 @@ private fun NewBreedTextField(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     singleLine: Boolean = true,
     minLines: Int = 1,
+    onValueChange: (String) -> Unit,
     trailingIcon: @Composable (() -> Unit)? = null
 ) {
     TextField(
@@ -615,8 +615,8 @@ private fun NewBreedTextField(
 private fun ImageSourceOption(
     label: String,
     icon: ImageVector,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
 ) {
     Surface(
         onClick = onClick,
