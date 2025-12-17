@@ -98,64 +98,20 @@ fun NewBreedSheetContent(
 ) {
     val context = LocalContext.current
 
-    // Field Value States
-    val name = remember { mutableStateOf("") }
-    val origin = remember { mutableStateOf("") }
-    val minLife = remember { mutableStateOf("") }
-    val maxLife = remember { mutableStateOf("") }
-    val description = remember { mutableStateOf("") }
-    val selectedTemperaments = remember { mutableStateOf(setOf<String>()) }
-    val selectedImageUri = remember { mutableStateOf<Uri?>(null) }
+    // Form State
+    val formState = rememberNewBreedFormState(allNames = allNames)
 
     // Helper States
-    val isOriginDropdownActive = remember { mutableStateOf(false) }
-    val hasSubmitted = remember { mutableStateOf(false) }
     val tempImageUri = remember { mutableStateOf<Uri?>(null) }
 
     // Validation
     val isDirty = remember {
-        derivedStateOf {
-            name.value.isNotBlank() ||
-                    origin.value.isNotBlank() ||
-                    minLife.value.isNotBlank() ||
-                    maxLife.value.isNotBlank() ||
-                    description.value.isNotBlank() ||
-                    selectedTemperaments.value.isNotEmpty() ||
-                    selectedImageUri.value != null
-        }
+        derivedStateOf { formState.isDirty() }
     }
 
     LaunchedEffect(isDirty.value) {
         onDirtyChange(isDirty.value)
     }
-
-    // Validation
-    val isNameDuplicate = remember {
-        derivedStateOf {
-            name.value.trim().isNotEmpty() &&
-                    allNames.any { it.equals(name.value.trim(), ignoreCase = true) }
-        }
-    }
-
-    val isMaxLessThanMin = remember {
-        derivedStateOf {
-            val min = minLife.value.toIntOrNull()
-            val max = maxLife.value.toIntOrNull()
-            if (min != null && max != null) max < min else false
-        }
-    }
-
-    fun validate(value: String, customError: String? = null): String {
-        if (customError != null) return customError
-        return if (hasSubmitted.value && value.isBlank()) "Required" else ""
-    }
-
-    // Error States
-    val nameError = remember { derivedStateOf { validate(name.value, if (isNameDuplicate.value) "Name already exists" else null) } }
-    val originError = remember { derivedStateOf { validate(origin.value) } }
-    val minLifeError = remember { derivedStateOf { validate(minLife.value) } }
-    val maxLifeError = remember { derivedStateOf { validate(maxLife.value, if (isMaxLessThanMin.value) "Must be >= Min" else null) } }
-    val descriptionError = remember { derivedStateOf { validate(description.value) } }
 
     // Helper Methods
     fun createTempImageUri(): Uri {
@@ -167,36 +123,18 @@ fun NewBreedSheetContent(
         )
     }
 
-    fun createBreed() = Breed(
-        id = "",
-        name = name.value.trim(),
-        origin = origin.value.trim(),
-        description = description.value.trim(),
-        temperament = selectedTemperaments.value.toList(),
-        lifeSpan = "${minLife.value.trim()} - ${maxLife.value.trim()}",
-        imageUrl = selectedImageUri.value?.toString(),
-        isFavorite = false
-    )
-
     fun validateAndSubmit() {
-        hasSubmitted.value = true
-        val hasLogicErrors = isNameDuplicate.value || isMaxLessThanMin.value
-        val hasEmptyFields = name.value.isBlank() ||
-                origin.value.isBlank() ||
-                minLife.value.isBlank() ||
-                maxLife.value.isBlank() ||
-                description.value.isBlank()
-
-        if (!hasLogicErrors && !hasEmptyFields) {
-            onSave(createBreed())
+        if (formState.validate()) {
+            val breed = formState.toBreed()
+            onSave(breed)
         }
     }
 
     val imagePickerLauncher = rememberLauncherForActivityResult(PickVisualMedia()) { uri ->
-        if (uri != null) selectedImageUri.value = uri
+        if (uri != null) formState.update(imageUri = uri.toString())
     }
     val cameraLauncher = rememberLauncherForActivityResult(TakePicture()) { success ->
-        if (success) selectedImageUri.value = tempImageUri.value
+        if (success) tempImageUri.value?.let { formState.update(imageUri = it.toString()) }
     }
 
     // Content
@@ -245,7 +183,7 @@ fun NewBreedSheetContent(
             // Image
             NewBreedImageField(
                 modifier = Modifier.fillMaxWidth(),
-                imageUri = selectedImageUri.value,
+                imageUri = if (formState.imageUri.value.isNotBlank()) Uri.parse(formState.imageUri.value) else null,
                 onGalleryClick = {
                     imagePickerLauncher.launch(
                         PickVisualMediaRequest(PickVisualMedia.ImageOnly)
@@ -261,55 +199,55 @@ fun NewBreedSheetContent(
             // Name
             NewBreedTextField(
                 modifier = Modifier.fillMaxWidth(),
-                value = name.value,
-                onValueChange = { name.value = it },
+                value = formState.name.value,
+                onValueChange = { formState.update(name = it) },
                 label = "Name",
                 maxCharCount = MAX_CHAR_COUNT_SMALL,
-                isError = nameError.value.isNotEmpty(),
-                errorMessage = nameError.value
+                isError = formState.nameError.value != null,
+                errorMessage = formState.nameError.value ?: ""
             )
 
             // Origin
             OriginField(
                 modifier = Modifier.fillMaxWidth(),
-                value = origin.value,
-                onValueChange = { origin.value = it },
-                expanded = isOriginDropdownActive.value,
-                onExpandedChange = { isOriginDropdownActive.value = it },
+                value = formState.origin.value,
+                onValueChange = { formState.update(origin = it) },
+                expanded = formState.isOriginDropdownActive.value,
+                onExpandedChange = { formState.update(isOriginDropdownActive = it) },
                 options = allOrigins,
                 maxCharCount = MAX_CHAR_COUNT_SMALL,
-                isError = originError.value.isNotEmpty(),
-                errorMessage = originError.value
+                isError = formState.originError.value != null,
+                errorMessage = formState.originError.value ?: ""
             )
 
             // Temperaments
             TemperamentField(
                 allTemperaments = allTemperaments,
-                selectedTemperaments = selectedTemperaments.value,
-                onSelectionChanged = { selectedTemperaments.value = it }
+                selectedTemperaments = formState.selectedTemperaments.value,
+                onSelectionChanged = { formState.update(selectedTemperaments = it) }
             )
 
             // Life Expectancy
             LifeExpectancyField(
-                minLife = minLife.value,
-                onMinLifeChange = { minLife.value = it },
-                minLifeError = minLifeError.value,
-                maxLife = maxLife.value,
-                onMaxLifeChange = { maxLife.value = it },
-                maxLifeError = maxLifeError.value
+                minLife = formState.minLife.value,
+                onMinLifeChange = { formState.update(minLife = it) },
+                minLifeError = formState.minLifeError.value ?: "",
+                maxLife = formState.maxLife.value,
+                onMaxLifeChange = { formState.update(maxLife = it) },
+                maxLifeError = formState.maxLifeError.value ?: ""
             )
 
             // Description
             NewBreedTextField(
                 modifier = Modifier.fillMaxWidth(),
-                value = description.value,
-                onValueChange = { description.value = it },
+                value = formState.description.value,
+                onValueChange = { formState.update(description = it) },
                 label = "Description",
                 maxCharCount = MAX_CHAR_COUNT_LARGE,
                 singleLine = false,
                 minLines = 3,
-                isError = descriptionError.value.isNotEmpty(),
-                errorMessage = descriptionError.value
+                isError = formState.descriptionError.value != null,
+                errorMessage = formState.descriptionError.value ?: ""
             )
 
             Spacer(modifier = Modifier.height(SheetBottomPadding))
