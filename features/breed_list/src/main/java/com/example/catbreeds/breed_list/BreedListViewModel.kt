@@ -10,21 +10,12 @@ import com.example.catbreeds.domain.repository.BreedRepository
 import com.example.catbreeds.core.util.ErrorMessages
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
-import java.util.UUID
 import javax.inject.Inject
-import android.content.Context
-import android.net.Uri
-import dagger.hilt.android.qualifiers.ApplicationContext
-import java.io.File
-import java.io.FileOutputStream
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class BreedListViewModel @Inject constructor(
-    private val breedRepository: BreedRepository,
-    @param:ApplicationContext private val context: Context
-): ViewModel() {
+    private val breedRepository: BreedRepository
+) : ViewModel() {
     private val _breeds = mutableStateOf<List<Breed>>(emptyList())
     val breeds: State<List<Breed>> = _breeds
 
@@ -161,49 +152,5 @@ class BreedListViewModel @Inject constructor(
 
     fun clearError() {
         _errorMessage.value = null
-    }
-
-    fun addNewBreed(
-        breed: Breed,
-        onSuccess: (String) -> Unit
-    ) {
-        viewModelScope.launch {
-            try {
-                val newId = UUID.randomUUID().toString()
-
-                val imagePath = if (!breed.imageUrl.isNullOrEmpty()) {
-                    saveImage(Uri.parse(breed.imageUrl), newId)
-                } else {
-                    ""
-                }
-
-                val newBreed = breed.copy(id = newId, imageUrl = imagePath)
-                breedRepository.addBreed(newBreed)
-                onSuccess(newBreed.id)
-            } catch (_: Exception) {
-                _errorMessage.value = ErrorMessages.LOCAL_ERROR
-            }
-        }
-    }
-
-    private suspend fun saveImage(uri: Uri, id: String): String {
-        return withContext(Dispatchers.IO) {
-            try {
-                val fileName = "breed_${id}.jpg"
-                val inputStream = context.contentResolver.openInputStream(uri)
-                val outputFile = File(context.filesDir, fileName)
-                val outputStream = FileOutputStream(outputFile)
-
-                inputStream?.use { input ->
-                    outputStream.use { output ->
-                        input.copyTo(output)
-                    }
-                }
-                outputFile.absolutePath
-            } catch (e: Exception) {
-                e.printStackTrace()
-                ""
-            }
-        }
     }
 }

@@ -20,7 +20,6 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
-import android.content.Context
 
 @ExperimentalCoroutinesApi
 class BreedListViewModelTest {
@@ -35,9 +34,6 @@ class BreedListViewModelTest {
     @RelaxedMockK
     private lateinit var breedRepository: BreedRepository
 
-    @RelaxedMockK
-    private lateinit var context: Context
-
     private val testBreeds = getBreeds()
     private val breed1 = testBreeds[0] // Siberian
     private val breed2 = testBreeds[1] // Persian
@@ -46,7 +42,7 @@ class BreedListViewModelTest {
 
     private val vmUnderTest: BreedListViewModel by lazy {
         spyk(
-            BreedListViewModel(breedRepository, context)
+            BreedListViewModel(breedRepository)
         )
     }
 

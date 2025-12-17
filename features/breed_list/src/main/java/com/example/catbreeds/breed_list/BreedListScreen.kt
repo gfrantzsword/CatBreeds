@@ -87,14 +87,15 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BreedListScreen(
-    viewModel: BreedListViewModel = hiltViewModel(),
+    breedListViewModel: BreedListViewModel = hiltViewModel(),
+    newBreedViewModel: NewBreedViewModel = hiltViewModel(),
     onBreedClick: (String) -> Unit
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
-                viewModel.refreshBreeds()
+                breedListViewModel.refreshBreeds()
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
@@ -103,9 +104,9 @@ fun BreedListScreen(
         }
     }
 
-    val breeds by viewModel.breeds
-    val searchQuery by viewModel.searchQuery
-    val filteredBreeds by viewModel.filteredBreeds
+    val breeds by breedListViewModel.breeds
+    val searchQuery by breedListViewModel.searchQuery
+    val filteredBreeds by breedListViewModel.filteredBreeds
     val isSearchActive = remember { mutableStateOf(false) }
 
     val isNewBreedActive = remember { mutableStateOf(false) }
@@ -125,21 +126,21 @@ fun BreedListScreen(
     )
     val scope = rememberCoroutineScope()
 
-    val allNames by viewModel.allNames
-    val allTemperaments by viewModel.allTemperaments
-    val allOrigins by viewModel.allOrigins
+    val allNames by breedListViewModel.allNames
+    val allTemperaments by breedListViewModel.allTemperaments
+    val allOrigins by breedListViewModel.allOrigins
 
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
 
     // Handles snackbar and error messages
-    val errorMessage by viewModel.errorMessage
+    val errorMessage by breedListViewModel.errorMessage
     val snackbarHostState = remember { SnackbarHostState() }
     ErrorHandler(
         errorMessage = errorMessage,
         snackbarHostState = snackbarHostState,
-        onErrorShown = viewModel::clearError
+        onErrorShown = breedListViewModel::clearError
     )
 
     // Scroll state for dynamic shadow
@@ -185,7 +186,7 @@ fun BreedListScreen(
                 onDismiss = { handleSheetClose(false) },
                 onDirtyChange = { isSheetDirty.value = it },
                 onSave = { breed ->
-                    viewModel.addNewBreed(
+                    newBreedViewModel.addNewBreed(
                         breed = breed,
                         onSuccess = { newId ->
                             handleSheetClose(true)
@@ -240,7 +241,7 @@ fun BreedListScreen(
                     title = {
                         TextField(
                             value = searchQuery,
-                            onValueChange = { viewModel.updateSearchQuery(it) },
+                            onValueChange = { breedListViewModel.updateSearchQuery(it) },
                             placeholder = { Text("Search breeds...") },
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -267,7 +268,7 @@ fun BreedListScreen(
                     navigationIcon = {
                         IconButton(onClick = {
                             isSearchActive.value = false
-                            viewModel.updateSearchQuery("")
+                            breedListViewModel.updateSearchQuery("")
                             keyboardController?.hide()
                         }) {
                             Icon(Icons.Default.Clear, contentDescription = "Close search")
@@ -329,7 +330,7 @@ fun BreedListScreen(
                         BreedCard(
                             breed = breed,
                             onClick = { onBreedClick(breed.id) },
-                            onFavoriteClick = { viewModel.toggleFavorite(breed.id) }
+                            onFavoriteClick = { breedListViewModel.toggleFavorite(breed.id) }
                         )
                     }
                 }
