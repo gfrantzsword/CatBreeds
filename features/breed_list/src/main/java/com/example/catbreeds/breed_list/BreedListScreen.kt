@@ -186,13 +186,11 @@ fun BreedListScreen(
                 onDismiss = { handleSheetClose(false) },
                 onDirtyChange = { isSheetDirty.value = it },
                 onSave = { breed ->
-                    newBreedViewModel.addNewBreed(
-                        breed = breed,
-                        onSuccess = { newId ->
-                            handleSheetClose(true)
-                            onBreedClick(newId)
-                        }
-                    )
+                    newBreedViewModel.addNewBreed(breed)
+                },
+                onSuccess = { newId ->
+                    handleSheetClose(true)
+                    onBreedClick(newId)
                 }
             )
         }

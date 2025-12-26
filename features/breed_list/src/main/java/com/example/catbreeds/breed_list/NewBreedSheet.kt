@@ -54,6 +54,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -84,7 +85,9 @@ import com.example.catbreeds.core.ui.theme.AppTypography.titleSmall
 import com.example.catbreeds.core.ui.theme.BrandBlue
 import com.example.catbreeds.core.ui.theme.BrandRed
 import com.example.catbreeds.domain.models.Breed
+import kotlinx.coroutines.launch
 import java.io.File
+import androidx.core.net.toUri
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -94,9 +97,11 @@ fun NewBreedSheetContent(
     allTemperaments: List<String>,
     onDismiss: () -> Unit,
     onDirtyChange: (Boolean) -> Unit,
-    onSave: (Breed) -> Unit
+    onSave: suspend (Breed) -> String?,
+    onSuccess: (String) -> Unit
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     // Form State
     val formState = rememberNewBreedFormState(allNames = allNames)
@@ -113,6 +118,13 @@ fun NewBreedSheetContent(
         onDirtyChange(isDirty.value)
     }
 
+    LaunchedEffect(formState.createdBreedId.value) {
+        formState.createdBreedId.value?.let { id ->
+            onSuccess(id)
+            formState.onNavigationHandled()
+        }
+    }
+
     // Helper Methods
     fun createTempImageUri(): Uri {
         val tempFile = File.createTempFile("cat_breed_", ".jpg", context.externalCacheDir)
@@ -126,7 +138,12 @@ fun NewBreedSheetContent(
     fun validateAndSubmit() {
         if (formState.validate()) {
             val breed = formState.toBreed()
-            onSave(breed)
+            scope.launch {
+                val newId = onSave(breed)
+                if (newId != null) {
+                    formState.onAddNewBreed(newId)
+                }
+            }
         }
     }
 
@@ -183,7 +200,7 @@ fun NewBreedSheetContent(
             // Image
             NewBreedImageField(
                 modifier = Modifier.fillMaxWidth(),
-                imageUri = if (formState.imageUri.value.isNotBlank()) Uri.parse(formState.imageUri.value) else null,
+                imageUri = if (formState.imageUri.value.isNotBlank()) formState.imageUri.value.toUri() else null,
                 onGalleryClick = {
                     imagePickerLauncher.launch(
                         PickVisualMediaRequest(PickVisualMedia.ImageOnly)

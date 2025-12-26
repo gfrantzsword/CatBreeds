@@ -38,6 +38,17 @@ class NewBreedFormState(
 
     private val _hasSubmitted = mutableStateOf(false)
 
+    private val _createdBreedId = mutableStateOf<String?>(null)
+    val createdBreedId: State<String?> = _createdBreedId
+
+    fun onAddNewBreed(id: String) {
+        _createdBreedId.value = id
+    }
+
+    fun onNavigationHandled() {
+        _createdBreedId.value = null
+    }
+
     // Field Validation
     private fun validateField(value: String, customError: String? = null): String? {
         if (customError != null) return customError
