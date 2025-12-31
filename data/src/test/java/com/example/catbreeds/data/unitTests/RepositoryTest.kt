@@ -14,6 +14,7 @@ import com.example.catbreeds.test_core.mock.MOCK_PERSIAN_NAME
 import com.example.catbreeds.test_core.mock.MOCK_SIBERIAN_ID
 import com.example.catbreeds.test_core.mock.MOCK_SIBERIAN_NAME
 import com.example.catbreeds.test_core.mock.mockBreedsList
+import com.example.catbreeds.test_core.mock.mockSiberianBreed
 import io.mockk.coEvery
 import io.mockk.coJustRun
 import io.mockk.coVerify
@@ -195,5 +196,27 @@ class RepositoryTest {
         } catch (e: Exception) { // THEN
             assertEquals("Something went wrong. Please try again later", e.message)
         }
+    }
+
+    @Test
+    fun `WHEN addBreed is called SHOULD map to entity AND insert into local database`() = runTest {
+        // GIVEN
+        val breed = mockSiberianBreed
+
+        val expectedEntity = BreedEntity(
+            id = breed.id,
+            name = breed.name,
+            origin = breed.origin,
+            description = breed.description,
+            temperament = breed.temperament.joinToString(", "),
+            lifeSpan = breed.lifeSpan,
+            imageUrl = breed.imageUrl ?: ""
+        )
+
+        // WHEN
+        repository.addBreed(breed)
+
+        // THEN
+        coVerify(exactly = 1) { breedDao.insert(expectedEntity) }
     }
 }

@@ -11,4 +11,5 @@ interface BreedRepository {
     suspend fun removeBreedFromFavorites(breedId : String)
     fun getFavoriteBreeds(): Flow<List<Breed>>
     fun getSimilarBreeds(breedId: String): Flow<List<Breed>>
+    suspend fun addBreed(breed: Breed)
 }
