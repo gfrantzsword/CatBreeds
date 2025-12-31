@@ -151,9 +151,10 @@ fun BreedListScreen(
         }
     }
 
-    LaunchedEffect(isSearchActive) {
+    LaunchedEffect(isSearchActive.value) {
         if (isSearchActive.value) {
             focusRequester.requestFocus()
+            keyboardController?.show()
         }
     }
 
