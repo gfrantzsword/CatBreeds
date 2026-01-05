@@ -23,7 +23,7 @@ class NewBreedViewModel @Inject constructor(
     @param:ApplicationContext private val context: Context
 ) : ViewModel() {
 
-    private val _errorMessage = mutableStateOf<String?>(null)
+    private val _errorMessage = mutableStateOf<Int?>(null)
 
     suspend fun addNewBreed(breed: Breed): String? {
         return try {

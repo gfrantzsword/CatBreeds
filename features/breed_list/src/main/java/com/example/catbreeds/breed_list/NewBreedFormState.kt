@@ -5,6 +5,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import com.example.catbreeds.core.R
 import com.example.catbreeds.domain.models.Breed
 
 class NewBreedFormState(
@@ -50,9 +51,9 @@ class NewBreedFormState(
     }
 
     // Field Validation
-    private fun validateField(value: String, customError: String? = null): String? {
+    private fun validateField(value: String, customError: Int? = null): Int? {
         if (customError != null) return customError
-        return if (_hasSubmitted.value && value.isBlank()) "Required" else null
+        return if (_hasSubmitted.value && value.isBlank()) R.string.error_required else null
     }
 
     private val isNameDuplicate = derivedStateOf {
@@ -67,11 +68,11 @@ class NewBreedFormState(
     }
 
     // Error States
-    val nameError: State<String?> = derivedStateOf { validateField(_name.value, if (isNameDuplicate.value) "A breed with this name already exists" else null) }
-    val originError: State<String?> = derivedStateOf { validateField(_origin.value) }
-    val descriptionError: State<String?> = derivedStateOf { validateField(_description.value) }
-    val minLifeError: State<String?> = derivedStateOf { validateField(_minLife.value) }
-    val maxLifeError: State<String?> = derivedStateOf { validateField(_maxLife.value, if (isMaxLessThanMin.value) "Must be >= Min" else null) }
+    val nameError: State<Int?> = derivedStateOf { validateField(_name.value, if (isNameDuplicate.value) R.string.error_name_exists else null) }
+    val originError: State<Int?> = derivedStateOf { validateField(_origin.value) }
+    val descriptionError: State<Int?> = derivedStateOf { validateField(_description.value) }
+    val minLifeError: State<Int?> = derivedStateOf { validateField(_minLife.value) }
+    val maxLifeError: State<Int?> = derivedStateOf { validateField(_maxLife.value, if (isMaxLessThanMin.value) R.string.error_min_max_validation else null) }
 
     fun update(
         name: String? = null,

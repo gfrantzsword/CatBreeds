@@ -22,8 +22,8 @@ class FavoriteListViewModel @Inject constructor(
     private val _isLoading = mutableStateOf(false)
     val isLoading: State<Boolean> = _isLoading
 
-    private val _errorMessage = mutableStateOf<String?>(null)
-    val errorMessage: State<String?> = _errorMessage
+    private val _errorMessage = mutableStateOf<Int?>(null)
+    val errorMessage: State<Int?> = _errorMessage
 
     init {
         loadFavoriteBreeds()

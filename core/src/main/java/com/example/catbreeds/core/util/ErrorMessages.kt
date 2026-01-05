@@ -1,7 +1,9 @@
 package com.example.catbreeds.core.util
 
+import com.example.catbreeds.core.R
+
 object ErrorMessages {
-    const val NO_INTERNET_CONNECTION = "No internet connection"
-    const val NETWORK_ERROR = "Something went wrong. Please try again later"
-    const val LOCAL_ERROR = "Something went wrong. Please try again later"
+    val NO_INTERNET_CONNECTION = R.string.error_no_internet
+    val NETWORK_ERROR = R.string.error_generic
+    val LOCAL_ERROR = R.string.error_generic
 }

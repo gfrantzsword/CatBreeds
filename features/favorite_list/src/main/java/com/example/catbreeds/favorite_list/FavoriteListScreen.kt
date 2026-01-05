@@ -17,6 +17,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
@@ -50,10 +51,10 @@ fun FavoriteListScreen(
     val isLoading by viewModel.isLoading
 
     // Handles snackbar and error messages
-    val errorMessage by viewModel.errorMessage
+    val errorMessageId by viewModel.errorMessage
     val snackbarHostState = remember { SnackbarHostState() }
     ErrorHandler(
-        errorMessage = errorMessage,
+        errorMessage = errorMessageId?.let { stringResource(it) },
         snackbarHostState = snackbarHostState,
         onErrorShown = viewModel::clearError
     )
@@ -83,7 +84,7 @@ fun FavoriteListScreen(
                 ),
                 title = {
                     Text(
-                        text = "Favorites",
+                        text = stringResource(R.string.favorites_title),
                         style = headlineMedium
                     )
                 }
@@ -120,7 +121,7 @@ fun FavoriteListScreen(
                             modifier = Modifier.padding(NoFavoritesMessageIconPadding)
                         )
                         Text(
-                            text = "No favorite breeds yet",
+                            text = stringResource(R.string.empty_favorites_message),
                             style = titleMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center
@@ -182,7 +183,7 @@ private fun FavoriteBreedCard(
             // Cat image
             AsyncImage(
                 model = breed.imageUrl,
-                contentDescription = "Image of ${breed.name}",
+                contentDescription = stringResource(R.string.cd_breed_image, breed.name),
                 modifier = Modifier
                     .size(TertiaryItemImageSize)
                     .padding(
@@ -220,7 +221,7 @@ private fun FavoriteBreedCard(
             IconButton(onClick = onRemoveFromFavorites) {
                 Icon(
                     Icons.Default.Favorite,
-                    contentDescription = "Remove from favorites",
+                    contentDescription = stringResource(R.string.cd_remove_favorite),
                     tint = BrandRed
                 )
             }

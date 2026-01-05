@@ -36,8 +36,8 @@ class BreedListViewModel @Inject constructor(
     private val _allTemperaments = mutableStateOf<List<String>>(emptyList())
     val allTemperaments: State<List<String>> = _allTemperaments
 
-    private val _errorMessage = mutableStateOf<String?>(null)
-    val errorMessage: State<String?> = _errorMessage
+    private val _errorMessage = mutableStateOf<Int?>(null)
+    val errorMessage: State<Int?> = _errorMessage
 
     init {
         observeBreeds()
@@ -97,7 +97,7 @@ class BreedListViewModel @Inject constructor(
                 breedRepository.refreshBreeds()
             } catch (e: Exception) {
                 _errorMessage.value = when (e.message) {
-                    ErrorMessages.NO_INTERNET_CONNECTION -> ErrorMessages.NO_INTERNET_CONNECTION
+                    "No internet connection" -> ErrorMessages.NO_INTERNET_CONNECTION
                     else -> ErrorMessages.NETWORK_ERROR
                 }
             }

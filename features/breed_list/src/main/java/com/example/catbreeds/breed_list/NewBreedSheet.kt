@@ -62,6 +62,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.core.content.FileProvider
@@ -164,13 +165,13 @@ fun NewBreedSheetContent(
                 ),
                 title = {
                     Text(
-                        text = "Add a new breed",
+                        text = stringResource(R.string.new_breed_title),
                         style = headlineMedium
                     )
                 },
                 actions = {
                     IconButton(onClick = onDismiss) {
-                        Icon(Icons.Default.Close, contentDescription = "Cancel")
+                        Icon(Icons.Default.Close, contentDescription = stringResource(R.string.cd_cancel))
                     }
                 }
             )
@@ -184,8 +185,8 @@ fun NewBreedSheetContent(
                     .padding(horizontal = ScreenPadding),
                 containerColor = BrandRed,
                 contentColor = Color.White,
-                icon = { Icon(Icons.Default.Check, contentDescription = "Checkmark") },
-                text = { Text("Add new breed") }
+                icon = { Icon(Icons.Default.Check, contentDescription = stringResource(R.string.cd_checkmark)) },
+                text = { Text(stringResource(R.string.action_add_breed)) }
             )
         }
     ) { paddingValues ->
@@ -218,10 +219,10 @@ fun NewBreedSheetContent(
                 modifier = Modifier.fillMaxWidth(),
                 value = formState.name.value,
                 onValueChange = { formState.update(name = it) },
-                label = "Name",
+                label = stringResource(R.string.label_name),
                 maxCharCount = MAX_CHAR_COUNT_SMALL,
                 isError = formState.nameError.value != null,
-                errorMessage = formState.nameError.value ?: ""
+                errorMessage = formState.nameError.value?.let { stringResource(it) } ?: ""
             )
 
             // Origin
@@ -234,7 +235,7 @@ fun NewBreedSheetContent(
                 options = allOrigins,
                 maxCharCount = MAX_CHAR_COUNT_SMALL,
                 isError = formState.originError.value != null,
-                errorMessage = formState.originError.value ?: ""
+                errorMessage = formState.originError.value?.let { stringResource(it) } ?: ""
             )
 
             // Temperaments
@@ -248,10 +249,10 @@ fun NewBreedSheetContent(
             LifeExpectancyField(
                 minLife = formState.minLife.value,
                 onMinLifeChange = { formState.update(minLife = it) },
-                minLifeError = formState.minLifeError.value ?: "",
+                minLifeError = formState.minLifeError.value?.let { stringResource(it) } ?: "",
                 maxLife = formState.maxLife.value,
                 onMaxLifeChange = { formState.update(maxLife = it) },
-                maxLifeError = formState.maxLifeError.value ?: ""
+                maxLifeError = formState.maxLifeError.value?.let { stringResource(it) } ?: ""
             )
 
             // Description
@@ -259,12 +260,12 @@ fun NewBreedSheetContent(
                 modifier = Modifier.fillMaxWidth(),
                 value = formState.description.value,
                 onValueChange = { formState.update(description = it) },
-                label = "Description",
+                label = stringResource(R.string.label_description),
                 maxCharCount = MAX_CHAR_COUNT_LARGE,
                 singleLine = false,
                 minLines = 3,
                 isError = formState.descriptionError.value != null,
-                errorMessage = formState.descriptionError.value ?: ""
+                errorMessage = formState.descriptionError.value?.let { stringResource(it) } ?: ""
             )
 
             Spacer(modifier = Modifier.height(SheetBottomPadding))
@@ -286,8 +287,8 @@ private fun TemperamentField(
         verticalArrangement = Arrangement.spacedBy(InterItemSpacing)
     ) {
         FieldTitle(
-            title = "Temperament",
-            subtitle = "${selectedTemperaments.size} / $MAX_CHIPS_TO_COLLECT selected"
+            title = stringResource(R.string.label_temperament),
+            subtitle = stringResource(R.string.format_selected_count, selectedTemperaments.size, MAX_CHIPS_TO_COLLECT)
         )
         FlowRow(
             modifier = Modifier
@@ -302,7 +303,7 @@ private fun TemperamentField(
             maxLines = if (isExpanded.value) Int.MAX_VALUE else 2,
             overflow = FlowRowOverflow.expandIndicator {
                 SelectChip(
-                    text = "See more",
+                    text = stringResource(R.string.action_see_more),
                     backgroundColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     textColor = Color.White,
                     onClick = { isExpanded.value = true }
@@ -325,7 +326,7 @@ private fun TemperamentField(
             }
             if (isExpanded.value) {
                 SelectChip(
-                    text = "Show less",
+                    text = stringResource(R.string.action_show_less),
                     backgroundColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     textColor = Color.White,
                     onClick = { isExpanded.value = false }
@@ -348,8 +349,8 @@ private fun LifeExpectancyField(
         verticalArrangement = Arrangement.spacedBy(InterItemSpacing)
     ) {
         FieldTitle(
-            title = "Life Expectancy",
-            subtitle = "Up to 99 years"
+            title = stringResource(R.string.label_life_expectancy),
+            subtitle = stringResource(R.string.subtitle_life_expectancy)
         )
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -363,7 +364,7 @@ private fun LifeExpectancyField(
                 modifier = Modifier.weight(DEFAULT_WEIGHT),
                 value = minLife,
                 onValueChange = { numberFilter(it)?.let(onMinLifeChange) },
-                label = "Min",
+                label = stringResource(R.string.label_min),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 isError = minLifeError.isNotEmpty(),
                 errorMessage = minLifeError
@@ -372,7 +373,7 @@ private fun LifeExpectancyField(
                 modifier = Modifier.weight(DEFAULT_WEIGHT),
                 value = maxLife,
                 onValueChange = { numberFilter(it)?.let(onMaxLifeChange) },
-                label = "Max",
+                label = stringResource(R.string.label_max),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 isError = maxLifeError.isNotEmpty(),
                 errorMessage = maxLifeError
@@ -389,8 +390,8 @@ private fun NewBreedImageField(
     onCameraClick: () -> Unit
 ) {
     FieldTitle(
-        title = "Photo",
-        subtitle = "Choose from your gallery or use the camera"
+        title = stringResource(R.string.label_photo),
+        subtitle = stringResource(R.string.subtitle_photo_selection)
     )
     Row(
         modifier = modifier
@@ -408,7 +409,7 @@ private fun NewBreedImageField(
             if (imageUri != null) {
                 AsyncImage(
                     model = imageUri,
-                    contentDescription = "Selected Image",
+                    contentDescription = stringResource(R.string.cd_selected_image),
                     contentScale = ContentScale.FillHeight
                 )
             } else {
@@ -420,7 +421,7 @@ private fun NewBreedImageField(
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.ic_cat_placeholder),
-                        contentDescription = "Placeholder"
+                        contentDescription = stringResource(R.string.cd_placeholder_image)
                     )
                 }
             }
@@ -432,13 +433,13 @@ private fun NewBreedImageField(
             verticalArrangement = Arrangement.spacedBy(InterItemSpacing)
         ) {
             ImageSourceOption(
-                label = "Gallery",
+                label = stringResource(R.string.label_gallery),
                 icon = Icons.Default.PhotoLibrary,
                 onClick = onGalleryClick,
                 modifier = Modifier.weight(DEFAULT_WEIGHT)
             )
             ImageSourceOption(
-                label = "Camera",
+                label = stringResource(R.string.label_camera),
                 icon = Icons.Default.PhotoCamera,
                 onClick = onCameraClick,
                 modifier = Modifier.weight(DEFAULT_WEIGHT)
@@ -482,7 +483,7 @@ private fun OriginField(
                 onValueChange(it)
                 onExpandedChange(true)
             },
-            label = "Origin",
+            label = stringResource(R.string.label_origin),
             maxCharCount = maxCharCount,
             isError = isError,
             errorMessage = errorMessage

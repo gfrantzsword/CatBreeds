@@ -26,8 +26,8 @@ class BreedDetailViewModel @Inject constructor(
     private val _similarBreeds = mutableStateOf<List<Breed>>(emptyList())
     val similarBreeds: State<List<Breed>> = _similarBreeds
 
-    private val _errorMessage = mutableStateOf<String?>(null)
-    val errorMessage: State<String?> = _errorMessage
+    private val _errorMessage = mutableStateOf<Int?>(null)
+    val errorMessage: State<Int?> = _errorMessage
 
     init {
         breedId?.let { id ->
@@ -83,8 +83,8 @@ class BreedDetailViewModel @Inject constructor(
                         _breed.value = it.copy(isFavorite = true)
                     }
                 }
-            } catch (e: Exception) {
-                throw Exception(ErrorMessages.LOCAL_ERROR, e)
+            } catch (_: Exception) {
+                _errorMessage.value = ErrorMessages.LOCAL_ERROR
             }
         }
     }
