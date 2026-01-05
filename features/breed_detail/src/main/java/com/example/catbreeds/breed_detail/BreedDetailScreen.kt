@@ -21,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.catbreeds.core.ui.theme.AppDimensions.BarShadow
@@ -86,13 +87,13 @@ fun BreedDetailScreen(
                 ),
                 title = {
                     Text(
-                        text = breed?.name ?: "Breed Details",
+                        text = breed?.name ?: stringResource(R.string.breed_details_title),
                         style = headlineMedium
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_back))
                     }
                 },
                 actions = {
@@ -100,7 +101,7 @@ fun BreedDetailScreen(
                         IconButton(onClick = { viewModel.toggleFavorite(breedData.id) }) {
                             Icon(
                                 imageVector = if (breedData.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                                contentDescription = if (breedData.isFavorite) "Remove from favorites" else "Add to favorites",
+                                contentDescription = if (breedData.isFavorite) stringResource(R.string.cd_remove_favorite) else stringResource(R.string.cd_add_favorite),
                                 tint = BrandRed
                             )
                         }
@@ -120,7 +121,7 @@ fun BreedDetailScreen(
                 // Cat image
                 AsyncImage(
                     model = breed.imageUrl,
-                    contentDescription = "Image of ${breed.name}",
+                    contentDescription = stringResource(R.string.cd_breed_image, breed.name),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = ScreenPadding)
@@ -141,13 +142,13 @@ fun BreedDetailScreen(
                 ) {
                     StatCard(
                         modifier = Modifier.weight(DEFAULT_WEIGHT),
-                        label = "Origin",
+                        label = stringResource(R.string.label_origin),
                         value = breed.origin
                     )
                     StatCard(
                         modifier = Modifier.weight(DEFAULT_WEIGHT),
-                        label = "Life Expectancy",
-                        value = "${breed.lifeSpan} years"
+                        label = stringResource(R.string.label_life_expectancy),
+                        value = stringResource(R.string.format_life_expectancy, breed.lifeSpan)
                     )
                 }
 
@@ -174,7 +175,7 @@ fun BreedDetailScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = ScreenPadding),
-                    label = "About the ${breed.name}",
+                    label = stringResource(R.string.about_breed_title, breed.name),
                     value = breed.description
                 )
 
@@ -182,7 +183,7 @@ fun BreedDetailScreen(
                 if (similarBreeds.isNotEmpty()) {
                     Column {
                         Text(
-                            text = "Similar Breeds",
+                            text = stringResource(R.string.similar_breeds_title),
                             style = titleMedium,
                             modifier = Modifier
                                 .padding(bottom = InterItemSpacing)
@@ -285,7 +286,7 @@ private fun SimilarBreedCard(
         Column {
             AsyncImage(
                 model = breed.imageUrl,
-                contentDescription = "Image of ${breed.name}",
+                contentDescription = stringResource(R.string.cd_breed_image, breed.name),
                 modifier = Modifier
                     .size(SecondaryItemImageSize)
                     .padding(

@@ -61,6 +61,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
@@ -200,19 +201,19 @@ fun BreedListScreen(
     if (showUnsavedChangesDialog.value) {
         AlertDialog(
             onDismissRequest = { showUnsavedChangesDialog.value = false },
-            title = { Text("Unsaved Changes") },
-            text = { Text("You have unsaved changes. Are you sure you want to discard them?") },
+            title = { Text(stringResource(R.string.dialog_unsaved_title)) },
+            text = { Text(stringResource(R.string.dialog_unsaved_message)) },
             confirmButton = {
                 TextButton(onClick = {
                     showUnsavedChangesDialog.value = false
                     handleSheetClose(true)
                 }) {
-                    Text("Discard", color = BrandRed)
+                    Text(stringResource(R.string.action_discard), color = BrandRed)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showUnsavedChangesDialog.value = false }) {
-                    Text("Keep Editing")
+                    Text(stringResource(R.string.action_keep_editing))
                 }
             }
         )
@@ -241,7 +242,7 @@ fun BreedListScreen(
                         TextField(
                             value = searchQuery,
                             onValueChange = { breedListViewModel.updateSearchQuery(it) },
-                            placeholder = { Text("Search breeds...") },
+                            placeholder = { Text(stringResource(R.string.search_placeholder)) },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .focusRequester(focusRequester),
@@ -270,7 +271,7 @@ fun BreedListScreen(
                             breedListViewModel.updateSearchQuery("")
                             keyboardController?.hide()
                         }) {
-                            Icon(Icons.Default.Clear, contentDescription = "Close search")
+                            Icon(Icons.Default.Clear, contentDescription = stringResource(R.string.cd_close_search))
                         }
                     }
                 )
@@ -280,16 +281,16 @@ fun BreedListScreen(
                     colors = topAppBarColors,
                     title = {
                         Text(
-                            text = "Cat Breeds",
+                            text = stringResource(R.string.app_title),
                             style = headlineMedium
                         )
                     },
                     actions = {
                         IconButton(onClick = { isSearchActive.value = true }) {
-                            Icon(Icons.Default.Search, contentDescription = "Search breeds")
+                            Icon(Icons.Default.Search, contentDescription = stringResource(R.string.cd_search))
                         }
                         IconButton(onClick = { isNewBreedActive.value = true }) {
-                            Icon(Icons.Default.Add, contentDescription = "New breed")
+                            Icon(Icons.Default.Add, contentDescription = stringResource(R.string.cd_new_breed))
                         }
                     }
                 )
@@ -360,7 +361,7 @@ private fun BreedCard(
             // Cat image
             AsyncImage(
                 model = breed.imageUrl,
-                contentDescription = "Image of ${breed.name}",
+                contentDescription = stringResource(R.string.cd_breed_image, breed.name),
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(
@@ -396,7 +397,7 @@ private fun BreedCard(
                 IconButton(onClick = onFavoriteClick) {
                     Icon(
                         imageVector = if (breed.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                        contentDescription = if (breed.isFavorite) "Remove from favorites" else "Add to favorites",
+                        contentDescription = if (breed.isFavorite) stringResource(R.string.cd_remove_favorite) else stringResource(R.string.cd_add_favorite),
                         tint = BrandRed
                     )
                 }
