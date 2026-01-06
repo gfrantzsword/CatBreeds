@@ -1,6 +1,7 @@
 package com.example.catbreeds.breed_list.unitTests
 
 import com.example.catbreeds.breed_list.NewBreedFormState
+import com.example.catbreeds.core.R
 import com.example.catbreeds.test_core.mock.getBreeds
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -10,10 +11,6 @@ class NewBreedFormStateTest {
     private val mockBreeds = getBreeds()
     private val existingNames = mockBreeds.map { it.name }
     private val state = NewBreedFormState(existingNames)
-
-    val errorRequired = "Required"
-    val errorDuplicate = "A breed with this name already exists"
-    val errorMinMax = "Must be >= Min"
     
     // Name Field
     @Test
@@ -25,7 +22,7 @@ class NewBreedFormStateTest {
         state.validate()
 
         // THEN
-        assertEquals(errorRequired, state.nameError.value)
+        assertEquals(R.string.error_required, state.nameError.value)
     }
 
     @Test
@@ -34,7 +31,7 @@ class NewBreedFormStateTest {
         state.update(name = existingNames[0])
 
         // THEN
-        assertEquals(errorDuplicate, state.nameError.value)
+        assertEquals(R.string.error_name_exists, state.nameError.value)
     }
 
     // Origin Field
@@ -47,7 +44,7 @@ class NewBreedFormStateTest {
         state.validate()
 
         // THEN
-        assertEquals(errorRequired, state.originError.value)
+        assertEquals(R.string.error_required, state.originError.value)
     }
 
     // Life Expectancy Field
@@ -61,7 +58,7 @@ class NewBreedFormStateTest {
         state.validate()
 
         // THEN
-        assertEquals(errorRequired, state.minLifeError.value)
+        assertEquals(R.string.error_required, state.minLifeError.value)
     }
 
     /// Max
@@ -74,7 +71,7 @@ class NewBreedFormStateTest {
         state.validate()
 
         // THEN
-        assertEquals(errorRequired, state.maxLifeError.value)
+        assertEquals(R.string.error_required, state.maxLifeError.value)
     }
 
     @Test
@@ -83,7 +80,7 @@ class NewBreedFormStateTest {
         state.update(minLife = "15", maxLife = "10")
 
         // THEN
-        assertEquals(errorMinMax, state.maxLifeError.value)
+        assertEquals(R.string.error_min_max_validation, state.maxLifeError.value)
     }
 
     // Description Field
@@ -96,6 +93,6 @@ class NewBreedFormStateTest {
         state.validate()
 
         // THEN
-        assertEquals(errorRequired, state.descriptionError.value)
+        assertEquals(R.string.error_required, state.descriptionError.value)
     }
 }
