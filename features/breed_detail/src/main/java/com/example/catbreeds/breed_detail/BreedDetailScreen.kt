@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.*
@@ -63,11 +64,34 @@ fun BreedDetailScreen(
         snackbarHostState = snackbarHostState,
         onErrorShown = viewModel::clearError
     )
+    val showDeleteDialog = remember { mutableStateOf(false) }
 
     // Scroll state for dynamic shadow
     val scrollState = rememberScrollState()
     val showTopBarShadow = remember {
         derivedStateOf { scrollState.value > 0 }
+    }
+
+    // Delete Dialog
+    if (showDeleteDialog.value) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog.value = false },
+            title = { Text(stringResource(R.string.dialog_delete_title)) },
+            text = { Text(stringResource(R.string.dialog_delete_message)) },
+            confirmButton = {
+                TextButton(onClick = {
+                        showDeleteDialog.value = false
+                        viewModel.deleteBreed(onSuccess = onBackClick)
+                    }) {
+                    Text(stringResource(R.string.action_delete), color = BrandRed)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog.value = false }) {
+                    Text(stringResource(R.string.cd_cancel))
+                }
+            }
+        )
     }
 
     // Content
@@ -98,6 +122,15 @@ fun BreedDetailScreen(
                 },
                 actions = {
                     breed?.let { breedData ->
+                        if (viewModel.isCustomBreed()) {
+                            IconButton(onClick = { showDeleteDialog.value = true }) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = stringResource(R.string.cd_delete_breed),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
                         IconButton(onClick = { viewModel.toggleFavorite(breedData.id) }) {
                             Icon(
                                 imageVector = if (breedData.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,

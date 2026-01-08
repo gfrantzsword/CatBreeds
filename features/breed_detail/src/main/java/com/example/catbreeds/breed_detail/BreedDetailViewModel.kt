@@ -1,5 +1,6 @@
 package com.example.catbreeds.breed_detail
 
+import com.example.catbreeds.core.R
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
@@ -87,6 +88,22 @@ class BreedDetailViewModel @Inject constructor(
                 throw Exception(ErrorMessages.LOCAL_ERROR, e)
             }
         }
+    }
+
+    fun deleteBreed(onSuccess: () -> Unit) {
+        val id = breedId ?: return
+        viewModelScope.launch {
+            try {
+                breedRepository.deleteBreed(id)
+                onSuccess()
+            } catch (e: Exception) {
+                _errorMessage.value = ErrorMessages.LOCAL_ERROR
+            }
+        }
+    }
+
+    fun isCustomBreed(): Boolean {
+        return breedId?.contains(R.string.new_breed_id_prefix.toString()) == true
     }
 
     fun clearError() {

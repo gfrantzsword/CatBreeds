@@ -17,10 +17,12 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.FlowRowOverflow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -61,6 +63,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -90,7 +93,7 @@ import kotlinx.coroutines.launch
 import java.io.File
 import androidx.core.net.toUri
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun NewBreedSheetContent(
     allNames: List<String>,
@@ -103,6 +106,8 @@ fun NewBreedSheetContent(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val focusManager = LocalFocusManager.current
+    val isKeyboardOpen = WindowInsets.isImeVisible
 
     // Form State
     val formState = rememberNewBreedFormState(allNames = allNames)
@@ -127,11 +132,20 @@ fun NewBreedSheetContent(
     }
 
     // Helper Methods
+    val filePrefix = stringResource(R.string.temp_jpg_file_prefix)
+    val fileExtension = stringResource(R.string.temp_jpg_file_extension)
+    val fileProviderStr = stringResource(R.string.create_temp_img_uri, context.packageName)
+
     fun createTempImageUri(): Uri {
-        val tempFile = File.createTempFile("cat_breed_", ".jpg", context.externalCacheDir)
+        val tempFile = File.createTempFile(
+            filePrefix,
+            fileExtension,
+            context.externalCacheDir
+        )
+
         return FileProvider.getUriForFile(
             context,
-            "${context.packageName}.fileprovider",
+            fileProviderStr,
             tempFile
         )
     }
@@ -176,13 +190,12 @@ fun NewBreedSheetContent(
                 }
             )
         },
-        floatingActionButtonPosition = FabPosition.Center,
+        floatingActionButtonPosition = FabPosition.End,
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = { validateAndSubmit() },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = ScreenPadding),
+                expanded = !isKeyboardOpen,
+                modifier = Modifier.padding(horizontal = ScreenPadding),
                 containerColor = BrandRed,
                 contentColor = Color.White,
                 icon = { Icon(Icons.Default.Check, contentDescription = stringResource(R.string.cd_checkmark)) },
@@ -242,7 +255,10 @@ fun NewBreedSheetContent(
             TemperamentField(
                 allTemperaments = allTemperaments,
                 selectedTemperaments = formState.selectedTemperaments.value,
-                onSelectionChanged = { formState.update(selectedTemperaments = it) }
+                onSelectionChanged = {
+                    focusManager.clearFocus()
+                    formState.update(selectedTemperaments = it)
+                }
             )
 
             // Life Expectancy
@@ -543,7 +559,7 @@ private fun NewBreedTextField(
                 }
                 if (maxCharCount != null) {
                     Text(
-                        text = "${value.length} / $maxCharCount",
+                        text = stringResource(R.string.subtitle_max_char_count, value.length, maxCharCount),
                         textAlign = TextAlign.End,
                         modifier = Modifier.padding(start = SecondaryCardPadding)
                     )

@@ -24,4 +24,6 @@ interface BreedDao {
     @Delete
     suspend fun delete(breed: BreedEntity)
 
+    @Query("DELETE FROM breeds WHERE id = :id")
+    suspend fun deleteById(id: String)
 }

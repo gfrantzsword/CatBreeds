@@ -110,4 +110,9 @@ class BreedRepositoryImpl(
             favoriteLocalSource.insert(FavoriteEntity(breed.id))
         }
     }
+
+    override suspend fun deleteBreed(breedId: String) {
+        localSource.deleteById(breedId)
+        removeBreedFromFavorites(breedId)
+    }
 }
