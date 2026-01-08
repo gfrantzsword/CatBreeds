@@ -5,8 +5,6 @@ converterGson = "2.12.0"
 core = "1.6.1"
 coreTesting = "2.2.0"
 hiltAndroid = "2.56.2"
-hiltAndroidCompiler = "2.57.1"
-hiltAndroidTesting = "2.57.2"
 hiltAndroidTestingVersion = "2.57.1"
 hiltNavigationFragment = "1.2.0"
 kotlin = "2.0.21"
@@ -25,10 +23,12 @@ jetbrainsKotlinJvm = "2.0.21"
 materialIconsExtended = "1.6.8"
 
 [libraries]
+androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 androidx-core = { module = "androidx.test:core", version.ref = "core" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-core-testing = { module = "androidx.arch.core:core-testing", version.ref = "coreTesting" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationFragment" }
+androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycleRuntimeKtx" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomCompiler" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomCompiler" }
 androidx-room-testing = { module = "androidx.room:room-testing", version.ref = "roomCompiler" }
@@ -36,10 +36,7 @@ coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose"
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroid" }
-hilt-android-compiler-v2571 = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidCompiler" }
-hilt-android-testing = { module = "com.google.dagger:hilt-android-testing", version.ref = "hiltAndroidTesting" }
 hilt-android-testing-v2571 = { module = "com.google.dagger:hilt-android-testing", version.ref = "hiltAndroidTestingVersion" }
-hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hiltAndroidTesting" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }

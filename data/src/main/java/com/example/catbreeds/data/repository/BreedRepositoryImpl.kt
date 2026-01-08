@@ -92,4 +92,27 @@ class BreedRepositoryImpl(
             }
         }
     }
+
+    override suspend fun addBreed(breed: Breed) {
+        val entity = BreedEntity(
+            id = breed.id,
+            name = breed.name,
+            origin = breed.origin,
+            description = breed.description,
+            temperament = breed.temperament.joinToString(", "),
+            lifeSpan = breed.lifeSpan,
+            imageUrl = breed.imageUrl ?: ""
+        )
+
+        localSource.insert(entity)
+
+        if (breed.isFavorite) {
+            favoriteLocalSource.insert(FavoriteEntity(breed.id))
+        }
+    }
+
+    override suspend fun deleteBreed(breedId: String) {
+        localSource.deleteById(breedId)
+        removeBreedFromFavorites(breedId)
+    }
 }

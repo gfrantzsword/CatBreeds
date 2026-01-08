@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.*
@@ -21,12 +22,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.catbreeds.core.ui.theme.AppDimensions.BarShadow
 import com.example.catbreeds.core.ui.theme.AppDimensions.CardCornerRadius
 import com.example.catbreeds.core.ui.theme.AppDimensions.CardPadding
-import com.example.catbreeds.core.ui.theme.AppDimensions.DefaultWeight
+import com.example.catbreeds.core.ui.theme.AppConstants.DEFAULT_WEIGHT
 import com.example.catbreeds.core.ui.theme.AppDimensions.DetailsVerticalSpacing
 import com.example.catbreeds.core.ui.theme.AppDimensions.InnerCornerRadius
 import com.example.catbreeds.core.ui.theme.AppDimensions.InterItemSpacing
@@ -62,11 +64,34 @@ fun BreedDetailScreen(
         snackbarHostState = snackbarHostState,
         onErrorShown = viewModel::clearError
     )
+    val showDeleteDialog = remember { mutableStateOf(false) }
 
     // Scroll state for dynamic shadow
     val scrollState = rememberScrollState()
     val showTopBarShadow = remember {
         derivedStateOf { scrollState.value > 0 }
+    }
+
+    // Delete Dialog
+    if (showDeleteDialog.value) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog.value = false },
+            title = { Text(stringResource(R.string.dialog_delete_title)) },
+            text = { Text(stringResource(R.string.dialog_delete_message)) },
+            confirmButton = {
+                TextButton(onClick = {
+                        showDeleteDialog.value = false
+                        viewModel.deleteBreed(onSuccess = onBackClick)
+                    }) {
+                    Text(stringResource(R.string.action_delete), color = BrandRed)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog.value = false }) {
+                    Text(stringResource(R.string.cd_cancel))
+                }
+            }
+        )
     }
 
     // Content
@@ -86,21 +111,30 @@ fun BreedDetailScreen(
                 ),
                 title = {
                     Text(
-                        text = breed?.name ?: "Breed Details",
+                        text = breed?.name ?: stringResource(R.string.breed_details_title),
                         style = headlineMedium
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_back))
                     }
                 },
                 actions = {
                     breed?.let { breedData ->
+                        if (viewModel.isCustomBreed()) {
+                            IconButton(onClick = { showDeleteDialog.value = true }) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = stringResource(R.string.cd_delete_breed),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
                         IconButton(onClick = { viewModel.toggleFavorite(breedData.id) }) {
                             Icon(
                                 imageVector = if (breedData.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                                contentDescription = if (breedData.isFavorite) "Remove from favorites" else "Add to favorites",
+                                contentDescription = if (breedData.isFavorite) stringResource(R.string.cd_remove_favorite) else stringResource(R.string.cd_add_favorite),
                                 tint = BrandRed
                             )
                         }
@@ -120,7 +154,7 @@ fun BreedDetailScreen(
                 // Cat image
                 AsyncImage(
                     model = breed.imageUrl,
-                    contentDescription = "Image of ${breed.name}",
+                    contentDescription = stringResource(R.string.cd_breed_image, breed.name),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = ScreenPadding)
@@ -140,14 +174,14 @@ fun BreedDetailScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     StatCard(
-                        modifier = Modifier.weight(DefaultWeight),
-                        label = "Origin",
+                        modifier = Modifier.weight(DEFAULT_WEIGHT),
+                        label = stringResource(R.string.label_origin),
                         value = breed.origin
                     )
                     StatCard(
-                        modifier = Modifier.weight(DefaultWeight),
-                        label = "Life Expectancy",
-                        value = breed.lifeSpan
+                        modifier = Modifier.weight(DEFAULT_WEIGHT),
+                        label = stringResource(R.string.label_life_expectancy),
+                        value = stringResource(R.string.format_life_expectancy, breed.lifeSpan)
                     )
                 }
 
@@ -174,7 +208,7 @@ fun BreedDetailScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = ScreenPadding),
-                    label = "About the ${breed.name}",
+                    label = stringResource(R.string.about_breed_title, breed.name),
                     value = breed.description
                 )
 
@@ -182,7 +216,7 @@ fun BreedDetailScreen(
                 if (similarBreeds.isNotEmpty()) {
                     Column {
                         Text(
-                            text = "Similar Breeds",
+                            text = stringResource(R.string.similar_breeds_title),
                             style = titleMedium,
                             modifier = Modifier
                                 .padding(bottom = InterItemSpacing)
@@ -285,7 +319,7 @@ private fun SimilarBreedCard(
         Column {
             AsyncImage(
                 model = breed.imageUrl,
-                contentDescription = "Image of ${breed.name}",
+                contentDescription = stringResource(R.string.cd_breed_image, breed.name),
                 modifier = Modifier
                     .size(SecondaryItemImageSize)
                     .padding(

@@ -17,13 +17,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.catbreeds.core.ui.theme.AppDimensions.BarShadow
 import com.example.catbreeds.core.ui.theme.AppDimensions.CardCornerRadius
 import com.example.catbreeds.core.ui.theme.AppDimensions.CardPadding
-import com.example.catbreeds.core.ui.theme.AppDimensions.DefaultWeight
+import com.example.catbreeds.core.ui.theme.AppConstants.DEFAULT_WEIGHT
 import com.example.catbreeds.core.ui.theme.AppDimensions.InnerCornerRadius
 import com.example.catbreeds.core.ui.theme.AppDimensions.InterItemSpacing
 import com.example.catbreeds.core.ui.theme.AppDimensions.LazyColumnBottomPaddingForNav
@@ -33,7 +34,6 @@ import com.example.catbreeds.core.ui.theme.AppDimensions.SecondaryCardPadding
 import com.example.catbreeds.core.ui.theme.AppDimensions.TertiaryItemImageSize
 import com.example.catbreeds.core.ui.theme.AppDimensions.ThinBorderEffect
 import com.example.catbreeds.core.ui.theme.AppTypography.bodyMedium
-import com.example.catbreeds.core.ui.theme.AppTypography.bodySmall
 import com.example.catbreeds.core.ui.theme.AppTypography.headlineMedium
 import com.example.catbreeds.core.ui.theme.AppTypography.titleMedium
 import com.example.catbreeds.core.ui.theme.BrandRed
@@ -84,7 +84,7 @@ fun FavoriteListScreen(
                 ),
                 title = {
                     Text(
-                        text = "Favorites",
+                        text = stringResource(R.string.favorites_title),
                         style = headlineMedium
                     )
                 }
@@ -121,7 +121,7 @@ fun FavoriteListScreen(
                             modifier = Modifier.padding(NoFavoritesMessageIconPadding)
                         )
                         Text(
-                            text = "No favorite breeds yet",
+                            text = stringResource(R.string.empty_favorites_message),
                             style = titleMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center
@@ -183,7 +183,7 @@ private fun FavoriteBreedCard(
             // Cat image
             AsyncImage(
                 model = breed.imageUrl,
-                contentDescription = "Image of ${breed.name}",
+                contentDescription = stringResource(R.string.cd_breed_image, breed.name),
                 modifier = Modifier
                     .size(TertiaryItemImageSize)
                     .padding(
@@ -204,7 +204,7 @@ private fun FavoriteBreedCard(
             // Name, origin, and average lifespan
             Column(
                 modifier = Modifier
-                    .weight(DefaultWeight)
+                    .weight(DEFAULT_WEIGHT)
                     .padding(SecondaryCardPadding)
             ) {
                 Text(
@@ -216,22 +216,12 @@ private fun FavoriteBreedCard(
                     style = bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-
-                // 'Average lifespan' actually uses the lower value of the range ('12 - 15' is 12)
-                val lowerLifeSpan = breed.lifeSpan.split(" - ").firstOrNull()?.trim()
-                lowerLifeSpan?.let {
-                    Text(
-                        text = "Average lifespan: $it years",
-                        style = bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
             }
             // Favorite button
             IconButton(onClick = onRemoveFromFavorites) {
                 Icon(
                     Icons.Default.Favorite,
-                    contentDescription = "Remove from favorites",
+                    contentDescription = stringResource(R.string.cd_remove_favorite),
                     tint = BrandRed
                 )
             }
