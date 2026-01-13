@@ -100,8 +100,7 @@ class NewBreedFormState(
                 originError.value == null &&
                 descriptionError.value == null &&
                 minLifeError.value == null &&
-                maxLifeError.value == null &&
-                _selectedTemperaments.value.isNotEmpty()
+                maxLifeError.value == null
     }
 
     fun toBreed(): Breed {
@@ -130,5 +129,5 @@ class NewBreedFormState(
 
 @Composable
 fun rememberNewBreedFormState(allNames: List<String>): NewBreedFormState {
-    return remember(allNames) { NewBreedFormState(allNames) }
+    return remember { NewBreedFormState(allNames) }
 }

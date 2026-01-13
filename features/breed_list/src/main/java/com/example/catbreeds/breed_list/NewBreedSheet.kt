@@ -116,7 +116,7 @@ fun NewBreedSheetContent(
     val tempImageUri = remember { mutableStateOf<Uri?>(null) }
 
     // Validation
-    val isDirty = remember {
+    val isDirty = remember(formState) {
         derivedStateOf { formState.isDirty() }
     }
 
