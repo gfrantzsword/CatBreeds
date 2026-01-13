@@ -13,7 +13,8 @@ data class BreedEntity(
     @ColumnInfo(name = "description") val description: String,
     @ColumnInfo(name = "temperament") val temperament: String,
     @ColumnInfo(name = "life_span") val lifeSpan: String,
-    @ColumnInfo(name = "image_url") val imageUrl: String
+    @ColumnInfo(name = "image_url") val imageUrl: String,
+    @ColumnInfo(name = "is_custom") val isCustom: Boolean
 ) {
     fun toBreed(isFavorite: Boolean = false): Breed {
         return Breed(
@@ -24,7 +25,8 @@ data class BreedEntity(
             temperament = temperament.split(",").map { it.trim() },
             lifeSpan = lifeSpan,
             imageUrl = imageUrl,
-            isFavorite = isFavorite
+            isFavorite = isFavorite,
+            isCustom = isCustom
         )
     }
 }

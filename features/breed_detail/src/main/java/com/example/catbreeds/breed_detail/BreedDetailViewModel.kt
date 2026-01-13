@@ -89,6 +89,18 @@ class BreedDetailViewModel @Inject constructor(
         }
     }
 
+    fun deleteBreed(onSuccess: () -> Unit) {
+        val id = breedId ?: return
+        viewModelScope.launch {
+            try {
+                breedRepository.deleteBreed(id)
+                onSuccess()
+            } catch (e: Exception) {
+                _errorMessage.value = ErrorMessages.LOCAL_ERROR
+            }
+        }
+    }
+
     fun clearError() {
         _errorMessage.value = null
     }

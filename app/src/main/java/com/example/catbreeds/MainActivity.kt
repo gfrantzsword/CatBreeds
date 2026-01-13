@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -34,6 +35,7 @@ import com.example.catbreeds.core.ui.theme.CatBreedsTheme
 import com.example.catbreeds.core.ui.theme.ShadowColor
 import com.example.catbreeds.favorite_list.FavoriteListScreen
 import dagger.hilt.android.AndroidEntryPoint
+import com.example.catbreeds.core.R
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -114,7 +116,7 @@ fun BottomNavigationBar(navController: NavController) {
 
             NavigationBarItem(
                 colors = itemColors,
-                icon = { Icon(Icons.Filled.Pets, contentDescription = "Breeds") },
+                icon = { Icon(Icons.Filled.Pets, contentDescription = stringResource(R.string.nav_breeds)) },
                 selected = currentRoute == Screen.BreedList.route,
                 onClick = {
                     if (currentRoute != Screen.BreedList.route) {
@@ -126,7 +128,7 @@ fun BottomNavigationBar(navController: NavController) {
             )
             NavigationBarItem(
                 colors = itemColors,
-                icon = { Icon(Icons.Default.Favorite, contentDescription = "Favorites") },
+                icon = { Icon(Icons.Default.Favorite, contentDescription = stringResource(R.string.nav_favorites)) },
                 selected = currentRoute == Screen.Favorites.route,
                 onClick = {
                     if (currentRoute != Screen.Favorites.route) {

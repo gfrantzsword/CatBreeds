@@ -14,6 +14,7 @@ import com.example.catbreeds.test_core.mock.MOCK_PERSIAN_NAME
 import com.example.catbreeds.test_core.mock.MOCK_SIBERIAN_ID
 import com.example.catbreeds.test_core.mock.MOCK_SIBERIAN_NAME
 import com.example.catbreeds.test_core.mock.mockBreedsList
+import com.example.catbreeds.test_core.mock.mockSiberianBreed
 import io.mockk.coEvery
 import io.mockk.coJustRun
 import io.mockk.coVerify
@@ -39,7 +40,8 @@ private fun getSampleBreedEntity(
     description = "Test Desc",
     temperament = "Test Temperament",
     lifeSpan = "10 - 12",
-    imageUrl = "https://cdn2.thecatapi.com/images/test_url.jpg"
+    imageUrl = "https://cdn2.thecatapi.com/images/test_url.jpg",
+    isCustom = false
 )
 
 private fun getSampleBreedEntities() = listOf(getSampleBreedEntity())
@@ -195,5 +197,28 @@ class RepositoryTest {
         } catch (e: Exception) { // THEN
             assertEquals("Something went wrong. Please try again later", e.message)
         }
+    }
+
+    @Test
+    fun `WHEN addBreed is called SHOULD map to entity AND insert into local database`() = runTest {
+        // GIVEN
+        val breed = mockSiberianBreed.copy(isCustom = true)
+
+        val expectedEntity = BreedEntity(
+            id = breed.id,
+            name = breed.name,
+            origin = breed.origin,
+            description = breed.description,
+            temperament = breed.temperament.joinToString(", "),
+            lifeSpan = breed.lifeSpan,
+            imageUrl = breed.imageUrl ?: "",
+            isCustom = true
+        )
+
+        // WHEN
+        repository.addBreed(breed)
+
+        // THEN
+        coVerify(exactly = 1) { breedDao.insert(expectedEntity) }
     }
 }
