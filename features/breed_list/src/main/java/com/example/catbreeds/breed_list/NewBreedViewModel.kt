@@ -1,6 +1,5 @@
 package com.example.catbreeds.breed_list
 
-import com.example.catbreeds.core.R
 import android.content.Context
 import android.net.Uri
 import androidx.compose.runtime.mutableStateOf
@@ -26,11 +25,9 @@ class NewBreedViewModel @Inject constructor(
 
     private val _errorMessage = mutableStateOf<String?>(null)
 
-    val newIdPrefix = R.string.new_breed_id_prefix.toString()
-
     suspend fun addNewBreed(breed: Breed): String? {
         return try {
-            val newId = newIdPrefix + UUID.randomUUID().toString()
+            val newId = UUID.randomUUID().toString()
 
             val imagePath = if (!breed.imageUrl.isNullOrEmpty()) {
                 saveImage(breed.imageUrl!!.toUri(), newId)

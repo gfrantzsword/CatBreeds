@@ -112,7 +112,8 @@ class NewBreedFormState(
             description = _description.value.trim(),
             lifeSpan = "${_minLife.value.trim()} - ${_maxLife.value.trim()}",
             imageUrl = _imageUri.value.ifEmpty { null },
-            isFavorite = false
+            isFavorite = false,
+            isCustom = true
         )
     }
 

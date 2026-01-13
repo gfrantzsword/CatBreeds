@@ -61,7 +61,8 @@ fun getBreed(
     temperament: List<String> = MOCK_YORK_TEMPERAMENT,
     lifeSpan: String = MOCK_YORK_LIFESPAN,
     isFavorite: Boolean = false,
-    imageUrl: String? = MOCK_YORK_IMG_URL
+    imageUrl: String? = MOCK_YORK_IMG_URL,
+    isCustom: Boolean = false
 ): Breed {
     return Breed(
         id = id,
@@ -71,6 +72,7 @@ fun getBreed(
         temperament = temperament,
         lifeSpan = lifeSpan,
         imageUrl = imageUrl,
-        isFavorite = isFavorite
+        isFavorite = isFavorite,
+        isCustom = isCustom
     )
 }

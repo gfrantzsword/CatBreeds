@@ -122,7 +122,7 @@ fun BreedDetailScreen(
                 },
                 actions = {
                     breed?.let { breedData ->
-                        if (viewModel.isCustomBreed()) {
+                        if (breedData.isCustom) {
                             IconButton(onClick = { showDeleteDialog.value = true }) {
                                 Icon(
                                     imageVector = Icons.Default.Delete,

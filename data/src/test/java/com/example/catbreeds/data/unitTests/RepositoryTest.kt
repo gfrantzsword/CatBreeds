@@ -40,7 +40,8 @@ private fun getSampleBreedEntity(
     description = "Test Desc",
     temperament = "Test Temperament",
     lifeSpan = "10 - 12",
-    imageUrl = "https://cdn2.thecatapi.com/images/test_url.jpg"
+    imageUrl = "https://cdn2.thecatapi.com/images/test_url.jpg",
+    isCustom = false
 )
 
 private fun getSampleBreedEntities() = listOf(getSampleBreedEntity())
@@ -201,7 +202,7 @@ class RepositoryTest {
     @Test
     fun `WHEN addBreed is called SHOULD map to entity AND insert into local database`() = runTest {
         // GIVEN
-        val breed = mockSiberianBreed
+        val breed = mockSiberianBreed.copy(isCustom = true)
 
         val expectedEntity = BreedEntity(
             id = breed.id,
@@ -210,7 +211,8 @@ class RepositoryTest {
             description = breed.description,
             temperament = breed.temperament.joinToString(", "),
             lifeSpan = breed.lifeSpan,
-            imageUrl = breed.imageUrl ?: ""
+            imageUrl = breed.imageUrl ?: "",
+            isCustom = true
         )
 
         // WHEN

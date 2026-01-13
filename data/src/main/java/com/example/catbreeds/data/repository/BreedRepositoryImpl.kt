@@ -50,7 +50,8 @@ class BreedRepositoryImpl(
                     description = breedDto.description,
                     temperament = breedDto.temperament,
                     lifeSpan = breedDto.lifeSpan,
-                    imageUrl = "https://cdn2.thecatapi.com/images/${breedDto.referenceImageId}.jpg"
+                    imageUrl = "https://cdn2.thecatapi.com/images/${breedDto.referenceImageId}.jpg",
+                    isCustom = false
                 )
             }
             localSource.insertAll(breedEntities)
@@ -101,7 +102,8 @@ class BreedRepositoryImpl(
             description = breed.description,
             temperament = breed.temperament.joinToString(", "),
             lifeSpan = breed.lifeSpan,
-            imageUrl = breed.imageUrl ?: ""
+            imageUrl = breed.imageUrl ?: "",
+            isCustom = breed.isCustom
         )
 
         localSource.insert(entity)

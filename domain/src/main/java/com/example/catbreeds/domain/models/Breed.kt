@@ -8,5 +8,6 @@ data class Breed(
     val origin: String,
     val lifeSpan: String,
     val imageUrl: String? = "",
-    val isFavorite: Boolean = false
+    val isFavorite: Boolean = false,
+    val isCustom: Boolean = false
 )

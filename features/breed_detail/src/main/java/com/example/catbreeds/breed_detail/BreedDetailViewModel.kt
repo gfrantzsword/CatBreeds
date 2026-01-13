@@ -1,6 +1,5 @@
 package com.example.catbreeds.breed_detail
 
-import com.example.catbreeds.core.R
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
@@ -100,10 +99,6 @@ class BreedDetailViewModel @Inject constructor(
                 _errorMessage.value = ErrorMessages.LOCAL_ERROR
             }
         }
-    }
-
-    fun isCustomBreed(): Boolean {
-        return breedId?.contains(R.string.new_breed_id_prefix.toString()) == true
     }
 
     fun clearError() {
